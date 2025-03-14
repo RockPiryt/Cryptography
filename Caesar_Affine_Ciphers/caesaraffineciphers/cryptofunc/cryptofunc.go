@@ -61,6 +61,11 @@ func ExecuteCipher(cipherType string, operation string) {
 		//Program łamiący szyfr bez pomocy tekstu jawnego czyta jedynie tekst zaszyfrowany i zapisuje jako tekst odszyfrowany wszystkie możliwe kandydatury (25 dla szyfru Cezara, 311 dla szyfru afinicznego).
 		params.InputText = "files/crypto.txt"
 		params.OutputText = "files/decrypt.txt"
+		// If Caesar explicit cryptanalysis (-c -k), call specialized function
+		if cipherType == "caesar" {
+			CaesarCryptAnalysis(params.InputText, params.OutputText)
+			return
+		}
 	default:
 		fmt.Println("Nieobsługiwana operacja.")
 		return
@@ -162,8 +167,6 @@ func CaesarCipher(text string, key1, _ int, operation string) string {
 	return result.String()
 }
 
-
-
 // FindCaesarKey calculates the Caesar cipher key based on the first matching characters in the ciphertext and extra text.
 func FindCaesarKey(cryptoText, extraText string) (int, int) {
 	// Znajdujemy pierwszy pasujący znak w obu tekstach
@@ -190,7 +193,6 @@ func FindCaesarKey(cryptoText, extraText string) (int, int) {
 	return -1, 0
 }
 
-
 // CaesarExplicitCryptAnalysis make analysis of Caesar cipher based on the extra text.
 func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputKey string) {
 	// Read the entire ciphertext.
@@ -207,7 +209,6 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 	}
 	extraText := strings.Join(extraLines, "\n")
 
-	// Check if the input files are not empty.
 	if len(cryptoText) == 0 || len(extraText) == 0 {
 		log.Fatal("Błąd: Brak danych w plikach wejściowych.")
 	}
@@ -222,14 +223,31 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 	// Decrypt using the guessed key
 	decryptedText := CaesarCipher(cryptoText, guessedKey, -1, "d")
 
-	// Save thedecrypted text to a file.
 	helpers.SaveOutput(decryptedText, outputText)
 }
 
-// func CaesarCryptAnalysis(inputText string, outputText string) string {
-// 	var result strings.Builder
-// 	return result.String()
-// }
+func CaesarCryptAnalysis(inputText string, outputText string) {
+	// Read the entire ciphertext.
+	cryptoLines, err := helpers.GetText(inputText)
+	if err != nil {
+		log.Fatalf("Błąd przy odczycie pliku %s: %v", inputText, err)
+	}
+	cryptoText := strings.Join(cryptoLines, "\n")
+
+	if len(cryptoText) == 0 {
+		log.Fatal("Błąd: Brak danych w pliku wejściowym.")
+	}
+
+	var result strings.Builder
+
+	// Test all possible keys (0-25)
+	for key := 1; key <= 25; key++ {
+		decryptedText := CaesarCipher(cryptoText, key, -1, "d")
+		result.WriteString(decryptedText + "\n") 
+	}
+
+	helpers.SaveOutput(result.String(), outputText)
+}
 
 // ------------------------------------------------------------------------Affine Cipher------------------------------------------------------------------------
 // Affine cipher function
