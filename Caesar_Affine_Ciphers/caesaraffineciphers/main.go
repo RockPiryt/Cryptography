@@ -21,7 +21,7 @@ func main() {
 
 	encryptFlag := flag.Bool("e", false, "szyfrowanie")
 	decryptFlag := flag.Bool("d", false, "deszyfrowanie")
-	explicitCryptAnalysisFlag := flag.Bool("j", false, "kryptoanaliza wyłącznie w oparciu o kryptogram")
+	explicitCryptAnalysisFlag := flag.Bool("j", false, "kryptoanaliza z tekstem jawnym")
 	cryptAnalysisFlag := flag.Bool("k", false, "kryptoanaliza wyłącznie w oparciu o kryptogram")
 
 	flag.Parse()
@@ -44,13 +44,12 @@ func main() {
 	}
 
 
-	// Determine the cipher function to use
-	var cipherFunc func(string, int, string) string
-
+	// Determine the cipher type
+	var cipherType string
 	if *caesarFlag {
-		cipherFunc = cryptofunc.CaesarCipher
+		cipherType = "caesar"
 	} else if *affineFlag {
-		cipherFunc = cryptofunc.AffineCipher
+		cipherType = "affine"
 	} else {
 		log.Fatal("Błąd: Nie wybrano poprawnego szyfru (-c dla Cezara, -a dla afinicznego).")
 	}
@@ -71,10 +70,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Call the appropriate function dynamically
-	if *caesarFlag {
-		cryptofunc.CaesarExecute(operation)
-	} else {
-		cryptofunc.AffineExecute(operation)
-	}
+	// Execute the cipher operation
+	cryptofunc.ExecuteCipher(cipherType, operation)
 }
