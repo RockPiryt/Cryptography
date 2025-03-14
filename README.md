@@ -34,14 +34,17 @@
     cd <project_directory>
     ```
 
-3. Run the program using the Go command:
+3. Run the program using the Go command with flags. Example flags:
 
     ```bash
-    go run main.go
+    go run main.go -c -e 
     ```
 
-
-
+    or 
+    
+    ```bash
+    ./cezar.exe -c -e    
+    ```
 ## Project Status
 Project is: _in progress_ 
 
