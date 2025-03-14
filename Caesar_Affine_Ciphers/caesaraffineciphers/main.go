@@ -6,8 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 	"log"
 	"caesaraffineciphers/helpers"
 	"caesaraffineciphers/cryptofunc"
@@ -46,55 +44,37 @@ func main() {
 	}
 
 
-		// Determine the cipher function to use
-		var cipherFunc func(string, int, bool) string
+	// Determine the cipher function to use
+	var cipherFunc func(string, int, string) string
 
-		if *caesarFlag {
-			cipherFunc = cryptofunc.CaesarCipher
-		} else if *affineFlag {
-			cipherFunc = cryptofunc.AffineCipher
-		} else {
-			log.Fatal("Błąd: Nie wybrano poprawnego szyfru (-c dla Cezara, -a dla afinicznego).")
-		}
-	
-		// Determine the operation
-		switch {
-		case *encryptFlag:
-			if *caesarFlag {
-				cryptofunc.CaesarEncrypt("e") 
-			} else {
-				cryptofunc.AffineEncrypt("e") 
-			}
-	
-		case *decryptFlag:
-		
-			if *caesarFlag {
-				cryptofunc.CaesarDecrypt("d") 
-			} else {
-				cryptofunc.AffineDecrypt("d") 
-			}
-	
-		case *explicitCryptAnalysisFlag:
-			
-			if *caesarFlag {
-				cryptofunc.CaesarExplicitCryptAnalysis("j") 
-			} else {
-				cryptofunc.AffineExplicitCryptAnalysis("j") 
-			}
-	
-		case *cryptAnalysisFlag:
-			
-			if *caesarFlag {
-				cryptofunc.CaesarCryptAnalysis("k") 
-			} else {
-				cryptofunc.AffineCryptAnalysis("k") 
-			}
-	
-		default:
-			fmt.Println("Błąd: Nie wybrano poprawnej operacji (-e, -d, -j, -k).")
-			os.Exit(1)
-		}
+	if *caesarFlag {
+		cipherFunc = cryptofunc.CaesarCipher
+	} else if *affineFlag {
+		cipherFunc = cryptofunc.AffineCipher
+	} else {
+		log.Fatal("Błąd: Nie wybrano poprawnego szyfru (-c dla Cezara, -a dla afinicznego).")
 	}
 
-}
+	// Determine the operation
+	var operation string
+	switch {
+	case *encryptFlag:
+		operation = "e"
+	case *decryptFlag:
+		operation = "d"
+	case *explicitCryptAnalysisFlag:
+		operation = "j"
+	case *cryptAnalysisFlag:
+		operation = "k"
+	default:
+		fmt.Println("Błąd: Nie wybrano poprawnej operacji (-e, -d, -j, -k).")
+		os.Exit(1)
+	}
 
+	// Call the appropriate function dynamically
+	if *caesarFlag {
+		cryptofunc.CaesarExecute(operation)
+	} else {
+		cryptofunc.AffineExecute(operation)
+	}
+}
