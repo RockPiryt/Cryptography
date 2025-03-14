@@ -1,4 +1,4 @@
-package datafile
+package helpers
 
 import (
 	"bufio"
@@ -7,14 +7,25 @@ import (
 
 //Author: Paulina Kimak
 
+// Function to count selected flags
+func CountSelectedFlags(flags []*bool) int {
+	count := 0
+	for _, f := range flags {
+		if *f {
+			count++
+		}
+	}
+	return count
+}
+
+// Function to read text from txt file
 func GetText(filename string) ([]string, error) {
 	var lines []string
-	//otwarcie pliku
+
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
-	//odczytanie danych
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -32,5 +43,10 @@ func GetText(filename string) ([]string, error) {
 	
 	return lines, nil
 }
+
+
+
+
+
 
 
