@@ -94,7 +94,6 @@ func ValidateCaesarKey(filePath string) int {
 		log.Fatalf("The key for Caesar cipher must be between 0 and 25. Found: %d", key)
 	}
 
-	// Return the validated key
 	return key
 }
 

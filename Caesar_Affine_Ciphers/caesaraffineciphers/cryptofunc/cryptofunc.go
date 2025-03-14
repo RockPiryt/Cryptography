@@ -10,32 +10,38 @@ import (
 //Author: Paulina Kimak
 
 // CaesarCipher encrypts or decrypts text using the Caesar cipher based on the given flags.
-func CaesarCipher(text string, key int, operationFlag bool) string {
+func CaesarCipher(text string, key int, operation string) string {
 	var result strings.Builder
 
 	for _, char := range text {
-		// Handle lowercase letters
-		if char >= 'a' && char <= 'z' {
-			shift := int(char - 'a')
-			if operationFlag { // Encrypt
+		// Handle encryption for lowercase letters and uppercase letters
+		if operation == "e" { 
+			if char >= 'a' && char <= 'z' {
+				shift := int(char - 'a')
 				shift = (shift + key) % 26
-			} else { // Decrypt
-				shift = (shift - key + 26) % 26
-			}
-			result.WriteRune(rune(shift + 'a'))
-
-		} else if char >= 'A' && char <= 'Z' {
-			// Handle uppercase letters
-			shift := int(char - 'A')
-			if operationFlag { // Encrypt
+				result.WriteRune(rune(shift + 'a'))
+			} else if char >= 'A' && char <= 'Z' { 
+				shift := int(char - 'A')
 				shift = (shift + key) % 26
-			} else { // Decrypt
-				shift = (shift - key + 26) % 26
+				result.WriteRune(rune(shift + 'A'))
 			}
-			result.WriteRune(rune(shift + 'A'))
+		}
 
-		} else {
-			// Non-alphabet characters remain unchanged
+		// Handle decryption for lowercase letters and uppercase letters
+		if operation == "d" { 
+			if char >= 'a' && char <= 'z' {
+				shift := int(char - 'a')
+				shift = (shift - key + 26) % 26
+				result.WriteRune(rune(shift + 'a'))
+			} else if char >= 'A' && char <= 'Z' { 
+				shift := int(char - 'A')
+				shift = (shift - key + 26) % 26
+				result.WriteRune(rune(shift + 'A'))
+			}
+		}
+
+		// Non-alphabet characters remain unchanged
+		if !(char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z') {
 			result.WriteRune(char)
 		}
 	}
@@ -43,7 +49,7 @@ func CaesarCipher(text string, key int, operationFlag bool) string {
 	return result.String()
 }
 
-func CaesarEncrypt(operationFlag bool) {
+func CaesarEncrypt(operation string) {
 	// Read plain text.
 	inputFileEncrypt := "files/plain.txt"
 	textLines, err := helpers.GetText(inputFileEncrypt)
@@ -57,28 +63,32 @@ func CaesarEncrypt(operationFlag bool) {
 	// Read and check the key.
 	key := helpers.ValidateCaesarKey("files/key.txt")
 
-	encodedTxt := CaesarCipher(originalText, key, *operationFlag)
+	// Encrypt the text.
+	encodedTxt := CaesarCipher(originalText, key, operation)
 	helpers.SaveOutput(encodedTxt, "files/crypto.txt")
 }
 
-func CaesarDecrypt(operationFlag bool) {
-	// Read plain text.
+func CaesarDecrypt(operation string) {
+	// Read cipher text.
 	inputFileDecrypt := "files/crypto.txt"
 	textLines, err := helpers.GetText(inputFileDecrypt)
 	if err != nil {
 		log.Fatalf("Błąd przy odczycie pliku: %v", err)
 	}
 
-	originalText := strings.Join(textLines, "\n")
-	fmt.Println(originalText)
+	encodedText := strings.Join(textLines, "\n")
+	fmt.Println(encodedText)
 	
 	// Read and check the key.
 	key := helpers.ValidateCaesarKey("files/key.txt")
 
-	encodedTxt := CaesarCipher(originalText, key, *operationFlag)
+	// Decrypt the text.
+	encodedTxt := CaesarCipher(encodedText, key, operation)
 	helpers.SaveOutput(encodedTxt, "files/decrypt.txt")
 }
-func AffineCipher(text string, key int, operationFlag bool) string {
+
+
+func AffineCipher(text string, key int, operation string) string {
 	var result strings.Builder
 	return result.String()
 }
