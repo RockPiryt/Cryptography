@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 )
 
-//Author: Paulina Kimak
+// Author: Paulina Kimak
 
 // Function to count selected flags
 func CountSelectedFlags(flags []*bool) int {
@@ -64,6 +66,36 @@ func SaveOutput(result string, outputFile string) {
 	}
 
 	fmt.Println("Zapisano wynik do pliku:", outputFile)
+}
+
+
+// ValidateCaesarKey reads and validates the key for Caesar cipher from a file.
+// It ensures the key is a single integer between 0 and 25.
+func ValidateCaesarKey(filePath string) int {
+	// Read the key from the file.
+	keyLines, err := GetText(filePath)
+	if err != nil {
+		log.Fatalf("Failed to read the key: %v", err)
+	}
+
+	// Ensure there is only one line in the key file.
+	if len(keyLines) != 1 {
+		log.Fatalf("The key file should only contain one line with a single integer. Found %d lines.", len(keyLines))
+	}
+
+	// Convert the key to an integer.
+	key, err := strconv.Atoi(strings.TrimSpace(keyLines[0]))
+	if err != nil {
+		log.Fatalf("Invalid key value. The key must be a valid integer: %v", err)
+	}
+
+	// Check if the key is within the valid range for Caesar cipher (0 to 25).
+	if key < 0 || key > 25 {
+		log.Fatalf("The key for Caesar cipher must be between 0 and 25. Found: %d", key)
+	}
+
+	// Return the validated key
+	return key
 }
 
 

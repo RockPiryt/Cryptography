@@ -46,27 +46,6 @@ func main() {
 	}
 
 
-	// Read text.
-	textLines, err := helpers.GetText("files/plain.txt")
-	if err != nil {
-		log.Fatalf("Błąd przy odczycie pliku: %v", err)
-	}
-
-	plaintext := strings.Join(textLines, "\n")
-	fmt.Println(plaintext)
-	
-	// Read a key.
-	keyLines, err := helpers.GetText("files/key.txt")
-	if err != nil {
-		log.Fatalf("Nie udało się odczytać klucza : %v", err)
-	}
-	
-	// Converse key to integer.
-	key, err := strconv.Atoi(keyLines[0])
-	if err != nil {
-		log.Fatalf("Błąd przy konwersji klucza: %v", err)
-	}
-
 	// Determine the cipher function to use
 	var cipherFunc func(string, int, bool) string
 
@@ -84,8 +63,10 @@ func main() {
 	switch {
 	case *encryptFlag:
 		operationFlag = encryptFlag
+		cryptofunc.CaesarEncrypt(*operationFlag)
 	case *decryptFlag:
 		operationFlag = decryptFlag
+		cryptofunc.CaesarDecrypt(*operationFlag)
 	case *explicitCryptAnalysisFlag:
 		operationFlag = explicitCryptAnalysisFlag
 	case *cryptAnalysisFlag:
@@ -95,8 +76,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Perform encryption or decryption
-	result := cipherFunc(plaintext, key, *operationFlag)
-	helpers.SaveOutput(result, "files/result.txt")
-
 }
+
