@@ -11,9 +11,92 @@ import (
 
 //Author: Paulina Kimak
 
+// Generic function to handle both Caesar and Affine ciphers
+func ExecuteCipher(cipherType string, operation string) {
+	var inputText, inputTextHelper, inputKey, outputText, outputKey string
+
+	// Define file paths based on operation
+	switch operation {
+	case "e":
+		// Program szyfrujący czyta tekst jawny i klucz i zapisuje tekst zaszyfrowany. Jeśli klucz jest nieprawidłowy, zgłasza jedynie błąd.
+		inputText = "files/plain.txt"
+		inputKey = "files/key.txt"
+		outputText = "files/crypto.txt"
+	case "d":
+		// Program odszyfrowujący czyta tekst zaszyfrowany i klucz i zapisuje tekst jawny. Jeśli klucz jest nieprawidłowy, zgłasza błąd. 
+		// Dla szyfru afinicznego częścią zadania jest znalezienie odwrotności dla liczby a podanej jako część klucza – 
+		// nie można zakładać, że program odszyfrowujący otrzymuje tę odwrotność.
+		inputText = "files/crypto.txt"
+		inputKey = "files/key.txt"
+		outputText = "files/decrypt.txt"
+	case "j":
+		// Program łamiący szyfr z pomocą tekstu jawnego czyta tekst zaszyfrowany, tekst pomocniczy i zapisuje znaleziony klucz i odszyfrowany tekst. 
+		// Jeśli niemożliwe jest znalezienie klucza, zgłasza sygnał błędu.
+		inputText = "files/crypto.txt"
+		inputTextHelper = "files/extra.txt"
+		outputText = "files/decrypt.txt"
+		outputKey = "files/key-found.txt"
+	case "k":
+		//Program łamiący szyfr bez pomocy tekstu jawnego czyta jedynie tekst zaszyfrowany i zapisuje jako tekst odszyfrowany wszystkie możliwe kandydatury (25 dla szyfru Cezara, 311 dla szyfru afinicznego).
+		inputText = "files/crypto.txt"
+		outputText = "files/decrypt.txt"
+	default:
+		fmt.Println("Nieobsługiwana operacja.")
+		return
+	}
+
+	// Execute corresponding cipher operations
+	switch cipherType {
+	case "caesar":
+		CipherOperations(operation, inputText, inputTextHelper, inputKey, outputText, outputKey, CaesarCipher, FindCaesarKey)
+	case "affine":
+		CipherOperations(operation, inputText, inputTextHelper, inputKey, outputText, outputKey, AffineCipher, FindAffineKey)
+	default:
+		fmt.Println("Nieobsługiwany typ szyfru.")
+	}
+}
+
+// Generic cipher function for both Caesar and Affine ciphers
+func CipherOperations(operation, inputText, inputTextHelper, inputKey, outputText, outputKey string,
+	cipherFunc func(string, int, int, string) string, keyFinder func(string, string) (int, int)) {
+
+	// Read input text
+	textLines, err := helpers.GetText(inputText)
+	if err != nil {
+		log.Fatalf("Błąd przy odczycie pliku: %v", err)
+	}
+	originalText := strings.Join(textLines, "\n")
+
+	var key1, key2 int
+
+	if operation == "e" || operation == "d" {
+		// Read and validate the key from key.txt
+		key1, key2 = helpers.ValidateKey(inputKey)
+	} else if operation == "j" {
+		// Read extra helper text for key finding
+		extraLines, err := helpers.GetText(inputTextHelper)
+		if err != nil {
+			log.Fatalf("Błąd przy odczycie pliku: %v", err)
+		}
+		extraText := strings.Join(extraLines, "\n")
+
+		// Find key based on ciphertext and helper text
+		key1, key2 = keyFinder(originalText, extraText)
+
+		// Save the found key
+		helpers.SaveOutput(fmt.Sprintf("%d %d", key1, key2), outputKey)
+	}
+
+	// Process encryption or decryption
+	processedText := cipherFunc(originalText, key1, key2, operation)
+
+	// Save output
+	helpers.SaveOutput(processedText, outputText)
+}
+
 // ------------------------------------------------------------------------Caesar Cipher------------------------------------------------------------------------
 // CaesarCipher encrypts or decrypts text using the Caesar cipher based on the given flags.
-func CaesarCipher(text string, key int, operation string) string {
+func CaesarCipher(text string, key1, _ int, operation string) string {
 	var result strings.Builder
 
 	for _, char := range text {
@@ -21,11 +104,11 @@ func CaesarCipher(text string, key int, operation string) string {
 		if operation == "e" {
 			if char >= 'a' && char <= 'z' {
 				shift := int(char - 'a')
-				shift = (shift + key) % 26
+				shift = (shift + key1) % 26
 				result.WriteRune(rune(shift + 'a'))
 			} else if char >= 'A' && char <= 'Z' {
 				shift := int(char - 'A')
-				shift = (shift + key) % 26
+				shift = (shift + key1) % 26
 				result.WriteRune(rune(shift + 'A'))
 			}
 		}
@@ -34,11 +117,11 @@ func CaesarCipher(text string, key int, operation string) string {
 		if operation == "d" {
 			if char >= 'a' && char <= 'z' {
 				shift := int(char - 'a')
-				shift = (shift - key + 26) % 26
+				shift = (shift - key1 + 26) % 26
 				result.WriteRune(rune(shift + 'a'))
 			} else if char >= 'A' && char <= 'Z' {
 				shift := int(char - 'A')
-				shift = (shift - key + 26) % 26
+				shift = (shift - key1 + 26) % 26
 				result.WriteRune(rune(shift + 'A'))
 			}
 		}
@@ -52,62 +135,34 @@ func CaesarCipher(text string, key int, operation string) string {
 	return result.String()
 }
 
-func CaesarExecute(operation string) {
-	var inputText, ipputTextHelper, inputKey, outputText,outputkey string
 
-	switch operation {
-	case "e":
-		// Program szyfrujący czyta tekst jawny i klucz i zapisuje tekst zaszyfrowany. Jeśli klucz jest nieprawidłowy, zgłasza jedynie błąd.
-		inputText = "files/plain.txt"
-		inputKey = "files/key.txt"
-		outputText = "files/crypto.txt"
-		CaesarOperations("e", inputText, inputKey, outputText) 
-	case "d":
-		// Program odszyfrowujący czyta tekst zaszyfrowany i klucz i zapisuje tekst jawny. Jeśli klucz jest nieprawidłowy, zgłasza błąd. 
-		// Dla szyfru afinicznego częścią zadania jest znalezienie odwrotności dla liczby a podanej jako część klucza – 
-		// nie można zakładać, że program odszyfrowujący otrzymuje tę odwrotność.
-		inputText = "files/crypto.txt"
-		inputKey = "files/key.txt"
-		outputText = "files/decrypt.txt"
-		CaesarOperations("d",inputText, inputKey, outputText) 
-	case "j":
-		// Program łamiący szyfr z pomocą tekstu jawnego czyta tekst zaszyfrowany, tekst pomocniczy i zapisuje znaleziony klucz i odszyfrowany tekst. 
-		// Jeśli niemożliwe jest znalezienie klucza, zgłasza sygnał błędu.
-		inputText = "files/crypto.txt"
-		ipputTextHelper = "files/extra.txt"
-		outputText = "files/decrypt.txt"
-		outputkey = "files/key-found.txt"
-		CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputKey)
-	case "k":
-		//Program łamiący szyfr bez pomocy tekstu jawnego czyta jedynie tekst zaszyfrowany i zapisuje jako tekst odszyfrowany wszystkie możliwe kandydatury (25 dla szyfru Cezara, 311 dla szyfru afinicznego).
-		inputText = "files/crypto.txt"
-		outputText = "files/decrypt.txt"
-		CaesarCryptAnalysis(inputText, outputText) 
-	default:
-		fmt.Println("Nieobsługiwana operacja dla Cezara.")
-		return
+
+// FindCaesarKey calculates the Caesar cipher key based on the first matching characters in the ciphertext and extra text.
+func FindCaesarKey(cryptoText, extraText string) (int, int) {
+	// Znajdujemy pierwszy pasujący znak w obu tekstach
+	for i := 0; i < len(extraText) && i < len(cryptoText); i++ {
+		cipherChar := cryptoText[i]
+		plainChar := extraText[i]
+
+		
+		if (cipherChar >= 'A' && cipherChar <= 'Z' && plainChar >= 'A' && plainChar <= 'Z') ||
+			(cipherChar >= 'a' && cipherChar <= 'z' && plainChar >= 'a' && plainChar <= 'z') {
+
+			// Calculate the key based on the difference between the characters
+			key := int(cipherChar - plainChar)
+
+			// Key must be between 0 and 25
+			if key < 0 {
+				key += 26
+			}
+			return key, 0
+		}
 	}
 
+	log.Fatal("Nie udało się znaleźć pasujących znaków do odgadnięcia klucza.")
+	return -1, 0
 }
 
-func CaesarOperations(operation string, inputText string, inputKey string, outputText string) {
-	// Read text from input file
-	textLines, err := helpers.GetText(inputText)
-	if err != nil {
-		log.Fatalf("Błąd przy odczycie pliku: %v", err)
-	}
-
-	originalText := strings.Join(textLines, "\n")
-
-	// Read and validate the key
-	key, _ := helpers.ValidateKey(inputKey)
-
-	// Encrypt or decrypt
-	processedText := CaesarCipher(originalText, key, operation)
-
-	// Save the result
-	helpers.SaveOutput(processedText, outputText)
-}
 
 // CaesarExplicitCryptAnalysis make analysis of Caesar cipher based on the extra text.
 func CaesarExplicitCryptAnalysis(inputText string, inputTextHelper string, outputText string, outputKey string) {
@@ -131,7 +186,7 @@ func CaesarExplicitCryptAnalysis(inputText string, inputTextHelper string, outpu
 	}
 
 	// Guess the key based on the first characters of the ciphertext and extra text.
-	guessedKey := FindCaesarKey(cryptoText, extraText)
+	guessedKey, _ := FindCaesarKey(cryptoText, extraText)
 
 	// Save the found key to a file.
 	err = helpers.SaveOutput(strconv.Itoa(guessedKey), outputKey)
@@ -140,7 +195,7 @@ func CaesarExplicitCryptAnalysis(inputText string, inputTextHelper string, outpu
 	}
 
 	// Decrypt the ciphertext using the guessed key.
-	decryptedText := CaesarCipher(cryptoText, guessedKey, "d")
+	decryptedText := CaesarCipher(cryptoText, guessedKey, 0, "d")
 
 	// Save thedecrypted text to a file.
 	err = helpers.SaveOutput(decryptedText, outputText)
@@ -149,109 +204,61 @@ func CaesarExplicitCryptAnalysis(inputText string, inputTextHelper string, outpu
 	}
 }
 
-// FindCaesarKey calculates the Caesar cipher key based on the first matching characters in the ciphertext and extra text.
-func FindCaesarKey(cryptoText, extraText string) int {
-	// Znajdujemy pierwszy pasujący znak w obu tekstach
-	for i := 0; i < len(extraText) && i < len(cryptoText); i++ {
-		cipherChar := cryptoText[i]
-		plainChar := extraText[i]
-
-		
-		if (cipherChar >= 'A' && cipherChar <= 'Z' && plainChar >= 'A' && plainChar <= 'Z') ||
-			(cipherChar >= 'a' && cipherChar <= 'z' && plainChar >= 'a' && plainChar <= 'z') {
-
-			// Calculate the key based on the difference between the characters
-			key := int(cipherChar - plainChar)
-
-			// Key must be between 0 and 25
-			if key < 0 {
-				key += 26
-			}
-			return key
-		}
-	}
-
-	log.Fatal("Nie udało się znaleźć pasujących znaków do odgadnięcia klucza.")
-	return -1 
-}
-
-
 func CaesarCryptAnalysis(inputText string, outputText string) string {
 	var result strings.Builder
 	return result.String()
 }
 
 // ------------------------------------------------------------------------Affine Cipher------------------------------------------------------------------------
-func AffineCipher(text string, a int, b int,  operation string) string {
-	return "a"
+// Affine cipher function
+func AffineCipher(text string, a, b int, operation string) string {
+	var result strings.Builder
+
+	if operation == "e" {
+		for _, char := range text {
+			if char >= 'a' && char <= 'z' {
+				result.WriteRune('a' + rune((a*int(char-'a')+b)%26))
+			} else if char >= 'A' && char <= 'Z' {
+				result.WriteRune('A' + rune((a*int(char-'A')+b)%26))
+			} else {
+				result.WriteRune(char)
+			}
+		}
+	} else if operation == "d" {
+		invA := modInverse(a, 26)
+		for _, char := range text {
+			if char >= 'a' && char <= 'z' {
+				result.WriteRune('a' + rune((invA*(int(char-'a')-b+26))%26))
+			} else if char >= 'A' && char <= 'Z' {
+				result.WriteRune('A' + rune((invA*(int(char-'A')-b+26))%26))
+			} else {
+				result.WriteRune(char)
+			}
+		}
+	}
+
+	return result.String()
 }
-func AffineExecute(operation string) {
-	var inputFile, outputFile string
 
-	switch operation {
-	case "e":
-		inputText = "files/plain.txt"
-		inputKey = "files/key.txt"
-		outputText = "files/crypto.txt"
-		AffineOperations("e", inputText, inputKey, outputText) 
-	case "d":
-		inputText = "files/crypto.txt"
-		inputKey = "files/key.txt"
-		outputText = "files/decrypt.txt"
-		AffineOperations("d",inputText, inputKey, outputText) 
-	case "j":
-		inputText = "files/crypto.txt"
-		ipputTextHelper = "files/extra.txt"
-		outputText = "files/decrypt.txt"
-		outputkey = "files/key-found.txt"
-		AffineExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputKey)
-	case "k":
-		inputText = "files/crypto.txt"
-		outputText = "files/decrypt.txt"
-		AffineCryptAnalysis(inputText, outputText) 
-	default:
-		fmt.Println("Nieobsługiwana operacja dla Cezara.")
-		return
+// Modular inverse function
+func modInverse(a, m int) int {
+	for x := 1; x < m; x++ {
+		if (a*x)%m == 1 {
+			return x
+		}
 	}
+	log.Fatal("Brak modularnej odwrotności dla danego 'a'.")
+	return -1
+}
 
-
-	// Odczytaj tekst wejściowy
-	textLines, err := helpers.GetText(inputFile)
-	if err != nil {
-		log.Fatalf("Błąd przy odczycie pliku: %v", err)
-	}
-
-	originalText := strings.Join(textLines, "\n")
-
-	// Odczytaj i zweryfikuj klucze (a, b) dla szyfru afinicznego
-	a, b := helpers.ValidateKey(inputKey)
-
-	// Wykonaj szyfrowanie lub deszyfrowanie
-	processedText := AffineCipher(originalText, a, b, operation)
-
-	// Zapisz wynik do pliku
-	helpers.SaveOutput(processedText, outputFile)
+// Find key for Affine cipher (placeholder implementation)
+func FindAffineKey(cryptoText, extraText string) (int, int) {
+	log.Fatal("Funkcja odgadnięcia klucza dla szyfru afinicznego nie jest jeszcze zaimplementowana.")
+	return -1, -1
 }
 
 
-func AffineOperations(operation string, inputText string, inputKey string, outputText string) {
-	// Read text from input file
-	textLines, err := helpers.GetText(inputText)
-	if err != nil {
-		log.Fatalf("Błąd przy odczycie pliku: %v", err)
-	}
 
-	originalText := strings.Join(textLines, "\n")
-
-	// Read and validate the a and b keys for the Affine cipher
-	a, b := helpers.ValidateKey(inputKey)
-
-	// Encrypt or decrypt
-	processedText := CaesarCipher(originalText, a, b, operation)
-
-	// Save the result
-	helpers.SaveOutput(processedText, outputText)
-}
 func AffineExplicitCryptAnalysis(inputText string, inputTextHelper string, outputText string, outputKey string) string {
 	var result strings.Builder
 	return result.String()
