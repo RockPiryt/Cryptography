@@ -69,32 +69,56 @@ func SaveOutput(result string, outputFile string) {
 }
 
 
-// ValidateCaesarKey reads and validates the key for Caesar cipher from a file.
-// It ensures the key is a single integer between 0 and 25.
-func ValidateCaesarKey(filePath string) int {
+// ValidateKey reads and validates the keys for both Caesar and Affine ciphers from a file.
+func ValidateKey(filePath string) (int, int) {
 	// Read the key from the file.
 	keyLines, err := GetText(filePath)
 	if err != nil {
-		log.Fatalf("Failed to read the key: %v", err)
+		log.Fatalf("Błąd przy odczycie pliku klucza: %v", err)
 	}
 
-	// Ensure there is only one line in the key file.
+	// Ensure the file contains exactly one line.
 	if len(keyLines) != 1 {
-		log.Fatalf("The key file should only contain one line with a single integer. Found %d lines.", len(keyLines))
+		log.Fatalf("Plik klucza powinien zawierać tylko jedną linię. Znaleziono: %d", len(keyLines))
 	}
 
-	// Convert the key to an integer.
-	key, err := strconv.Atoi(strings.TrimSpace(keyLines[0]))
+	// Split the line into parts (expecting two space-separated numbers).
+	parts := strings.Fields(keyLines[0])
+	if len(parts) != 2 {
+		log.Fatalf("Plik klucza musi zawierać dokładnie dwie liczby oddzielone spacją (np. '3 7'). Znaleziono: %s", keyLines[0])
+	}
+
+	// Convert the first number (Caesar cipher shift key).
+	caesarKey, err := strconv.Atoi(parts[0])
 	if err != nil {
-		log.Fatalf("Invalid key value. The key must be a valid integer: %v", err)
+		log.Fatalf("Nieprawidłowa wartość klucza Cezara. Musi być liczbą całkowitą: %v", err)
 	}
 
-	// Check if the key is within the valid range for Caesar cipher (0 to 25).
-	if key < 0 || key > 25 {
-		log.Fatalf("The key for Caesar cipher must be between 0 and 25. Found: %d", key)
+	// Validate the Caesar cipher key (must be between 0 and 25).
+	if caesarKey < 0 || caesarKey > 25 {
+		log.Fatalf("Klucz Cezara musi być liczbą z zakresu 0-25. Znaleziono: %d", caesarKey)
 	}
 
-	return key
+	// Convert the second number (Affine cipher 'a' coefficient).
+	affineA, err := strconv.Atoi(parts[1])
+	if err != nil {
+		log.Fatalf("Nieprawidłowa wartość współczynnika 'a' dla szyfru afinicznego. Musi być liczbą całkowitą: %v", err)
+	}
+
+	// Validate the 'a' coefficient for the Affine cipher (must be coprime with 26).
+	if gcd(affineA, 26) != 1 {
+		log.Fatalf("Współczynnik 'a' dla szyfru afinicznego musi być względnie pierwsza z 26. Znaleziono: %d", affineA)
+	}
+
+	return caesarKey, affineA
+}
+
+// gcd calculates the greatest common divisor (GCD) of two numbers.
+func gcd(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
 }
 
 
