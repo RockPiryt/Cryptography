@@ -1,15 +1,17 @@
 package main
 
+
+
 import (
 	"flag"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
-	"caesar/helpers"
-	"caesar/cryptofunc"
 	"log"
-	)
+	"caesaraffineciphers/helpers"
+	"caesaraffineciphers/cryptofunc"
+)
 
 //Author: Paulina Kimak
 
@@ -43,57 +45,58 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Open a file.
-	lines, err := helpers.GetText("plain.txt")
-	if err != nil {
-		log.Fatalf("Nie udało się odczytać pliku: %v", err)
-	}
-	fmt.Println(lines)
 
 	// Read text.
-	textLines, err := helpers.GetText("plain.txt")
+	textLines, err := helpers.GetText("files/plain.txt")
 	if err != nil {
 		log.Fatalf("Błąd przy odczycie pliku: %v", err)
 	}
 
 	plaintext := strings.Join(textLines, "\n")
-
+	fmt.Println(plaintext)
+	
 	// Read a key.
-	keyLines, err := helpers.GetText("key.txt")
+	keyLines, err := helpers.GetText("files/key.txt")
 	if err != nil {
 		log.Fatalf("Nie udało się odczytać klucza : %v", err)
 	}
+	
 	// Converse key to integer.
 	key, err := strconv.Atoi(keyLines[0])
 	if err != nil {
 		log.Fatalf("Błąd przy konwersji klucza: %v", err)
 	}
 
-	// Caesar encrytion.
-	result := cryptofunc.CaesarCipher(plaintext, key, *encryptFlag)
+	// Determine the cipher function to use
+	var cipherFunc func(string, int, bool) string
 
-	// Save result to file.
-	outputFile := "result.txt"
-	
-	// Sprawdzenie, czy plik istnieje
-	if _, err := os.Stat(outputFile); os.IsNotExist(err) {
-		// Plik nie istnieje, więc go tworzymy
-		file, err := os.Create(outputFile)
-		if err != nil {
-			fmt.Println("Błąd przy tworzeniu pliku:", err)
-			return
-		}
-		file.Close()
-	}
-	
-	// Zapisanie wyniku do pliku
-	err := os.WriteFile(outputFile, []byte(result), 0644)
-	if err != nil {
-		fmt.Println("Błąd przy zapisywaniu wyniku:", err)
-		return
+	if *caesarFlag {
+		cipherFunc = cryptofunc.CaesarCipher
+	} else if *affineFlag {
+		cipherFunc = cryptofunc.AffineCipher
+	} else {
+		log.Fatal("Błąd: Nie wybrano poprawnego szyfru (-c dla Cezara, -a dla afinicznego).")
 	}
 
-	fmt.Println("Zapisano wynik do pliku:", outputFile)
+	// Determine the operation
+	var operationFlag *bool
+
+	switch {
+	case *encryptFlag:
+		operationFlag = encryptFlag
+	case *decryptFlag:
+		operationFlag = decryptFlag
+	case *explicitCryptAnalysisFlag:
+		operationFlag = explicitCryptAnalysisFlag
+	case *cryptAnalysisFlag:
+		operationFlag = cryptAnalysisFlag
+	default:
+		fmt.Println("Błąd: Nie wybrano poprawnej operacji (-e, -d, -j, -k).")
+		os.Exit(1)
+	}
+
+	// Perform encryption or decryption
+	result := cipherFunc(plaintext, key, *operationFlag)
+	helpers.SaveOutput(result, "files/result.txt")
+
 }
-
-
