@@ -67,7 +67,7 @@ func SaveOutput(result string, outputFile string) {
 		log.Fatalf("Błąd przy zapisywaniu wyniku: %v", err)
 	}
 
-	fmt.Println("Zapisano wynik do pliku:", outputFile)
+	//fmt.Println("Zapisano wynik do pliku:", outputFile)
 }
 
 
@@ -120,7 +120,7 @@ func ValidateKey(filePath string, cipherType string) (int, int) {
 
 	// Validate that 'a' is coprime with 26.
 	m := 26
-	gcd, _, _ := extendedGCD(a, m)
+	gcd, _, _ := ExtendedGCD(a, m)
 	if gcd != 1 {
 		fmt.Printf("Błędny klucz afiniczny: Współczynnik 'a' musi być względnie pierwsza z 26. Znaleziono: %d\n", a)
 		return -1, -1
@@ -130,11 +130,11 @@ func ValidateKey(filePath string, cipherType string) (int, int) {
 }
 
 // Extended Euclidean algorithm
-func extendedGCD(a, b int) (int, int, int) {
+func ExtendedGCD(a, b int) (int, int, int) {
 	if b == 0 {
 		return a, 1, 0
 	}
-	gcd, x1, y1 := extendedGCD(b, a%b)
+	gcd, x1, y1 := ExtendedGCD(b, a%b)
 	x := y1
 	y := x1 - (a/b)*y1
 	return gcd, x, y
@@ -143,7 +143,7 @@ func extendedGCD(a, b int) (int, int, int) {
 // ModInverseExtended calculates the modular inverse of a mod m using the extended Euclidean algorithm.
 // If the modular inverse does not exist, it returns an error.
 func ModInverseExtended(a, m int) (int, error) {
-	gcd, x, _ := extendedGCD(a, m)
+	gcd, x, _ := ExtendedGCD(a, m)
 	if gcd != 1 {
 		return 0, fmt.Errorf("brak modularnej odwrotności dla a=%d (mod %d)", a, m)
 	}

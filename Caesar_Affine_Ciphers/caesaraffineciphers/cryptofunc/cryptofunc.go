@@ -15,22 +15,22 @@ import (
 // Struct to store cipher parameters.
 type CipherParams struct {
 	Operation       string
-	InputText      string
+	InputText       string
 	InputTextHelper string
-	InputKey       string
-	OutputText     string
-	OutputKey      string
-	CipherType     string
-	CipherFunc     func(string, int, int, string) (string, error)
-	KeyFinder      func(string, string) (int, int)
+	InputKey        string
+	OutputText      string
+	OutputKey       string
+	CipherType      string
+	CipherFunc      func(string, int, int, string) (string, error)
+	KeyFinder       func(string, string) (int, int)
 }
 
 // ------------------------------------------------------------------------General functions------------------------------------------------------------------------
 // Generic function to handle both Caesar and Affine ciphers
 func ExecuteCipher(cipherType string, operation string) {
 	params := CipherParams{
-		Operation:   operation,
-		CipherType:  cipherType,
+		Operation:  operation,
+		CipherType: cipherType,
 	}
 
 	switch operation {
@@ -40,14 +40,14 @@ func ExecuteCipher(cipherType string, operation string) {
 		params.InputKey = "files/key.txt"
 		params.OutputText = "files/crypto.txt"
 	case "d":
-		// Program odszyfrowujący czyta tekst zaszyfrowany i klucz i zapisuje tekst jawny. Jeśli klucz jest nieprawidłowy, zgłasza błąd. 
-		// Dla szyfru afinicznego częścią zadania jest znalezienie odwrotności dla liczby a podanej jako część klucza – 
+		// Program odszyfrowujący czyta tekst zaszyfrowany i klucz i zapisuje tekst jawny. Jeśli klucz jest nieprawidłowy, zgłasza błąd.
+		// Dla szyfru afinicznego częścią zadania jest znalezienie odwrotności dla liczby a podanej jako część klucza –
 		// nie można zakładać, że program odszyfrowujący otrzymuje tę odwrotność.
 		params.InputText = "files/crypto.txt"
 		params.InputKey = "files/key.txt"
 		params.OutputText = "files/decrypt.txt"
 	case "j":
-		// Program łamiący szyfr z pomocą tekstu jawnego czyta tekst zaszyfrowany, tekst pomocniczy. Następnie zapisuje znaleziony klucz i odszyfrowany tekst. 
+		// Program łamiący szyfr z pomocą tekstu jawnego czyta tekst zaszyfrowany, tekst pomocniczy. Następnie zapisuje znaleziony klucz i odszyfrowany tekst.
 		// Jeśli niemożliwe jest znalezienie klucza, zgłasza sygnał błędu.
 		params.InputText = "files/crypto.txt"
 		params.InputTextHelper = "files/extra.txt"
@@ -59,7 +59,7 @@ func ExecuteCipher(cipherType string, operation string) {
 			return
 		} else if cipherType == "affine" {
 			AffineExplicitCryptAnalysis(params.InputText, params.InputTextHelper, params.OutputText, params.OutputKey)
-			return	
+			return
 		}
 
 	case "k":
@@ -69,6 +69,9 @@ func ExecuteCipher(cipherType string, operation string) {
 		// If Caesar explicit cryptanalysis (-c -k), call specialized function
 		if cipherType == "caesar" {
 			CaesarCryptAnalysis(params.InputText, params.OutputText)
+			return
+		} else if cipherType == "affine" {
+			AffineCryptAnalysis(params.InputText, params.OutputText)
 			return
 		}
 	default:
@@ -134,10 +137,10 @@ func CipherOperations(params CipherParams) {
 		log.Fatalf("Błąd szyfrowania: %v", cipherErr)
 	}
 
-
 	// Save the result to a file.
 	helpers.SaveOutput(resultText, params.OutputText)
 }
+
 // ------------------------------------------------------------------------Caesar Cipher------------------------------------------------------------------------
 // CaesarCipher encrypts or decrypts text using the Caesar cipher based on the given flags.
 func CaesarCipher(text string, _, c int, operation string) (string, error) {
@@ -194,7 +197,6 @@ func FindCaesarKey(cryptoText, extraText string) (int, int) {
 		cipherChar := cryptoText[i]
 		plainChar := extraText[i]
 
-		
 		if (cipherChar >= 'A' && cipherChar <= 'Z' && plainChar >= 'A' && plainChar <= 'Z') ||
 			(cipherChar >= 'a' && cipherChar <= 'z' && plainChar >= 'a' && plainChar <= 'z') {
 
@@ -232,7 +234,7 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 	if len(cryptoText) == 0 || len(extraText) == 0 {
 		log.Fatal("Błąd: Brak danych w plikach wejściowych.")
 	}
-	
+
 	// Guess the Caesar key by comparing characters
 	guessedKey := (int(cryptoText[0]) - int(extraText[0]) + 26) % 26
 	guessedKeyString := strconv.Itoa(guessedKey)
@@ -241,7 +243,7 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 	helpers.SaveOutput(guessedKeyString, outputKey)
 
 	// Decrypt using the guessed key
-	decryptedText,_ := CaesarCipher(cryptoText, guessedKey, -1, "d")
+	decryptedText, _ := CaesarCipher(cryptoText, guessedKey, -1, "d")
 
 	helpers.SaveOutput(decryptedText, outputText)
 }
@@ -262,8 +264,8 @@ func CaesarCryptAnalysis(inputText string, outputText string) {
 
 	// Test all possible keys (0-25)
 	for key := 1; key <= 25; key++ {
-		decryptedText,_ := CaesarCipher(cryptoText, key, -1, "d")
-		result.WriteString(decryptedText + "\n") 
+		decryptedText, _ := CaesarCipher(cryptoText, key, -1, "d")
+		result.WriteString(decryptedText + "\n")
 	}
 
 	helpers.SaveOutput(result.String(), outputText)
@@ -275,8 +277,8 @@ func AffineCipher(text string, a, c int, operation string) (string, error) {
 	m := 26
 	var result string
 
-	fmt.Printf("AffineCipher: a=%d, c=%d, operation=%s\n", a, c, operation)
-	fmt.Printf("Input text: %s\n", text)
+	//fmt.Printf("AffineCipher: a=%d, c=%d, operation=%s\n", a, c, operation)
+	//fmt.Printf("Input text: %s\n", text)
 
 	// Calculate the modular inverse of 'a' if decrypting
 	aInv := 0
@@ -314,8 +316,6 @@ func AffineCipher(text string, a, c int, operation string) (string, error) {
 	return result, nil
 }
 
-
-
 // FindAffineKey finds the affine cipher key based on the first matching characters in the ciphertext and extra text.
 func FindAffineKey(cryptoText, extraText string) (int, int) {
 
@@ -328,9 +328,9 @@ func FindAffineKey(cryptoText, extraText string) (int, int) {
 		x2 := int(unicode.ToUpper(rune(extraText[i+1])) - 'A')
 		y2 := int(unicode.ToUpper(rune(cryptoText[i+1])) - 'A')
 
-		fmt.Printf("x1: %d, y1: %d, x2: %d, y2: %d\n", x1, y1, x2, y2)
+		//fmt.Printf("x1: %d, y1: %d, x2: %d, y2: %d\n", x1, y1, x2, y2)
 
-		a, c, err := solveAffineSystemSr(x1, x2,y1, y2)
+		a, c, err := solveAffineSystemSr(x1, x2, y1, y2)
 		if err != nil {
 			log.Fatal("Nie udało się znaleźć poprawnych wartości a i c:", err)
 		}
@@ -345,28 +345,28 @@ func FindAffineKey(cryptoText, extraText string) (int, int) {
 // solveAffineSystemSr solves the system of two affine equations to find the key for the affine cipher.
 func solveAffineSystemSr(x1, x2, y1, y2 int) (int, int, error) {
 	m := 26
-	fmt.Printf("solveAffineSystem: x1=%d, x2=%d, y1=%d, y2=%d\n", x1, x2, y1, y2)
+	//fmt.Printf("solveAffineSystem: x1=%d, x2=%d, y1=%d, y2=%d\n", x1, x2, y1, y2)
 	// Calculate the differences.
 	deltaY := (y1 - y2 + m) % m // ex.15 - 16 = -1 -> mod 26 -> 25
 	deltaX := (x1 - x2 + m) % m //ex 8 - 5 = 3
-	fmt.Printf("deltaY: %d, deltaX: %d\n", deltaY, deltaX)
+	//fmt.Printf("deltaY: %d, deltaX: %d\n", deltaY, deltaX)
 
 	// Find the modular inverse of deltaX (3 mod 26)
 	invDeltaX, err := helpers.ModInverseExtended(deltaX, m)
-	fmt.Printf("invDeltaX: %d\n", invDeltaX)
+	//fmt.Printf("invDeltaX: %d\n", invDeltaX)
 	if err != nil {
 		return -1, -1, fmt.Errorf("nie można znaleźć odwrotności modularnej: %v", err)
 	}
 
 	x := (deltaY * invDeltaX) % m // x = (25 * 9) mod 26
-	fmt.Printf("Obliczone x: %d\n", x)
+	//fmt.Printf("Obliczone a: %d\n", x)
 
 	// Calculate y from the first equation: y = 15 - x * 8 mod 26
 	y := (y1 - x*x1) % m
 	if y < 0 {
 		y += m
 	}
-	fmt.Printf("Obliczone y: %d\n", y)
+	//.Printf("Obliczone c: %d\n", y)
 
 	return x, y, nil
 }
@@ -379,7 +379,7 @@ func AffineExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 		log.Fatalf("Błąd przy odczycie pliku %s: %v", inputText, err)
 	}
 	cryptoText := strings.Join(cryptoLines, "\n")
-	fmt.Printf("Oczekiwany zaszyfrowany: pq, a jest cryptoText: %s\n", cryptoText)
+	//fmt.Printf("Oczekiwany zaszyfrowany cryptoText: %s\n", cryptoText)
 
 	// Read the extra text (known plaintext).
 	extraLines, err := helpers.GetText(inputTextHelper)
@@ -387,7 +387,7 @@ func AffineExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 		log.Fatalf("Błąd przy odczycie pliku %s: %v", inputTextHelper, err)
 	}
 	extraText := strings.Join(extraLines, "\n")
-	fmt.Printf("Oczekiwany jawny: if, a jest extraText: %s\n", extraText)
+	//fmt.Printf("Oczekiwany jawny extraText: %s\n", extraText)
 
 	if len(cryptoText) == 0 || len(extraText) == 0 {
 		log.Fatal("Błąd: Brak danych w plikach wejściowych.")
@@ -395,7 +395,7 @@ func AffineExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 
 	// Find the affine cipher key based on the known plaintext
 	a, c := FindAffineKey(cryptoText, extraText)
-	fmt.Printf("Znaleziony klucz: a=%d, c=%d\n", a, c)
+	//fmt.Printf("Znaleziony klucz: a=%d, c=%d\n", a, c)
 
 	// Save the key (a, c) to the output key file
 	helpers.SaveOutput(fmt.Sprintf("%d %d", c, a), outputKey)
@@ -405,13 +405,53 @@ func AffineExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 	if err != nil {
 		log.Fatalf("Błąd odszyfrowania: %v", err)
 	}
-	fmt.Printf("Odszyfrowany tekst: %s\n", decryptedText)
+	//fmt.Printf("Odszyfrowany tekst: %s\n", decryptedText)
 
 	// Save the decrypted text to the output file
 	helpers.SaveOutput(decryptedText, outputText)
 }
 
-func AffineCryptAnalysis(inputText string, outputText string)  string {
+// AffineCryptAnalysis tests all possible keys (a, c) for the affine cipher and saves all decrypted texts.
+func AffineCryptAnalysis(inputText string, outputText string) {
+	m := 26
 	var result strings.Builder
-	return result.String()
+
+	// Read the entire ciphertext
+	cryptoLines, err := helpers.GetText(inputText)
+	if err != nil {
+		log.Fatalf("Błąd przy odczycie pliku %s: %v", inputText, err)
+	}
+	cryptoText := strings.Join(cryptoLines, "\n")
+	//fmt.Printf("Oczekiwany zaszyfrowany tekst: %s\n", cryptoText)
+
+	// Check if the ciphertext is empty
+	if len(cryptoText) == 0 {
+		log.Fatal("Błąd: Brak danych w pliku wejściowym.")
+	}
+
+	// Check all possible combinations of a (1-25) and c (0-25) for the affine cipher
+	for a := 0; a < m; a++ {
+		// Check if 'a' is coprime with 26 (i.e., gcd(a, 26) == 1)
+		gcd, _, _ := helpers.ExtendedGCD(a, m)
+		if gcd == 1 {
+			for c := 0; c < m; c++ {
+				// Skip the key (1, 0), as it does not alter the text
+				if a == 1 && c == 0 {
+					continue
+				}
+
+				// Decrypt the text using the affine cipher with key (a, c)
+				decryptedText, err := AffineCipher(cryptoText, a, c, "d")
+				if err != nil {
+					log.Fatalf("Błąd odszyfrowania: %v", err)
+				}
+				//fmt.Printf("Próba: a=%d, c=%d\n odszyfrowany tekst: %s\n\n", a, c, decryptedText)
+
+				// Save the decrypted text
+				result.WriteString(fmt.Sprintf("%s\n", decryptedText))
+			}
+		}
+	}
+
+	helpers.SaveOutput(result.String(), outputText)
 }
