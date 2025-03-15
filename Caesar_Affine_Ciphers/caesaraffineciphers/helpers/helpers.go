@@ -111,6 +111,12 @@ func ValidateKey(filePath string, cipherType string) (int, int) {
 		return c, -1
 	}
 
+	// If the cipherType is not "caesar" or "affine", report an error.
+	if cipherType != "affine" {
+		fmt.Printf("Błędny typ szyfru: Oczekiwano 'caesar' lub 'affine', znaleziono: %s\n", cipherType)
+		return -1, -1
+	}
+
 	// Convert the second number (used only for Affine cipher).
 	a, err := strconv.Atoi(parts[1])
 	if err != nil {
@@ -118,14 +124,21 @@ func ValidateKey(filePath string, cipherType string) (int, int) {
 		return -1, -1
 	}
 
-	// Validate that 'a' is coprime with 26.
+	// Validate that 'a' is coprime with 26 and is in the range [1, 25].
 	m := 26
+	if a < 1 || a > 25 {
+		fmt.Printf("Błędny klucz afiniczny: 'a' musi być liczbą z zakresu 1-25. Znaleziono: %d\n", a)
+		return -1, -1
+	}
+
+	// Check that 'a' is coprime with 26 (gcd(a, 26) == 1).
 	gcd, _, _ := ExtendedGCD(a, m)
 	if gcd != 1 {
 		fmt.Printf("Błędny klucz afiniczny: Współczynnik 'a' musi być względnie pierwsza z 26. Znaleziono: %d\n", a)
 		return -1, -1
 	}
 
+	// Return both values: c (for Caesar) and a (for Affine).
 	return c, a
 }
 
