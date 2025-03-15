@@ -57,7 +57,11 @@ func ExecuteCipher(cipherType string, operation string) {
 		if cipherType == "caesar" {
 			CaesarExplicitCryptAnalysis(params.InputText, params.InputTextHelper, params.OutputText, params.OutputKey)
 			return
+		} else if cipherType == "affine" {
+			AffineExplicitCryptAnalysis(params.InputText, params.InputTextHelper, params.OutputText, params.OutputKey)
+			return	
 		}
+
 	case "k":
 		//Program łamiący szyfr bez pomocy tekstu jawnego czyta jedynie tekst zaszyfrowany i zapisuje jako tekst odszyfrowany wszystkie możliwe kandydatury (25 dla szyfru Cezara, 311 dla szyfru afinicznego).
 		params.InputText = "files/crypto.txt"
@@ -367,11 +371,44 @@ func solveAffineSystemSr(x1, x2, y1, y2 int) (int, int, error) {
 	return x, y, nil
 }
 
+// Function to break the Affine cipher using known plaintext (extra text)
+func AffineExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputKey string) {
+	// Read the entire ciphertext.
+	cryptoLines, err := helpers.GetText(inputText)
+	if err != nil {
+		log.Fatalf("Błąd przy odczycie pliku %s: %v", inputText, err)
+	}
+	cryptoText := strings.Join(cryptoLines, "\n")
+	fmt.Printf("Oczekiwany zaszyfrowany: pq, a jest cryptoText: %s\n", cryptoText)
 
+	// Read the extra text (known plaintext).
+	extraLines, err := helpers.GetText(inputTextHelper)
+	if err != nil {
+		log.Fatalf("Błąd przy odczycie pliku %s: %v", inputTextHelper, err)
+	}
+	extraText := strings.Join(extraLines, "\n")
+	fmt.Printf("Oczekiwany jawny: if, a jest extraText: %s\n", extraText)
 
-func AffineExplicitCryptAnalysis(inputText string, inputTextHelper string, outputText string, outputKey string) string {
-	var result strings.Builder
-	return result.String()
+	if len(cryptoText) == 0 || len(extraText) == 0 {
+		log.Fatal("Błąd: Brak danych w plikach wejściowych.")
+	}
+
+	// Find the affine cipher key based on the known plaintext
+	a, c := FindAffineKey(cryptoText, extraText)
+	fmt.Printf("Znaleziony klucz: a=%d, c=%d\n", a, c)
+
+	// Save the key (a, c) to the output key file
+	helpers.SaveOutput(fmt.Sprintf("%d %d", c, a), outputKey)
+
+	// Decrypt the ciphertext using the found key
+	decryptedText, err := AffineCipher(cryptoText, a, c, "d")
+	if err != nil {
+		log.Fatalf("Błąd odszyfrowania: %v", err)
+	}
+	fmt.Printf("Odszyfrowany tekst: %s\n", decryptedText)
+
+	// Save the decrypted text to the output file
+	helpers.SaveOutput(decryptedText, outputText)
 }
 
 func AffineCryptAnalysis(inputText string, outputText string)  string {
