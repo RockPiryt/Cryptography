@@ -7,11 +7,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // Author: Paulina Kimak
-
-const m = 26 // Alfabet łaciński
 
 // Function to count selected flags
 func CountSelectedFlags(flags []*bool) int {
@@ -35,6 +34,7 @@ func GetText(filename string) ([]string, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
+		line = RemovePolishLetters(line)
 		lines = append(lines, line)
 	}
 
@@ -48,6 +48,29 @@ func GetText(filename string) ([]string, error) {
 	}
 	
 	return lines, nil
+}
+
+// Function to remove Polish letters from text
+func RemovePolishLetters(input string) string {
+	// Mapa polskich liter z diakrytykami na ich odpowiedniki w alfabecie łacińskim
+	replacementMap := map[rune]rune{
+		'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z',
+		'Ą': 'A', 'Ć': 'C', 'Ę': 'E', 'Ł': 'L', 'Ń': 'N', 'Ó': 'O', 'Ś': 'S', 'Ź': 'Z', 'Ż': 'Z',
+	}
+
+	// Iterate through each character in the input string and replace if it's a Polish letter
+	var result strings.Builder
+	for _, r := range input {
+		// If the character is a Polish letter, replace it
+		if repl, found := replacementMap[r]; found {
+			result.WriteRune(repl)
+		} else if unicode.IsLetter(r) || unicode.IsSpace(r) {
+			// If it's a letter (ignoring Polish diacriticals) or a space, keep it
+			result.WriteRune(r)
+		}
+	}
+
+	return result.String()
 }
 
 func SaveOutput(result string, outputFile string) {
