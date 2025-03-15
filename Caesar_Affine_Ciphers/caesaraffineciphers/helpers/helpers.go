@@ -11,6 +11,8 @@ import (
 
 // Author: Paulina Kimak
 
+const m = 26 // Alfabet łaciński
+
 // Function to count selected flags
 func CountSelectedFlags(flags []*bool) int {
 	count := 0
@@ -138,11 +140,12 @@ func extendedGCD(a, b int) (int, int, int) {
 	return gcd, x, y
 }
 
-// Function to calculate the modular inverse using the extended Euclidean algorithm
-func ModInverseExtended(a, m int) int {
+// ModInverseExtended calculates the modular inverse of a mod m using the extended Euclidean algorithm.
+// If the modular inverse does not exist, it returns an error.
+func ModInverseExtended(a, m int) (int, error) {
 	gcd, x, _ := extendedGCD(a, m)
 	if gcd != 1 {
-		log.Fatal("Brak modularnej odwrotności dla danego 'a'.")
+		return 0, fmt.Errorf("brak modularnej odwrotności dla a=%d (mod %d)", a, m)
 	}
-	return (x%m + m) % m // Avoid negative numbers
+	return (x%m + m) % m, nil // Ensure non-negative result
 }

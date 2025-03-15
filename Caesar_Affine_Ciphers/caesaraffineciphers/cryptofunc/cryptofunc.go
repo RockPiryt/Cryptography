@@ -21,7 +21,7 @@ type CipherParams struct {
 	OutputText     string
 	OutputKey      string
 	CipherType     string
-	CipherFunc     func(string, int, int, string) string
+	CipherFunc     func(string, int, int, string) (string, error)
 	KeyFinder      func(string, string) (int, int)
 }
 
@@ -122,15 +122,30 @@ func CipherOperations(params CipherParams) {
 	}
 
 	// Execute the cipher function.
-	resultText := params.CipherFunc(originalText, a, c, params.Operation)
+	var resultText string
+	var cipherErr error
+
+	resultText, cipherErr = AffineCipher(originalText, a, c, params.Operation)
+	if cipherErr != nil {
+		log.Fatalf("Błąd szyfrowania: %v", cipherErr)
+	}
+
 
 	// Save the result to a file.
 	helpers.SaveOutput(resultText, params.OutputText)
 }
 // ------------------------------------------------------------------------Caesar Cipher------------------------------------------------------------------------
 // CaesarCipher encrypts or decrypts text using the Caesar cipher based on the given flags.
-func CaesarCipher(text string, c, _ int, operation string) string {
+func CaesarCipher(text string, _, c int, operation string) (string, error) {
 	var result strings.Builder
+
+	if operation != "e" && operation != "d" {
+		return "", fmt.Errorf("nieprawidłowa operacja: %s", operation)
+	}
+
+	if len(text) == 0 {
+		return "", fmt.Errorf("tekst wejściowy jest pusty")
+	}
 
 	for _, char := range text {
 		// Handle encryption for lowercase letters and uppercase letters
@@ -165,7 +180,7 @@ func CaesarCipher(text string, c, _ int, operation string) string {
 		}
 	}
 
-	return result.String()
+	return result.String(), nil
 }
 
 // FindCaesarKey calculates the Caesar cipher key based on the first matching characters in the ciphertext and extra text.
@@ -222,7 +237,7 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 	helpers.SaveOutput(guessedKeyString, outputKey)
 
 	// Decrypt using the guessed key
-	decryptedText := CaesarCipher(cryptoText, guessedKey, -1, "d")
+	decryptedText,_ := CaesarCipher(cryptoText, guessedKey, -1, "d")
 
 	helpers.SaveOutput(decryptedText, outputText)
 }
@@ -243,7 +258,7 @@ func CaesarCryptAnalysis(inputText string, outputText string) {
 
 	// Test all possible keys (0-25)
 	for key := 1; key <= 25; key++ {
-		decryptedText := CaesarCipher(cryptoText, key, -1, "d")
+		decryptedText,_ := CaesarCipher(cryptoText, key, -1, "d")
 		result.WriteString(decryptedText + "\n") 
 	}
 
@@ -252,52 +267,104 @@ func CaesarCryptAnalysis(inputText string, outputText string) {
 
 // ------------------------------------------------------------------------Affine Cipher------------------------------------------------------------------------
 // Affine cipher function
-func AffineCipher(text string, a, c int, operation string) string {
-	result := ""
+func AffineCipher(text string, a, c int, operation string) (string, error) {
 	m := 26
+	var result string
 
 	fmt.Printf("AffineCipher: a=%d, c=%d, operation=%s\n", a, c, operation)
 	fmt.Printf("Input text: %s\n", text)
 
-	// If decrypting, calculate the modular inverse of 'a'
+	// Calculate the modular inverse of 'a' if decrypting
 	aInv := 0
 	if operation == "d" {
-		aInv = helpers.ModInverseExtended(a, m)
+		var err error
+		aInv, err = helpers.ModInverseExtended(a, m)
+		if err != nil {
+			return "", fmt.Errorf("nie można odszyfrować: %v", err)
+		}
 	}
 
+	// Process each character
 	for _, char := range text {
-		if unicode.IsLetter(char) && unicode.Is(unicode.Latin, char) { // Skip Polish characters and others
+		if unicode.IsLetter(char) && unicode.Is(unicode.Latin, char) { // Only process Latin letters
 			isUpper := unicode.IsUpper(char)
-			var base rune
+			base := 'a'
 			if isUpper {
 				base = 'A'
-			} else {
-				base = 'a'
 			}
 
-			x := int(char - base)
+			x := int(char - base) // Convert to numerical value (0-25)
 
 			if operation == "e" { // Encrypt
 				y := (a*x + c) % m
 				result += string(rune(y) + base)
 			} else if operation == "d" { // Decrypt
-				y := (aInv * (x - c + m)) % m
+				y := (aInv * ((x - c + m) % m)) % m
 				result += string(rune(y) + base)
 			}
 		} else {
-			result += string(char) // Skip other characters
+			result += string(char) // Leave non-letter characters unchanged
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 
 
-// Find key for Affine cipher (placeholder implementation)
+// FindAffineKey finds the affine cipher key based on the first matching characters in the ciphertext and extra text.
 func FindAffineKey(cryptoText, extraText string) (int, int) {
-	log.Fatal("Funkcja odgadnięcia klucza dla szyfru afinicznego nie jest jeszcze zaimplementowana.")
+
+	// Find the first matching pair of characters in both texts
+	for i := 0; i < len(cryptoText)-1; i++ {
+		// Convert characters to integers
+		x1 := int(extraText[i] - 'a')
+		y1 := int(cryptoText[i] - 'a')
+		
+		x2 := int(extraText[i+1] - 'a')
+		y2 := int(cryptoText[i+1] - 'a')
+
+		fmt.Printf("x1: %d, y1: %d, x2: %d, y2: %d\n", x1, y1, x2, y2)
+
+		a, c, err := solveAffineSystemSr(x1, x2,y1, y2)
+		if err != nil {
+			log.Fatal("Nie udało się znaleźć poprawnych wartości a i c:", err)
+		}
+
+		return a, c
+	}
+
+	log.Fatal("Nie udało się znaleźć odpowiednich par do rozwiązania układu równań.")
 	return -1, -1
+}
+
+// solveAffineSystemSr solves the system of two affine equations to find the key for the affine cipher.
+func solveAffineSystemSr(x1, x2, y1, y2 int) (int, int, error) {
+	m := 26
+	fmt.Printf("solveAffineSystem: x1=%d, x2=%d, y1=%d, y2=%d\n", x1, x2, y1, y2)
+	// Calculate the differences.
+	deltaY := (y1 - y2 + m) % m // ex.15 - 16 = -1 -> mod 26 -> 25
+	deltaX := (x1 - x2 + m) % m //ex 8 - 5 = 3
+	fmt.Printf("deltaY: %d, deltaX: %d\n", deltaY, deltaX)
+
+	// Find the modular inverse of deltaX (3 mod 26)
+	invDeltaX, err := helpers.ModInverseExtended(deltaX, m)
+	fmt.Printf("invDeltaX: %d\n", invDeltaX)
+	if err != nil {
+		return -1, -1, fmt.Errorf("nie można znaleźć odwrotności modularnej: %v", err)
+	}
+
+	x := (deltaY * invDeltaX) % m // x = (25 * 9) mod 26
+	fmt.Printf("Obliczone x: %d\n", x)
+
+	// Calculate y from the first equation: y = 15 - x * 8 mod 26
+	y := (y1 - x*x1) % m
+	if y < 0 {
+		y += m
+	}
+	fmt.Printf("Obliczone y: %d\n", y)
+
+	return x, y, nil
 }
 
 

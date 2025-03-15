@@ -82,4 +82,11 @@ func main() {
 
 	// fmt.Printf("Zapisuję do pliku: %s\n", ciphertextfull)
 	// helpers.SaveOutput(ciphertextfull, "output2.txt")
+
+
+	// ciphertext := "pq" 
+	// plaintext := "if"
+	// // Znajdowanie klucza (a, c)
+	// a, c := cryptofunc.FindAffineKey(ciphertext, plaintext)
+	// fmt.Printf("Odgadnięty klucz z dobrego pliku: a = %d, c = %d\n", a, c)
 }
