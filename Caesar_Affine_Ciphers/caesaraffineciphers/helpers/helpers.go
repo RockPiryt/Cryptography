@@ -92,51 +92,57 @@ func ValidateKey(filePath string, cipherType string) (int, int) {
 	}
 
 	// Convert the first number (always used for Caesar and Affine).
-	caesarKey, err := strconv.Atoi(parts[0])
+	c, err := strconv.Atoi(parts[0])
 	if err != nil {
 		fmt.Printf("Błędny klucz Cezara: Musi być liczbą całkowitą. Znaleziono: %s\n", parts[0])
 		return -1, -1
 	}
 
 	// Validate the Caesar cipher key (0-25).
-	if caesarKey < 0 || caesarKey > 25 {
-		fmt.Printf("Błędny klucz Cezara: Klucz musi być liczbą z zakresu 0-25. Znaleziono: %d\n", caesarKey)
+	if c < 0 || c > 25 {
+		fmt.Printf("Błędny klucz Cezara: Klucz musi być liczbą z zakresu 0-25. Znaleziono: %d\n", c)
 		return -1, -1
 	}
 
 	// If Caesar cipher is used, return only the first key, ignoring the second.
 	if cipherType == "caesar" {
-		return caesarKey, -1
+		return c, -1
 	}
 
 	// Convert the second number (used only for Affine cipher).
-	affineA, err := strconv.Atoi(parts[1])
+	a, err := strconv.Atoi(parts[1])
 	if err != nil {
 		fmt.Printf("Błędny klucz afiniczny: Musi być liczbą całkowitą. Znaleziono: %s\n", parts[1])
 		return -1, -1
 	}
 
 	// Validate that 'a' is coprime with 26.
-	if gcd(affineA, 26) != 1 {
-		fmt.Printf("Błędny klucz afiniczny: Współczynnik 'a' musi być względnie pierwsza z 26. Znaleziono: %d\n", affineA)
+	m := 26
+	gcd, _, _ := extendedGCD(a, m)
+	if gcd != 1 {
+		fmt.Printf("Błędny klucz afiniczny: Współczynnik 'a' musi być względnie pierwsza z 26. Znaleziono: %d\n", a)
 		return -1, -1
 	}
 
-	return caesarKey, affineA
+	return c, a
 }
 
-
-// gcd calculates the greatest common divisor (GCD) of two numbers.
-func gcd(a, b int) int {
-	for b != 0 {
-		a, b = b, a%b
+// Extended Euclidean algorithm
+func extendedGCD(a, b int) (int, int, int) {
+	if b == 0 {
+		return a, 1, 0
 	}
-	return a
+	gcd, x1, y1 := extendedGCD(b, a%b)
+	x := y1
+	y := x1 - (a/b)*y1
+	return gcd, x, y
 }
 
-
-
-
-
-
-
+// Function to calculate the modular inverse using the extended Euclidean algorithm
+func ModInverseExtended(a, m int) int {
+	gcd, x, _ := extendedGCD(a, m)
+	if gcd != 1 {
+		log.Fatal("Brak modularnej odwrotności dla danego 'a'.")
+	}
+	return (x%m + m) % m // Avoid negative numbers
+}

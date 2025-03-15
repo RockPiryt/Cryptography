@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"caesaraffineciphers/helpers"
 )
@@ -97,12 +98,12 @@ func CipherOperations(params CipherParams) {
 	}
 	originalText := strings.Join(textLines, "\n")
 
-	var key1, key2 int
+	var c, a int
 
 	switch params.Operation {
 	case "e", "d":
 		// Validate the key.
-		key1, key2 = helpers.ValidateKey(params.InputKey, params.CipherType)
+		c, a = helpers.ValidateKey(params.InputKey, params.CipherType)
 	case "j":
 		// Read the extra text.
 		extraTextLines, err := helpers.GetText(params.InputTextHelper)
@@ -112,23 +113,23 @@ func CipherOperations(params CipherParams) {
 		extraText := strings.Join(extraTextLines, "\n")
 
 		// Find the key based on the extra text.
-		key1, key2 = params.KeyFinder(originalText, extraText)
+		c, a = params.KeyFinder(originalText, extraText)
 
 		// Save the key to a file.
-		helpers.SaveOutput(fmt.Sprintf("%d %d", key1, key2), params.OutputKey)
+		helpers.SaveOutput(fmt.Sprintf("%d %d", c, a), params.OutputKey)
 	default:
 		log.Fatalf("Nieznana operacja: %s", params.Operation)
 	}
 
 	// Execute the cipher function.
-	resultText := params.CipherFunc(originalText, key1, key2, params.Operation)
+	resultText := params.CipherFunc(originalText, a, c, params.Operation)
 
 	// Save the result to a file.
 	helpers.SaveOutput(resultText, params.OutputText)
 }
 // ------------------------------------------------------------------------Caesar Cipher------------------------------------------------------------------------
 // CaesarCipher encrypts or decrypts text using the Caesar cipher based on the given flags.
-func CaesarCipher(text string, key1, _ int, operation string) string {
+func CaesarCipher(text string, c, _ int, operation string) string {
 	var result strings.Builder
 
 	for _, char := range text {
@@ -136,11 +137,11 @@ func CaesarCipher(text string, key1, _ int, operation string) string {
 		if operation == "e" {
 			if char >= 'a' && char <= 'z' {
 				shift := int(char - 'a')
-				shift = (shift + key1) % 26
+				shift = (shift + c) % 26
 				result.WriteRune(rune(shift + 'a'))
 			} else if char >= 'A' && char <= 'Z' {
 				shift := int(char - 'A')
-				shift = (shift + key1) % 26
+				shift = (shift + c) % 26
 				result.WriteRune(rune(shift + 'A'))
 			}
 		}
@@ -149,11 +150,11 @@ func CaesarCipher(text string, key1, _ int, operation string) string {
 		if operation == "d" {
 			if char >= 'a' && char <= 'z' {
 				shift := int(char - 'a')
-				shift = (shift - key1 + 26) % 26
+				shift = (shift - c + 26) % 26
 				result.WriteRune(rune(shift + 'a'))
 			} else if char >= 'A' && char <= 'Z' {
 				shift := int(char - 'A')
-				shift = (shift - key1 + 26) % 26
+				shift = (shift - c + 26) % 26
 				result.WriteRune(rune(shift + 'A'))
 			}
 		}
@@ -251,45 +252,47 @@ func CaesarCryptAnalysis(inputText string, outputText string) {
 
 // ------------------------------------------------------------------------Affine Cipher------------------------------------------------------------------------
 // Affine cipher function
-func AffineCipher(text string, a, b int, operation string) string {
-	var result strings.Builder
+func AffineCipher(text string, a, c int, operation string) string {
+	result := ""
+	m := 26
 
-	if operation == "e" {
-		for _, char := range text {
-			if char >= 'a' && char <= 'z' {
-				result.WriteRune('a' + rune((a*int(char-'a')+b)%26))
-			} else if char >= 'A' && char <= 'Z' {
-				result.WriteRune('A' + rune((a*int(char-'A')+b)%26))
+	fmt.Printf("AffineCipher: a=%d, c=%d, operation=%s\n", a, c, operation)
+	fmt.Printf("Input text: %s\n", text)
+
+	// If decrypting, calculate the modular inverse of 'a'
+	aInv := 0
+	if operation == "d" {
+		aInv = helpers.ModInverseExtended(a, m)
+	}
+
+	for _, char := range text {
+		if unicode.IsLetter(char) && unicode.Is(unicode.Latin, char) { // Skip Polish characters and others
+			isUpper := unicode.IsUpper(char)
+			var base rune
+			if isUpper {
+				base = 'A'
 			} else {
-				result.WriteRune(char)
+				base = 'a'
 			}
-		}
-	} else if operation == "d" {
-		invA := modInverse(a, 26)
-		for _, char := range text {
-			if char >= 'a' && char <= 'z' {
-				result.WriteRune('a' + rune((invA*(int(char-'a')-b+26))%26))
-			} else if char >= 'A' && char <= 'Z' {
-				result.WriteRune('A' + rune((invA*(int(char-'A')-b+26))%26))
-			} else {
-				result.WriteRune(char)
+
+			x := int(char - base)
+
+			if operation == "e" { // Encrypt
+				y := (a*x + c) % m
+				result += string(rune(y) + base)
+			} else if operation == "d" { // Decrypt
+				y := (aInv * (x - c + m)) % m
+				result += string(rune(y) + base)
 			}
+		} else {
+			result += string(char) // Skip other characters
 		}
 	}
 
-	return result.String()
+	return result
 }
 
-// Modular inverse function
-func modInverse(a, m int) int {
-	for x := 1; x < m; x++ {
-		if (a*x)%m == 1 {
-			return x
-		}
-	}
-	log.Fatal("Brak modularnej odwrotności dla danego 'a'.")
-	return -1
-}
+
 
 // Find key for Affine cipher (placeholder implementation)
 func FindAffineKey(cryptoText, extraText string) (int, int) {

@@ -72,4 +72,14 @@ func main() {
 
 	// Execute the cipher operation
 	cryptofunc.ExecuteCipher(cipherType, operation)
+
+	// c, a := helpers.ValidateKey("files/key.txt", "affine")
+	// fmt.Printf("Przesunięcie c=%d, współczynnik a=%d:", c, a)
+
+	// plaintext := "AZURE RAY"
+	// ciphertextfull := cryptofunc.AffineCipher(plaintext, a, c, "e")
+	// fmt.Println("Zaszyfrowany tekst full:", ciphertextfull)
+
+	// fmt.Printf("Zapisuję do pliku: %s\n", ciphertextfull)
+	// helpers.SaveOutput(ciphertextfull, "output2.txt")
 }
