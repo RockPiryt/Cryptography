@@ -321,12 +321,12 @@ func FindAffineKey(cryptoText, extraText string) (int, int) {
 
 	// Find the first matching pair of characters in both texts
 	for i := 0; i < len(cryptoText)-1; i++ {
-		// Convert characters to integers
-		x1 := int(extraText[i] - 'a')
-		y1 := int(cryptoText[i] - 'a')
-		
-		x2 := int(extraText[i+1] - 'a')
-		y2 := int(cryptoText[i+1] - 'a')
+		// Convert characters to zero-based indices (0-25)
+		x1 := int(unicode.ToUpper(rune(extraText[i])) - 'A')
+		y1 := int(unicode.ToUpper(rune(cryptoText[i])) - 'A')
+
+		x2 := int(unicode.ToUpper(rune(extraText[i+1])) - 'A')
+		y2 := int(unicode.ToUpper(rune(cryptoText[i+1])) - 'A')
 
 		fmt.Printf("x1: %d, y1: %d, x2: %d, y2: %d\n", x1, y1, x2, y2)
 
