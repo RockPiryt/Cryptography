@@ -34,8 +34,10 @@ func GetText(filename string) ([]string, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		line = RemovePolishLetters(line)
-		lines = append(lines, line)
+		//fmt.Printf("Odczytano linię: %s\n", line)
+		lineAng := RemovePolishLetters(line)
+		//fmt.Printf("Po usunięciu polskich liter: %s\n", lineAng)
+		lines = append(lines, lineAng)
 	}
 
 	err = file.Close()
@@ -64,8 +66,8 @@ func RemovePolishLetters(input string) string {
 		// If the character is a Polish letter, replace it
 		if repl, found := replacementMap[r]; found {
 			result.WriteRune(repl)
-		} else if unicode.IsLetter(r) || unicode.IsSpace(r) {
-			// If it's a letter (ignoring Polish diacriticals) or a space, keep it
+		} else if unicode.IsLetter(r) || unicode.IsSpace(r) || unicode.IsDigit(r) {
+			// If it's a letter, digit, or space, keep it
 			result.WriteRune(r)
 		}
 	}

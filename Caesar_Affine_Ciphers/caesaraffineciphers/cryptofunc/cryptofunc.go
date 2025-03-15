@@ -111,6 +111,7 @@ func CipherOperations(params CipherParams) {
 	case "e", "d":
 		// Validate the key.
 		c, a = helpers.ValidateKey(params.InputKey, params.CipherType)
+		//fmt.Printf("Klucz: %d %d\n", c, a)
 	case "j":
 		// Read the extra text.
 		extraTextLines, err := helpers.GetText(params.InputTextHelper)
@@ -128,23 +129,35 @@ func CipherOperations(params CipherParams) {
 		log.Fatalf("Nieznana operacja: %s", params.Operation)
 	}
 
-	// Execute the cipher function.
+	// Execute the cipher function based on the cipher type
 	var resultText string
 	var cipherErr error
 
-	resultText, cipherErr = AffineCipher(originalText, a, c, params.Operation)
+	switch params.CipherType {
+	case "caesar":
+		// If it's Caesar, use CaesarCipher
+		resultText, cipherErr = CaesarCipher(originalText, a, c, params.Operation)
+	case "affine":
+		// If it's Affine, use AffineCipher
+		resultText, cipherErr = AffineCipher(originalText, a, c, params.Operation)
+	default:
+		log.Fatalf("Nieobsługiwany typ szyfru: %s", params.CipherType)
+	}
+
 	if cipherErr != nil {
 		log.Fatalf("Błąd szyfrowania: %v", cipherErr)
 	}
 
 	// Save the result to a file.
 	helpers.SaveOutput(resultText, params.OutputText)
+
 }
 
 // ------------------------------------------------------------------------Caesar Cipher------------------------------------------------------------------------
 // CaesarCipher encrypts or decrypts text using the Caesar cipher based on the given flags.
 func CaesarCipher(text string, _, c int, operation string) (string, error) {
 	var result strings.Builder
+	//fmt.Printf("CaesarCipher: c=%d, operation=%s\n", c, operation)
 
 	if operation != "e" && operation != "d" {
 		return "", fmt.Errorf("nieprawidłowa operacja: %s", operation)
@@ -158,32 +171,32 @@ func CaesarCipher(text string, _, c int, operation string) (string, error) {
 		// Handle encryption for lowercase letters and uppercase letters
 		if operation == "e" {
 			if char >= 'a' && char <= 'z' {
-				shift := int(char - 'a')
-				shift = (shift + c) % 26
-				result.WriteRune(rune(shift + 'a'))
+				shift := int(char - 'a')  
+				shift = (shift + c) % 26  
+				result.WriteRune(rune(shift + 'a')) 
 			} else if char >= 'A' && char <= 'Z' {
-				shift := int(char - 'A')
-				shift = (shift + c) % 26
-				result.WriteRune(rune(shift + 'A'))
+				shift := int(char - 'A')  
+				shift = (shift + c) % 26  
+				result.WriteRune(rune(shift + 'A')) 
 			}
 		}
 
 		// Handle decryption for lowercase letters and uppercase letters
 		if operation == "d" {
 			if char >= 'a' && char <= 'z' {
-				shift := int(char - 'a')
-				shift = (shift - c + 26) % 26
-				result.WriteRune(rune(shift + 'a'))
+				shift := int(char - 'a')  
+				shift = (shift - c + 26) % 26  
+				result.WriteRune(rune(shift + 'a'))  
 			} else if char >= 'A' && char <= 'Z' {
-				shift := int(char - 'A')
-				shift = (shift - c + 26) % 26
-				result.WriteRune(rune(shift + 'A'))
+				shift := int(char - 'A') 
+				shift = (shift - c + 26) % 26  
+				result.WriteRune(rune(shift + 'A')) 
 			}
 		}
 
 		// Non-alphabet characters remain unchanged
 		if !(char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z') {
-			result.WriteRune(char)
+			result.WriteRune(char) 
 		}
 	}
 
@@ -223,6 +236,7 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 		log.Fatalf("Błąd przy odczycie pliku %s: %v", inputText, err)
 	}
 	cryptoText := strings.Join(cryptoLines, "\n")
+	//fmt.Printf("Oczekiwany zaszyfrowany tekst: %s\n", cryptoText)
 
 	// Read the extra text.
 	extraLines, err := helpers.GetText(inputTextHelper)
@@ -230,6 +244,7 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 		log.Fatalf("Błąd przy odczycie pliku %s: %v", inputTextHelper, err)
 	}
 	extraText := strings.Join(extraLines, "\n")
+	//fmt.Printf("Oczekiwany jawny tekst pomocniczy: %s\n", extraText)
 
 	if len(cryptoText) == 0 || len(extraText) == 0 {
 		log.Fatal("Błąd: Brak danych w plikach wejściowych.")
@@ -243,7 +258,7 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 	helpers.SaveOutput(guessedKeyString, outputKey)
 
 	// Decrypt using the guessed key
-	decryptedText, _ := CaesarCipher(cryptoText, guessedKey, -1, "d")
+	decryptedText, _ := CaesarCipher(cryptoText, -1, guessedKey, "d")
 
 	helpers.SaveOutput(decryptedText, outputText)
 }
@@ -264,7 +279,7 @@ func CaesarCryptAnalysis(inputText string, outputText string) {
 
 	// Test all possible keys (0-25)
 	for key := 1; key <= 25; key++ {
-		decryptedText, _ := CaesarCipher(cryptoText, key, -1, "d")
+		decryptedText, _ := CaesarCipher(cryptoText, -1, key, "d")
 		result.WriteString(decryptedText + "\n")
 	}
 
