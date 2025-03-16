@@ -3,6 +3,7 @@ package cryptofunc
 import (
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"unicode"
@@ -53,6 +54,15 @@ func ExecuteCipher(cipherType string, operation string) {
 		params.InputTextHelper = "files/extra.txt"
 		params.OutputText = "files/decrypt.txt"
 		params.OutputKey = "files/key-found.txt"
+
+		// Ensure extra.txt exists before proceeding
+		if _, err := os.Stat("files/extra.txt"); os.IsNotExist(err) {
+			log.Println("Plik extra.txt nie istnieje, tworzenie go...")
+			if err := helpers.CreateExtraFile(); err != nil {
+				log.Fatalf("Błąd przy tworzeniu pliku extra.txt: %v", err)
+			}
+		}
+
 		// If Caesar explicit cryptanalysis (-c -j), call specialized function
 		if cipherType == "caesar" {
 			CaesarExplicitCryptAnalysis(params.InputText, params.InputTextHelper, params.OutputText, params.OutputKey)

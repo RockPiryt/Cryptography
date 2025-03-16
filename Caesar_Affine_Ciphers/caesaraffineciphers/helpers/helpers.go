@@ -95,7 +95,51 @@ func SaveOutput(result string, outputFile string) {
 	//fmt.Println("Zapisano wynik do pliku:", outputFile)
 }
 
+// Function to create a new file (extra.txt) containing the first two characters from plain.txt
+func CreateExtraFile() error {
+	// Check if extra.txt already exists
+	if _, err := os.Stat("files/extra.txt"); err == nil {
+		// If the file exists, print a message and return
+		log.Println("Plik extra.txt już istnieje.")
+		return nil
+	} else if !os.IsNotExist(err) {
+		// If an error occurs other than "file does not exist", return the error
+		log.Printf("błąd przy sprawdzaniu istnienia pliku extra.txt: %v", err)
+		return fmt.Errorf("błąd przy sprawdzaniu istnienia pliku extra.txt: %v", err)
+	}
 
+	// Read the text from plain.txt
+	lines, err := GetText("files/plain.txt")
+	if err != nil {
+		log.Printf("błąd przy odczycie pliku plain.txt: %v", err)
+		return fmt.Errorf("błąd przy odczycie pliku plain.txt: %v", err)
+	}
+
+	// Check if we have at least one line in the file
+	if len(lines) == 0 {
+		log.Println("plik plain.txt jest pusty")
+		return fmt.Errorf("plik plain.txt jest pusty")
+	}
+
+	// Get the first two characters from the first line
+	line := lines[0]
+	if len(line) < 2 {
+		log.Println("pierwsza linia w pliku plain.txt zawiera mniej niż dwa znaki")
+		return fmt.Errorf("pierwsza linia w pliku plain.txt zawiera mniej niż dwa znaki")
+	}
+
+	// Get the first two characters
+	extraText := line[:2]
+
+	// Write the extracted text to extra.txt
+	err = os.WriteFile("files/extra.txt", []byte(extraText), 0644)
+	if err != nil {
+		log.Printf("błąd przy zapisywaniu do pliku extra.txt: %v", err)
+		return fmt.Errorf("błąd przy zapisywaniu do pliku extra.txt: %v", err)
+	}
+
+	return nil
+}
 // ValidateKey reads and validates the keys for both Caesar and Affine ciphers from a file.
 func ValidateKey(filePath string, cipherType string) (int, int) {
 	// Read the key from the file.
