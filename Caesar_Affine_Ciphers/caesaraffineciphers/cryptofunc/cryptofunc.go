@@ -220,12 +220,12 @@ func FindCaesarKey(cryptoText, extraText string) (int, int) {
 			if key < 0 {
 				key += 26
 			}
-			return key, 0
+			return key, 1
 		}
 	}
 
 	log.Fatal("Nie udało się znaleźć pasujących znaków do odgadnięcia klucza.")
-	return -1, 0
+	return -1, 1
 }
 
 // CaesarExplicitCryptAnalysis make analysis of Caesar cipher based on the extra text.
@@ -255,7 +255,7 @@ func CaesarExplicitCryptAnalysis(inputText, inputTextHelper, outputText, outputK
 	guessedKeyString := strconv.Itoa(guessedKey)
 
 	// Save the guessed key
-	helpers.SaveOutput(guessedKeyString, outputKey)
+	helpers.SaveOutput(guessedKeyString + " 1", outputKey)
 
 	// Decrypt using the guessed key
 	decryptedText, _ := CaesarCipher(cryptoText, -1, guessedKey, "d")
