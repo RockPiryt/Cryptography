@@ -3,6 +3,7 @@ package helpers
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -89,76 +90,29 @@ func SaveOutput(result string, outputFile string) {
 }
 
 
-// ValidateKey reads and validates the keys for both Caesar and Affine ciphers from a file.
-func ValidateKey(filePath string, cipherType string) (int, int) {
-	// Read the key from the file.
-	keyLines, err := GetText(filePath)
+// Function to read and validate the key for Vignere cipher
+func ValidateKey(filePath string) (string, error) {
+	keyBytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		fmt.Printf("Błąd przy odczycie pliku klucza: %v\n", err)
-		return -1, -1
+		log.Printf("błąd przy odczycie pliku %s: %v", filePath, err)
+		return "", fmt.Errorf("błąd przy odczycie pliku %s: %v", filePath, err)
+	}
+	key := string(keyBytes)
+
+	// Check if the key is empty.
+	if len(key) == 0 {
+		return "", fmt.Errorf("klucz jest pusty")
 	}
 
-	// Ensure the file contains exactly one line.
-	if len(keyLines) != 1 {
-		fmt.Printf("Błędny klucz: Plik klucza powinien zawierać tylko jedną linię. Znaleziono: %d\n", len(keyLines))
-		return -1, -1
+	// Check if the key contains only small letters.
+	for _, char := range key {
+		if !unicode.IsLetter(char) {
+			return "", fmt.Errorf("klucz zawiera niedozwolony znak: %c", char)
+		}
 	}
-
-	// Split the line into two space-separated numbers.
-	parts := strings.Fields(keyLines[0])
-	if len(parts) != 2 {
-		fmt.Printf("Błędny klucz: Plik klucza musi zawierać dokładnie dwie liczby oddzielone spacją (np. '3 7'). Znaleziono: %s\n", keyLines[0])
-		return -1, -1
-	}
-
-	// Convert the first number (always used for Caesar and Affine).
-	c, err := strconv.Atoi(parts[0])
-	if err != nil {
-		fmt.Printf("Błędny klucz Cezara: Musi być liczbą całkowitą. Znaleziono: %s\n", parts[0])
-		return -1, -1
-	}
-
-	// Validate the Caesar cipher key (0-25).
-	if c < 0 || c > 25 {
-		fmt.Printf("Błędny klucz Cezara: Klucz musi być liczbą z zakresu 0-25. Znaleziono: %d\n", c)
-		return -1, -1
-	}
-
-	// If Caesar cipher is used, return only the first key, ignoring the second.
-	if cipherType == "caesar" {
-		return c, -1
-	}
-
-	// If the cipherType is not "caesar" or "affine", report an error.
-	if cipherType != "affine" {
-		fmt.Printf("Błędny typ szyfru: Oczekiwano 'caesar' lub 'affine', znaleziono: %s\n", cipherType)
-		return -1, -1
-	}
-
-	// Convert the second number (used only for Affine cipher).
-	a, err := strconv.Atoi(parts[1])
-	if err != nil {
-		fmt.Printf("Błędny klucz afiniczny: Musi być liczbą całkowitą. Znaleziono: %s\n", parts[1])
-		return -1, -1
-	}
-
-	// Validate that 'a' is coprime with 26 and is in the range [1, 25].
-	m := 26
-	if a < 1 || a > 25 {
-		fmt.Printf("Błędny klucz afiniczny: 'a' musi być liczbą z zakresu 1-25. Znaleziono: %d\n", a)
-		return -1, -1
-	}
-
-	// Check that 'a' is coprime with 26 (gcd(a, 26) == 1).
-	gcd, _, _ := ExtendedGCD(a, m)
-	if gcd != 1 {
-		fmt.Printf("Błędny klucz afiniczny: Współczynnik 'a' musi być względnie pierwsza z 26. Znaleziono: %d\n", a)
-		return -1, -1
-	}
-
-	// Return both values: c (for Caesar) and a (for Affine).
-	return c, a
+	return key, nil
 }
+
 
 // Extended Euclidean algorithm
 func ExtendedGCD(a, b int) (int, int, int) {
