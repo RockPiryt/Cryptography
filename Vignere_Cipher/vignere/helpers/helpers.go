@@ -34,10 +34,7 @@ func GetText(filename string) ([]string, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		//fmt.Printf("Odczytano linię: %s\n", line)
-		lineAng := cleanText(line)
-		//fmt.Printf("Po usunięciu polskich liter: %s\n", lineAng)
-		lines = append(lines, lineAng)
+		lines = append(lines, line)
 	}
 
 	err = file.Close()
@@ -52,18 +49,23 @@ func GetText(filename string) ([]string, error) {
 	return lines, nil
 }
 
-// Function to preapare text for encryption.
-func cleanText(input string) string {
-	var cleanedText []rune 
+// Function to prepare text for encryption, cleans non-letter characters and converts to lowercase.
+func CleanText(input string) (string, error) {
+	var cleanedText []rune
 
+	// Check if the input text is empty.
+	if len(input) == 0 {
+		return "", fmt.Errorf("input text is empty")
+	}
+	// Prepare the text for encryption/
 	for _, char := range input {
-		if unicode.IsLetter(char) { 
+		if unicode.IsLetter(char) {
 			char = unicode.ToLower(char)
 			cleanedText = append(cleanedText, char)
 		}
 	}
 
-	return string(cleanedText)
+	return string(cleanedText), nil
 }
 
 func SaveOutput(result string, outputFile string) {
