@@ -75,3 +75,5 @@ This project is open source and available under the [MIT License]().
 For a detailed explanation of the Vigenère cipher, refer to:
 - [Vigenère Cipher](./descriptions/vigenere.md)
 
+To check
+Get-Content ".\org.txt" | measure -Character

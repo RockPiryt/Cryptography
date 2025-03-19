@@ -1,4 +1,4 @@
-package cryptofunc
+package flagfunc
 
 import (
 	"fmt"
