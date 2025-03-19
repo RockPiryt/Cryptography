@@ -35,7 +35,7 @@ func GetText(filename string) ([]string, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		//fmt.Printf("Odczytano linię: %s\n", line)
-		lineAng := RemovePolishLetters(line)
+		lineAng := cleanText(line)
 		//fmt.Printf("Po usunięciu polskich liter: %s\n", lineAng)
 		lines = append(lines, lineAng)
 	}
@@ -52,27 +52,18 @@ func GetText(filename string) ([]string, error) {
 	return lines, nil
 }
 
-// Function to remove Polish letters from text
-func RemovePolishLetters(input string) string {
-	// Mapa polskich liter z diakrytykami na ich odpowiedniki w alfabecie łacińskim
-	replacementMap := map[rune]rune{
-		'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z',
-		'Ą': 'A', 'Ć': 'C', 'Ę': 'E', 'Ł': 'L', 'Ń': 'N', 'Ó': 'O', 'Ś': 'S', 'Ź': 'Z', 'Ż': 'Z',
-	}
+// Function to preapare text for encryption.
+func cleanText(input string) string {
+	var cleanedText []rune 
 
-	// Iterate through each character in the input string and replace if it's a Polish letter
-	var result strings.Builder
-	for _, r := range input {
-		// If the character is a Polish letter, replace it
-		if repl, found := replacementMap[r]; found {
-			result.WriteRune(repl)
-		} else if unicode.IsLetter(r) || unicode.IsSpace(r) || unicode.IsDigit(r) {
-			// If it's a letter, digit, or space, keep it
-			result.WriteRune(r)
+	for _, char := range input {
+		if unicode.IsLetter(char) { 
+			char = unicode.ToLower(char)
+			cleanedText = append(cleanedText, char)
 		}
 	}
 
-	return result.String()
+	return string(cleanedText)
 }
 
 func SaveOutput(result string, outputFile string) {
