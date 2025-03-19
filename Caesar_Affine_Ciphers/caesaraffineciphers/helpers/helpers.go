@@ -100,7 +100,7 @@ func CreateExtraFile() error {
 	// Check if extra.txt already exists
 	if _, err := os.Stat("files/extra.txt"); err == nil {
 		// If the file exists, print a message and return
-		log.Println("Plik extra.txt już istnieje.")
+		// log.Println("Plik extra.txt już istnieje.")
 		return nil
 	} else if !os.IsNotExist(err) {
 		// If an error occurs other than "file does not exist", return the error
