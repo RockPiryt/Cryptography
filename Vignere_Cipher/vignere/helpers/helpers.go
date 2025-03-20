@@ -23,7 +23,7 @@ func CountSelectedFlags(flags []*bool) int {
 }
 
 // Function to read text from txt file
-func GetText(filename string) ([]string, error) {
+func ReadText(filename string) ([]string, error) {
 	var lines []string
 
 	file, err := os.Open(filename)
@@ -93,9 +93,8 @@ func CleanText(input string) (string, error) {
 	return string(cleanedText), nil
 }
 
-
-func PrepareText(filePath string) (string, error) {
-		_, err := os.Stat(filePath)
+func GetText(filePath string) (string, error) {
+	_, err := os.Stat(filePath)
 		if os.IsNotExist(err) {
 			fmt.Printf("plik %s nie istnieje", filePath)
 			return "", fmt.Errorf("plik %s nie istnieje", filePath)
@@ -104,7 +103,7 @@ func PrepareText(filePath string) (string, error) {
 			return "", fmt.Errorf("błąd przy sprawdzaniu istnienia pliku %s: %v", filePath, err)
 		}
 	
-		lines, err := GetText(filePath)
+		lines, err := ReadText(filePath)
 		if err != nil {
 			fmt.Printf("błąd przy odczycie pliku %s: %v", filePath, err)
 			return "", fmt.Errorf("błąd przy odczycie pliku %s: %v",filePath, err)
@@ -116,6 +115,16 @@ func PrepareText(filePath string) (string, error) {
 		}
 	
 		inputText := strings.Join(lines, "\n")
+		return inputText, nil
+}
+
+// Function to prepare text for encryption, cleans non-letter characters and converts to lowercase.
+func PrepareText(filePath string) (string, error) {
+		// Get input text.
+		inputText,err := GetText(filePath)
+		if err != nil {
+			return "", fmt.Errorf("błąd przy odczycie pliku %s: %v", filePath, err)
+		}
 		preparedText, err := CleanText(inputText)
 		if err != nil {
 			log.Printf("błąd przy czyszczeniu tekstu: %v", err)
