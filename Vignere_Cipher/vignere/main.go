@@ -36,6 +36,7 @@ func main() {
 	outputFile := "files/plain.txt"
 	inputKey := "files/key.txt"
 	outputText := "files/crypto.txt"
+	preparedText := "files/plain.txt"
 
 	// preparedText, err := helpers.PrepareText(inputFile)
 	// if err != nil {
@@ -50,26 +51,41 @@ func main() {
 
 	
 	// Prepare the text for encryption.
+	// err := flagfunc.CreatePlainFile(inputText, outputFile)
+	// if err != nil {
+	// 	log.Printf("błąd przy przygotowywaniu tekstu: %v", err)
+	// }
+	
+	
+	// key, err := helpers.ValidateKey(inputKey)
+	// if err != nil {
+	// 	log.Printf("nie udało się zwalidować klucza %v", err)
+	// }
+	// fmt.Println("Zwalidowany Klucz: ", key)
+
+
+	// numKey,err:=helpers.ConverseKey(key)
+	// if err != nil {
+	// 	log.Printf("nie udało się przekonwertować klucza %v", err)
+	// }
+	// fmt.Println("Skonwersowany Klucz  do liczb: ", numKey)
+
+
+	// numKey, err := flagfunc.GetKey(inputKey)
+	// if err != nil {
+	// 	log.Printf("nie udało się przekonwertować klucza %v", err)
+	// }
+	// fmt.Println("Skonwersowany Klucz  do liczb: ", numKey)
+
 	err := flagfunc.CreatePlainFile(inputText, outputFile)
+		if err != nil {
+			fmt.Printf("błąd przy przygotowywaniu tekstu: %v", err)
+		}
+
+	inputText, err = flagfunc.EncodeText(preparedText, inputKey, outputText)
 	if err != nil {
-		log.Printf("błąd przy przygotowywaniu tekstu: %v", err)
+		log.Printf("nie udało się odczytać poprawnego tekstu %v", err)
 	}
-	
-	
-	key, err := helpers.ValidateKey(inputKey)
-	if err != nil {
-		log.Printf("nie udało się zwalidować klucza %v", err)
-	}
-	fmt.Println("Zwalidowany Klucz: ", key)
-
-
-	numKey,err:=helpers.ConverseKey(key)
-	if err != nil {
-		log.Printf("nie udało się przekonwertować klucza %v", err)
-	}
-	fmt.Println("Skonwersowany Klucz  do liczb: ", numKey)
-
-
-	
+	fmt.Println("Odczytany tekst: ", inputText)
 
 }

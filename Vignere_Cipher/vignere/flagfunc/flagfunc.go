@@ -3,8 +3,6 @@ package flagfunc
 import (
 	"fmt"
 	"log"
-	"os"
-	"strings"
 
 	"vignere/helpers"
 )
@@ -40,9 +38,10 @@ func ExecuteCipher(operation string) {
 		}
 	case "e":
 		// Encode the text from plain.txt using the key from key.txt and saves the result to crypto.txt
+		params.PreparedText = "files/plain.txt"
 		params.InputKey = "files/key.txt"
 		params.OutputText = "files/crypto.txt"
-		EncodeText(params.InputKey, params.OutputText) 
+		EncodeText(params.PreparedText, params.InputKey, params.OutputText) 
 	case "d":
 		// Decode the text from crypto.txt using the key from key.txt and saves the result to decrypt.txt
 		params.InputText = "files/crypto.txt"
@@ -95,40 +94,26 @@ func GetKey(inputKey string) (string, error) {
 		return "", fmt.Errorf("nie udało się przekonwertować klucza")
 	}
 
-	fmt.Println("Przekonwertowany klucz: ", numKey)
 	return numKey, nil
 }
 
 // Function to encode the text using Vignere cipher.
-func EncodeText(inputKey, outputText string) (string, error) {
-	// Check if the plaintext file exists
-	plainTextFile := "files/plain.txt"
-	if _, err := os.Stat(plainTextFile); os.IsNotExist(err) {
-		return "", fmt.Errorf("file %s does not exist", plainTextFile)
-	} else if err != nil {
-		return "", fmt.Errorf("error checking file %s: %v", plainTextFile, err)
-	}
-
-	// Read plaintext from the file
-	lines, err := helpers.GetText(plainTextFile)
-	if err != nil {
-		return "", fmt.Errorf("błąd przy odczycie pliku %s: %v",plainTextFile, err)
-	}
-
-	if len(lines) == 0 {
-		return "", fmt.Errorf("plik %s jest pusty", plainTextFile)
-	}
-
-	inputText := strings.Join(lines, "\n")
-	fmt.Println("Odczytany tekst: ", inputText)
-	
+func EncodeText(plainTextFile, inputKey, outputText string) (string, error) {
 	// Prepare the key for encryption.
 	numKey,err := GetKey(inputKey)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się odczytać poprawnego klucza")
 	}
 
-	return numKey, nil
+	fmt.Println("Skonwersowany Klucz  do liczb: ", numKey)
+
+	// Get the prepared text for encryption.
+	inputText, err := helpers.GetText(plainTextFile)
+	if err != nil {
+		return "", fmt.Errorf("błąd przy odczycie pliku %s: %v", plainTextFile, err)
+	}
+
+	return inputText, nil
 }
 
 
