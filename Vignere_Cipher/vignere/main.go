@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"vignere/flagfunc"
 	"vignere/helpers"
 )
 
@@ -31,17 +32,44 @@ func main() {
 	}
 
 	// Tests
-	inputFile := "files/org.txt"
-	preparedText, err := helpers.PrepareText(inputFile)
-	if err != nil {
-		log.Printf("błąd przy czyszczeniu tekstu: %v", err)
-	}
-	fmt.Println(preparedText)
-
+	inputText := "files/org.txt"
 	outputFile := "files/plain.txt"
-	err = helpers.SaveOutput(preparedText, outputFile)
+	inputKey := "files/key.txt"
+	outputText := "files/crypto.txt"
+
+	// preparedText, err := helpers.PrepareText(inputFile)
+	// if err != nil {
+	// 	log.Printf("błąd przy czyszczeniu tekstu: %v", err)
+	// }
+	// fmt.Println(preparedText)
+
+	// err = helpers.SaveOutput(preparedText, outputFile)
+	// if err != nil {
+	// 	log.Printf("błąd przy zapisie tekstu: %v", err)
+	// }	
+
+	
+	// Prepare the text for encryption.
+	err := flagfunc.CreatePlainFile(inputText, outputFile)
 	if err != nil {
-		log.Printf("błąd przy zapisie tekstu: %v", err)
-	}	
+		log.Printf("błąd przy przygotowywaniu tekstu: %v", err)
+	}
+	
+	
+	key, err := helpers.ValidateKey(inputKey)
+	if err != nil {
+		log.Printf("nie udało się zwalidować klucza %v", err)
+	}
+	fmt.Println("Zwalidowany Klucz: ", key)
+
+
+	numKey,err:=helpers.ConverseKey(key)
+	if err != nil {
+		log.Printf("nie udało się przekonwertować klucza %v", err)
+	}
+	fmt.Println("Skonwersowany Klucz  do liczb: ", numKey)
+
+
+	
 
 }
