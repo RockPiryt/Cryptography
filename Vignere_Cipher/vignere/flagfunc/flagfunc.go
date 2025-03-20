@@ -3,6 +3,7 @@ package flagfunc
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"vignere/helpers"
 )
@@ -25,7 +26,7 @@ func ExecuteCipher(operation string) {
 		plainText := "files/plain.txt"
 		inputKey := "files/key.txt"
 		outputText := "files/crypto.txt"
-		inputText, err := VigenereEncode(plainText, inputKey, outputText)
+		inputText, err := EncodeVignere(plainText, inputKey, outputText)
 		if err != nil {
 			log.Printf("nie udało się odczytać poprawnego tekstu %v", err)
 		}
@@ -35,12 +36,12 @@ func ExecuteCipher(operation string) {
 		inputText := "files/crypto.txt"
 		inputKey := "files/key.txt"
 		outputText := "files/decrypt.txt"
-		DecodeText(inputText, inputKey, outputText) 
+		DecodeVignere(inputText, inputKey, outputText) 
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
 		inputText := "files/crypto.txt"
 		outputText := "files/decrypt.txt"
-		VignereCryptAnalysis(inputText, outputText)
+		CryptAnalysisVignere(inputText, outputText)
 
 	default:
 		fmt.Println("Nieobsługiwana operacja.")
@@ -68,7 +69,7 @@ func CreatePlainFile(inputFile string, outputFile string) error {
 
 
 // Function to encode text using Vigenere cipher with numeric key shifts
-func VigenereEncode(plainText, inputKey, outputText string) (string, error) {
+func VigenereEncode2(plainText, inputKey, outputText string) (string, error) {
 	keyShifts ,err := helpers.GetKey(inputKey)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się odczytać poprawnego klucza")
@@ -93,7 +94,93 @@ func VigenereEncode(plainText, inputKey, outputText string) (string, error) {
 	return string(encodedText), nil
 }
 
-func VignereCryptAnalysis(cryptoText, outputFile string) error{
+// encryptVigenere encrypts the given text using the Vigenère cipher.
+func EncodeVignere(plainText, key, outputText string) (string, error) {
+	if len(plainText) == 0 || len(key) == 0 {
+		return "", fmt.Errorf("input plainText, or key cannot be empty")
+	}
+	alphabet := "abcdefghijklmnopqrstuvwxyz"
+	var result []rune
+
+	for i, char := range plainText {
+		index := strings.IndexRune(alphabet, char)
+		keyIndex := strings.IndexRune(alphabet, rune(key[i % len(key)]))
+
+		encryptedIndex := (index + keyIndex) % len(alphabet)
+		result = append(result, rune(alphabet[encryptedIndex]))
+	}
+
+	// Save the decrypted text to decrypt.txt
+	err := helpers.SaveOutput(string(result), outputText)
+	if err != nil {
+		log.Printf("błąd przy zapisie tekstu: %v", err)
+		return "", fmt.Errorf("błąd przy zapisie tekstu: %v", err)
+	}
+
+	return string(result), nil
+}
+
+// decryptVigenereSimple decrypts the given plainText using the Vigenère cipher with the provided key.
+func decryptVigenereSimple(plainText, key, alphabet string) (string, error) {
+	if len(plainText) == 0 || len(key) == 0 || len(alphabet) == 0 {
+		return "", fmt.Errorf("input plainText, key, or alphabet cannot be empty")
+	}
+
+	plainText = strings.ToLower(plainText)
+	key = strings.ToLower(key)
+	keyLength := len(key)
+	alphabetLength := len(alphabet)
+	var result []rune
+
+	for i, char := range plainText {
+		index := strings.IndexRune(alphabet, char)
+		if index == -1 {
+			result = append(result, char) // Keep non-alphabet characters unchanged
+			continue
+		}
+
+		keyIndex := strings.IndexRune(alphabet, rune(key[i%keyLength]))
+		if keyIndex == -1 {
+			return "", fmt.Errorf("invalid character in key")
+		}
+
+		decryptedIndex := (index - keyIndex + alphabetLength) % alphabetLength
+		result = append(result, rune(alphabet[decryptedIndex]))
+	}
+
+	return string(result), nil
+}
+
+// getReversedKey generates a reversed key for decrypting using the Wikipedia formula: K2(i) = [26 – K(i)] mod 26
+func getReversedKey(key, alphabet string) (string, error) {
+	if len(key) == 0 || len(alphabet) == 0 {
+		return "", fmt.Errorf("key or alphabet cannot be empty")
+	}
+
+	alphabetLength := len(alphabet)
+	var reversedKey []rune
+
+	for _, char := range key {
+		keyIndex := strings.IndexRune(alphabet, char)
+		if keyIndex == -1 {
+			return "", fmt.Errorf("invalid character in key")
+		}
+
+		reversedIndex := (alphabetLength - keyIndex) % alphabetLength
+		reversedKey = append(reversedKey, rune(alphabet[reversedIndex]))
+	}
+
+	return string(reversedKey), nil
+}
+
+// decryptReversedKey decrypts the plainText using the reversed key.
+func DecodeVignere(cryptoText, reversedKey, alphabet string) (string, error) {
+	return EncodeVignere(cryptoText, reversedKey, alphabet)
+}
+
+
+//------------------------------------------------------------Kryptoanaliza------------------------------------------------------------
+func CryptAnalysisVignere(cryptoText, outputFile string) error{
 	// Save the decrypted text to decrypt.txt
 	err := helpers.SaveOutput(cryptoText, outputFile)
 	if err != nil {
@@ -102,7 +189,4 @@ func VignereCryptAnalysis(cryptoText, outputFile string) error{
 	}
 
 	return nil
-}
-func DecodeText(inputText, inputKey, outputText string) {
-	panic("unimplemented")
 }
