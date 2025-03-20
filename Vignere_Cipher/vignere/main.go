@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"vignere/helpers"
-	"vignere/flagfunc"
+
 )
 
 //Author: Paulina Kimak
@@ -29,12 +29,5 @@ func main() {
 		fmt.Println("Błąd: Musisz wybrać dokładnie jedną operację (-p, -e, -d lub -k).")
 		os.Exit(1)
 	}
-
-	err := flagfunc.CreatePlainFile()
-	if err != nil {
-		fmt.Printf("Błąd z czyszczeniem pliku org.txt: %v\n", err)
-		os.Exit(1)
-	}
-
 
 }

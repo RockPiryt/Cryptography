@@ -3,10 +3,8 @@ package helpers
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"unicode"
 )
@@ -50,6 +48,28 @@ func GetText(filename string) ([]string, error) {
 	return lines, nil
 }
 
+
+func SaveOutput(result string, outputFile string) error {
+	// Check if the file exists
+	if _, err := os.Stat(outputFile); os.IsNotExist(err) {
+		// Create the file if it does not exist
+		file, err := os.Create(outputFile)
+		if err != nil {
+			return fmt.Errorf("błąd przy tworzeniu pliku: %v", err)
+		}
+		file.Close()
+	}
+
+	// Write the result to the file
+	err := os.WriteFile(outputFile, []byte(result), 0644)
+	if err != nil {
+		return fmt.Errorf("błąd przy zapisywaniu wyniku: %v", err)
+	}
+
+	fmt.Println("Zapisano wynik do pliku:", outputFile)
+	return nil
+}
+
 // Function to prepare text for encryption, cleans non-letter characters and converts to lowercase.
 func CleanText(input string) (string, error) {
 	var cleanedText []rune
@@ -66,38 +86,50 @@ func CleanText(input string) (string, error) {
 		}
 	}
 
+	if len(cleanedText) == 0 {
+		return "", fmt.Errorf("tekst nie zawiera liter do przetworzenia")
+
+	}
 	return string(cleanedText), nil
 }
 
-func SaveOutput(result string, outputFile string) {
-	// Check if the file exists
-	if _, err := os.Stat(outputFile); os.IsNotExist(err) {
-		// Create the file if it does not exist
-		file, err := os.Create(outputFile)
-		if err != nil {
-			log.Fatalf("Błąd przy tworzeniu pliku: %v", err)
+
+func PrepareText(filePath string) (string, error) {
+		_, err := os.Stat(filePath)
+		if os.IsNotExist(err) {
+			log.Println("plik %s nie istnieje", filePath)
+			return "", fmt.Errorf("plik %s nie istnieje", filePath)
+		} else if err != nil {
+			log.Printf("błąd przy sprawdzaniu istnienia pliku %s %v", filePath, err)
+			return "", fmt.Errorf("błąd przy sprawdzaniu istnienia pliku %s: %v", filePath, err)
 		}
-		file.Close()
-	}
-
-	// Write the result to the file
-	err := os.WriteFile(outputFile, []byte(result), 0644)
-	if err != nil {
-		log.Fatalf("Błąd przy zapisywaniu wyniku: %v", err)
-	}
-
-	//fmt.Println("Zapisano wynik do pliku:", outputFile)
+	
+		lines, err := GetText(filePath)
+		if err != nil {
+			log.Printf("błąd przy odczycie pliku %s: %v", filePath, err)
+			return "", fmt.Errorf("błąd przy odczycie pliku %s: %v",filePath, err)
+		}
+	
+		if len(lines) == 0 {
+			log.Println("plik %s jest pusty", filePath)
+			return "", fmt.Errorf("plik %s jest pusty", filePath)
+		}
+	
+		inputText := strings.Join(lines, "\n")
+		preparedText, err := CleanText(inputText)
+		if err != nil {
+			log.Printf("błąd przy czyszczeniu tekstu: %v", err)
+			return "", fmt.Errorf("błąd przy czyszczeniu tekstu: %v", err)
+		}
+		return preparedText, nil
 }
-
 
 // Function to read and validate the key for Vignere cipher
 func ValidateKey(filePath string) (string, error) {
-	keyBytes, err := ioutil.ReadFile(filePath)
+	key, err := PrepareText(filePath)
 	if err != nil {
-		log.Printf("błąd przy odczycie pliku %s: %v", filePath, err)
-		return "", fmt.Errorf("błąd przy odczycie pliku %s: %v", filePath, err)
+		return "", fmt.Errorf("nie udało się przygotować klucza")
 	}
-	key := string(keyBytes)
 
 	// Check if the key is empty.
 	if len(key) == 0 {
@@ -110,6 +142,8 @@ func ValidateKey(filePath string) (string, error) {
 			return "", fmt.Errorf("klucz zawiera niedozwolony znak: %c", char)
 		}
 	}
+
+
 	return key, nil
 }
 
