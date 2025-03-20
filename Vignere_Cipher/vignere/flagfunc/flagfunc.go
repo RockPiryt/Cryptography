@@ -3,6 +3,8 @@ package flagfunc
 import (
 	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	"vignere/helpers"
 )
@@ -28,13 +30,19 @@ func ExecuteCipher(operation string) {
 	}
 
 	switch operation {
-	case "e":
-		// Encode the text from plain.txt using the key from key.txt and saves the result to crypto.txt
+	case "p":
+		// Prepare the text for encryption and save it to plain.txt
 		params.InputText = "files/org.txt"
 		params.PreparedText = "files/plain.txt"
+		err := CreatePlainFile(params.InputText, params.PreparedText)
+		if err != nil {
+			fmt.Printf("błąd przy przygotowywaniu tekstu: %v", err)
+		}
+	case "e":
+		// Encode the text from plain.txt using the key from key.txt and saves the result to crypto.txt
 		params.InputKey = "files/key.txt"
 		params.OutputText = "files/crypto.txt"
-		encodeText(params.InputText, params.PreparedText, params.InputKey , params.OutputText) 
+		EncodeText(params.InputKey, params.OutputText) 
 	case "d":
 		// Decode the text from crypto.txt using the key from key.txt and saves the result to decrypt.txt
 		params.InputText = "files/crypto.txt"
@@ -53,9 +61,6 @@ func ExecuteCipher(operation string) {
 		CipherOperations(params)
 }
 
-func VignereCryptAnalysis(s1, s2 string) {
-	panic("unimplemented")
-}
 
 func CipherOperations(params CipherParams) {
 	panic("unimplemented")
@@ -79,7 +84,7 @@ func CreatePlainFile(inputFile string, outputFile string) error {
 }
 
 // Function to get the key for Vignere cipher.
-func GetKey(inputKey string ) (string, error) {
+func GetKey(inputKey string) (string, error) {
 	key, err := helpers.ValidateKey(inputKey)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się zwalidować klucza")
@@ -95,9 +100,28 @@ func GetKey(inputKey string ) (string, error) {
 }
 
 // Function to encode the text using Vignere cipher.
-func encodeText(inputText, preparedText, inputKey, outputText string) (string, error) {
-	// Prepare the text for encryption.
-	CreatePlainFile(inputText, preparedText)
+func EncodeText(inputKey, outputText string) (string, error) {
+	// Check if the plaintext file exists
+	plainTextFile := "files/plain.txt"
+	if _, err := os.Stat(plainTextFile); os.IsNotExist(err) {
+		return "", fmt.Errorf("file %s does not exist", plainTextFile)
+	} else if err != nil {
+		return "", fmt.Errorf("error checking file %s: %v", plainTextFile, err)
+	}
+
+	// Read plaintext from the file
+	lines, err := helpers.GetText(plainTextFile)
+	if err != nil {
+		return "", fmt.Errorf("błąd przy odczycie pliku %s: %v",plainTextFile, err)
+	}
+
+	if len(lines) == 0 {
+		return "", fmt.Errorf("plik %s jest pusty", plainTextFile)
+	}
+
+	inputText := strings.Join(lines, "\n")
+	fmt.Println("Odczytany tekst: ", inputText)
+	
 	// Prepare the key for encryption.
 	numKey,err := GetKey(inputKey)
 	if err != nil {
@@ -108,4 +132,6 @@ func encodeText(inputText, preparedText, inputKey, outputText string) (string, e
 }
 
 
-
+func VignereCryptAnalysis(s1, s2 string) {
+	panic("unimplemented")
+}
