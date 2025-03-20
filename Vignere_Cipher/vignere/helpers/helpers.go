@@ -97,7 +97,7 @@ func CleanText(input string) (string, error) {
 func PrepareText(filePath string) (string, error) {
 		_, err := os.Stat(filePath)
 		if os.IsNotExist(err) {
-			log.Println("plik %s nie istnieje", filePath)
+			fmt.Println("plik %s nie istnieje", filePath)
 			return "", fmt.Errorf("plik %s nie istnieje", filePath)
 		} else if err != nil {
 			log.Printf("błąd przy sprawdzaniu istnienia pliku %s %v", filePath, err)
@@ -106,12 +106,12 @@ func PrepareText(filePath string) (string, error) {
 	
 		lines, err := GetText(filePath)
 		if err != nil {
-			log.Printf("błąd przy odczycie pliku %s: %v", filePath, err)
+			fmt.Printf("błąd przy odczycie pliku %s: %v", filePath, err)
 			return "", fmt.Errorf("błąd przy odczycie pliku %s: %v",filePath, err)
 		}
 	
 		if len(lines) == 0 {
-			log.Println("plik %s jest pusty", filePath)
+			fmt.Println("plik %s jest pusty", filePath)
 			return "", fmt.Errorf("plik %s jest pusty", filePath)
 		}
 	
@@ -143,8 +143,29 @@ func ValidateKey(filePath string) (string, error) {
 		}
 	}
 
-
 	return key, nil
+}
+
+func ConverseKey(key string) (string, error) {
+	// Check if the key is empty
+	if len(key) == 0 {
+		return "", fmt.Errorf("key is empty")
+	}
+
+	var convertedKey []string
+
+	for _, char := range key {
+		// Ensure the character is a lowercase letter
+		if char < 'a' || char > 'z' {
+			return "", fmt.Errorf("invalid character in key: %c", char)
+		}
+
+		// Calculate shift value
+		numValue := int(char - 'a')
+		convertedKey = append(convertedKey, fmt.Sprintf("%d", numValue))
+	}
+
+	return strings.Join(convertedKey, ","), nil
 }
 
 

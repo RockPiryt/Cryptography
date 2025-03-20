@@ -34,7 +34,7 @@ func ExecuteCipher(operation string) {
 		params.PreparedText = "files/plain.txt"
 		params.InputKey = "files/key.txt"
 		params.OutputText = "files/crypto.txt"
-		CreatePlainFile(params.InputText, params.PreparedText)
+		encodeText(params.InputText, params.PreparedText, params.InputKey , params.OutputText) 
 	case "d":
 		// Decode the text from crypto.txt using the key from key.txt and saves the result to decrypt.txt
 		params.InputText = "files/crypto.txt"
@@ -62,7 +62,7 @@ func CipherOperations(params CipherParams) {
 }
 
 // Function to create a new file (plain.txt) containing prepared text for encryption.
-func CreatePlainFile(inputFile string, outputFile string) error {
+func createPlainFile(inputFile string, outputFile string) error {
 	preparedText, err := helpers.PrepareText(inputFile)
 	if err != nil {
 		log.Printf("błąd przy czyszczeniu tekstu: %v", err)
@@ -77,5 +77,35 @@ func CreatePlainFile(inputFile string, outputFile string) error {
 
 	return nil
 }
+
+// Function to get the key for Vignere cipher.
+func getKey(inputKey string ) (string, error) {
+	key, err := helpers.ValidateKey(inputKey)
+	if err != nil {
+		return "", fmt.Errorf("nie udało się zwalidować klucza")
+	}
+
+	numKey,err:=helpers.ConverseKey(key)
+	if err != nil {
+		return "", fmt.Errorf("nie udało się przekonwertować klucza")
+	}
+
+	fmt.Println("Przekonwertowany klucz: ", numKey)
+	return numKey, nil
+}
+
+// Function to encode the text using Vignere cipher.
+func encodeText(inputText, preparedText, inputKey, outputText string) (string, error) {
+	// Prepare the text for encryption.
+	createPlainFile(inputText, preparedText)
+	// Prepare the key for encryption.
+	numKey,err := getKey(inputKey)
+	if err != nil {
+		return "", fmt.Errorf("nie udało się odczytać poprawnego klucza")
+	}
+
+	return numKey, nil
+}
+
 
 
