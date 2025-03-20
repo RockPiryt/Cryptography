@@ -66,36 +66,15 @@ func CreatePlainFile(inputFile string, outputFile string) error {
 	return nil
 }
 
-// Function to get the key for Vignere cipher.
-func GetKey(inputKey string) (string, error) {
-	key, err := helpers.ValidateKey(inputKey)
-	if err != nil {
-		return "", fmt.Errorf("nie udało się zwalidować klucza")
-	}
-
-	numKey,err:=helpers.ConverseKey(key)
-	if err != nil {
-		return "", fmt.Errorf("nie udało się przekonwertować klucza")
-	}
-
-	return numKey, nil
-}
-
 
 // Function to encode text using Vigenere cipher with numeric key shifts
 func VigenereEncode(plainText, inputKey, outputText string) (string, error) {
-	key,err := GetKey(inputKey)
+	keyShifts ,err := helpers.GetKey(inputKey)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się odczytać poprawnego klucza")
 	}
-	fmt.Println("Skonwersowany Klucz  do liczb: ", key)
+	fmt.Println("Skonwersowany Klucz  do liczb: ", keyShifts)
 
-	keyShifts, err := helpers.ParseKey(key)
-	if err != nil {
-		return "", fmt.Errorf("nie udało się przetworzyć klucza")
-	}
-
-	fmt.Printf("Klucz jako przesunięcie: %v\n", keyShifts)
 	var encodedText []rune
 
 	for i, char := range plainText {
