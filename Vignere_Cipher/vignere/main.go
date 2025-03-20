@@ -50,18 +50,18 @@ func main() {
 
 	// Tests
 	// inputText := "files/org.txt"
-	// outputFile := "files/plain.txt"
-	// inputKey := "files/key.txt"
+	outputFile := "files/plain.txt"
+	inputKey := "files/key.txt"
 	// outputText := "files/crypto.txt"
-	// preparedText := "files/plain.txt"
+	plainText := "files/plain.txt"
 
-	// preparedText, err := helpers.PrepareText(inputFile)
+	// plainText, err := helpers.PrepareText(inputFile)
 	// if err != nil {
 	// 	log.Printf("błąd przy czyszczeniu tekstu: %v", err)
 	// }
-	// fmt.Println(preparedText)
+	// fmt.Println(plainText)
 
-	// err = helpers.SaveOutput(preparedText, outputFile)
+	// err = helpers.SaveOutput(plainText, outputFile)
 	// if err != nil {
 	// 	log.Printf("błąd przy zapisie tekstu: %v", err)
 	// }	
@@ -99,10 +99,18 @@ func main() {
 	// 		fmt.Printf("błąd przy przygotowywaniu tekstu: %v", err)
 	// 	}
 
-	// inputText, err = flagfunc.EncodeText(preparedText, inputKey, outputText)
+	// inputText, err = flagfunc.EncodeText(plainText, inputKey, outputText)
 	// if err != nil {
 	// 	log.Printf("nie udało się odczytać poprawnego tekstu %v", err)
 	// }
 	// fmt.Println("Odczytany tekst: ", inputText)
+
+	encodedText,err := flagfunc.VigenereEncode(plainText, inputKey, outputFile)
+
+	if err != nil {
+		fmt.Printf("błąd przy szyfrowaniu tekstu: %v", err)
+	}
+
+	fmt.Println("Zaszyfrowany tekst: ", encodedText)
 
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -175,6 +176,22 @@ func ConverseKey(key string) (string, error) {
 	}
 
 	return strings.Join(convertedKey, ","), nil
+}
+
+// Convert numeric key string to int slice (e.g., "3,20,7" -> []int{3, 20, 7})
+func ParseKey(key string) ([]int, error) {
+	parts := strings.Split(key, ",")
+	var keyShifts []int
+
+	for _, part := range parts {
+		num, err := strconv.Atoi(strings.TrimSpace(part))
+		if err != nil {
+			return nil, fmt.Errorf("invalid key format: %v", err)
+		}
+		keyShifts = append(keyShifts, num)
+	}
+
+	return keyShifts, nil
 }
 
 
