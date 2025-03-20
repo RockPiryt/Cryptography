@@ -9,60 +9,46 @@ import (
 
 //Author: Paulina Kimak
 
-// Struct to store cipher parameters.
-type CipherParams struct {
-	Operation       string
-	InputText       string
-	PreparedText    string
-	InputKey        string
-	OutputText      string
-	OutputKey       string
-	CipherFunc      func(string, int, int, string) (string, error)
-	KeyFinder       func(string, string) (int, int)
-}
+
 
 // Generic function to handle Vignere cipher
 func ExecuteCipher(operation string) {
-	params := CipherParams{
-		Operation:  operation,
-	}
-
 	switch operation {
 	case "p":
 		// Prepare the text for encryption and save it to plain.txt
-		params.InputText = "files/org.txt"
-		params.PreparedText = "files/plain.txt"
-		err := CreatePlainFile(params.InputText, params.PreparedText)
+		inputText := "files/org.txt"
+		preparedText := "files/plain.txt"
+		err := CreatePlainFile(inputText, preparedText)
 		if err != nil {
 			fmt.Printf("błąd przy przygotowywaniu tekstu: %v", err)
 		}
 	case "e":
 		// Encode the text from plain.txt using the key from key.txt and saves the result to crypto.txt
-		params.PreparedText = "files/plain.txt"
-		params.InputKey = "files/key.txt"
-		params.OutputText = "files/crypto.txt"
-		EncodeText(params.PreparedText, params.InputKey, params.OutputText) 
+		preparedText := "files/plain.txt"
+		inputKey := "files/key.txt"
+		outputText := "files/crypto.txt"
+		inputText, err := EncodeText(preparedText, inputKey, outputText)
+		if err != nil {
+			log.Printf("nie udało się odczytać poprawnego tekstu %v", err)
+		}
+		fmt.Println("Odczytany tekst: ", inputText)
 	case "d":
 		// Decode the text from crypto.txt using the key from key.txt and saves the result to decrypt.txt
-		params.InputText = "files/crypto.txt"
-		params.InputKey = "files/key.txt"
-		params.OutputText = "files/decrypt.txt"
+		inputText := "files/crypto.txt"
+		inputKey := "files/key.txt"
+		outputText := "files/decrypt.txt"
+		DecodeText(inputText, inputKey, outputText) 
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
-		params.InputText = "files/crypto.txt"
-		params.OutputText = "files/decrypt.txt"
-		VignereCryptAnalysis(params.InputText, params.OutputText)
+		inputText := "files/crypto.txt"
+		outputText := "files/decrypt.txt"
+		VignereCryptAnalysis(inputText, outputText)
 
 	default:
 		fmt.Println("Nieobsługiwana operacja.")
 		return
 	}	
-		CipherOperations(params)
-}
 
-
-func CipherOperations(params CipherParams) {
-	panic("unimplemented")
 }
 
 // Function to create a new file (plain.txt) containing prepared text for encryption.
@@ -117,6 +103,16 @@ func EncodeText(plainTextFile, inputKey, outputText string) (string, error) {
 }
 
 
-func VignereCryptAnalysis(s1, s2 string) {
+func VignereCryptAnalysis(cryptoText, outputFile string) error{
+	// Save the decrypted text to decrypt.txt
+	err := helpers.SaveOutput(cryptoText, outputFile)
+	if err != nil {
+		log.Printf("błąd przy zapisie tekstu: %v", err)
+		return fmt.Errorf("błąd przy zapisie tekstu: %v", err)
+	}
+
+	return nil
+}
+func DecodeText(inputText, inputKey, outputText string) {
 	panic("unimplemented")
 }

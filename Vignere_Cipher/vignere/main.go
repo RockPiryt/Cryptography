@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"vignere/flagfunc"
 	"vignere/helpers"
@@ -31,12 +30,30 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Determine the operation
+	var operation string
+	switch {
+	case *prepareFlag:
+		operation = "p"
+	case *encryptFlag:
+		operation = "e"
+	case *decryptFlag:
+		operation = "d"
+	case *cryptAnalysisFlag:
+		operation = "k"
+	default:
+		fmt.Println("Błąd: Nie wybrano poprawnej operacji (-p, -e, -d, -k).")
+		os.Exit(1)
+	}
+
+	flagfunc.ExecuteCipher(operation)
+
 	// Tests
-	inputText := "files/org.txt"
-	outputFile := "files/plain.txt"
-	inputKey := "files/key.txt"
-	outputText := "files/crypto.txt"
-	preparedText := "files/plain.txt"
+	// inputText := "files/org.txt"
+	// outputFile := "files/plain.txt"
+	// inputKey := "files/key.txt"
+	// outputText := "files/crypto.txt"
+	// preparedText := "files/plain.txt"
 
 	// preparedText, err := helpers.PrepareText(inputFile)
 	// if err != nil {
@@ -77,15 +94,15 @@ func main() {
 	// }
 	// fmt.Println("Skonwersowany Klucz  do liczb: ", numKey)
 
-	err := flagfunc.CreatePlainFile(inputText, outputFile)
-		if err != nil {
-			fmt.Printf("błąd przy przygotowywaniu tekstu: %v", err)
-		}
+	// err := flagfunc.CreatePlainFile(inputText, outputFile)
+	// 	if err != nil {
+	// 		fmt.Printf("błąd przy przygotowywaniu tekstu: %v", err)
+	// 	}
 
-	inputText, err = flagfunc.EncodeText(preparedText, inputKey, outputText)
-	if err != nil {
-		log.Printf("nie udało się odczytać poprawnego tekstu %v", err)
-	}
-	fmt.Println("Odczytany tekst: ", inputText)
+	// inputText, err = flagfunc.EncodeText(preparedText, inputKey, outputText)
+	// if err != nil {
+	// 	log.Printf("nie udało się odczytać poprawnego tekstu %v", err)
+	// }
+	// fmt.Println("Odczytany tekst: ", inputText)
 
 }
