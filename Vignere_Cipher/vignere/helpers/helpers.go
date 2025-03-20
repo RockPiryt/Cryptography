@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"unicode"
 )
@@ -146,9 +145,9 @@ func ValidateKey(filePath string) (string, error) {
 		return "", fmt.Errorf("klucz jest pusty")
 	}
 
-	// Check if the key contains only small letters.
+	// Check if the key contains only lowercase English letters.
 	for _, char := range key {
-		if !unicode.IsLetter(char) {
+		if char < 'a' || char > 'z' { // Ensure only 'a' to 'z'
 			return "", fmt.Errorf("klucz zawiera niedozwolony znak: %c", char)
 		}
 	}
@@ -156,62 +155,32 @@ func ValidateKey(filePath string) (string, error) {
 	return key, nil
 }
 
-func ConverseKey(key string) (string, error) {
-	// Check if the key is empty
-	if len(key) == 0 {
-		return "", fmt.Errorf("key is empty")
-	}
-
-	var convertedKey []string
+// Function to convert the key to a slice of shift values.
+func ConverseKey(key string) ([]int, error) {
+	var convertedKey []int
 
 	for _, char := range key {
-		// Ensure the character is a lowercase letter
-		if char < 'a' || char > 'z' {
-			return "", fmt.Errorf("invalid character in key: %c", char)
-		}
-
-		// Calculate shift value
+		// Convert letter to shift value (a = 0, b = 1, ..., z = 25)
 		numValue := int(char - 'a')
-		convertedKey = append(convertedKey, fmt.Sprintf("%d", numValue))
+		convertedKey = append(convertedKey, numValue)
 	}
 
-	return strings.Join(convertedKey, ","), nil
-}
-
-// Convert numeric key string to int slice (e.g., "3,20,7" -> []int{3, 20, 7})
-func ParseKey(key string) ([]int, error) {
-	parts := strings.Split(key, ",")
-	var keyShifts []int
-
-	for _, part := range parts {
-		num, err := strconv.Atoi(strings.TrimSpace(part))
-		if err != nil {
-			return nil, fmt.Errorf("invalid key format: %v", err)
-		}
-		keyShifts = append(keyShifts, num)
-	}
-
-	return keyShifts, nil
+	return convertedKey, nil
 }
 
 
-// Extended Euclidean algorithm
-func ExtendedGCD(a, b int) (int, int, int) {
-	if b == 0 {
-		return a, 1, 0
+// Function to get the key for Vignere cipher.
+func GetKey(inputKey string) ([]int, error) {
+	// Read alpha key from file and validate key.
+	key, err := ValidateKey(inputKey)
+	if err != nil {
+		return nil, fmt.Errorf("nie udało się zwalidować klucza")
 	}
-	gcd, x1, y1 := ExtendedGCD(b, a%b)
-	x := y1
-	y := x1 - (a/b)*y1
-	return gcd, x, y
-}
 
-// ModInverseExtended calculates the modular inverse of a mod m using the extended Euclidean algorithm.
-// If the modular inverse does not exist, it returns an error.
-func ModInverseExtended(a, m int) (int, error) {
-	gcd, x, _ := ExtendedGCD(a, m)
-	if gcd != 1 {
-		return 0, fmt.Errorf("brak modularnej odwrotności dla a=%d (mod %d)", a, m)
+	// Convert alpha key to numeric key slice
+	numKey,err := ConverseKey(key)
+	if err != nil {
+		return nil, fmt.Errorf("nie udało się przekonwertować klucza")
 	}
-	return (x%m + m) % m, nil // Ensure non-negative result
+	return numKey, nil
 }
