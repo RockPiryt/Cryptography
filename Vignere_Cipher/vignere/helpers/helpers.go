@@ -97,7 +97,7 @@ func CleanText(input string) (string, error) {
 func PrepareText(filePath string) (string, error) {
 		_, err := os.Stat(filePath)
 		if os.IsNotExist(err) {
-			fmt.Println("plik %s nie istnieje", filePath)
+			fmt.Printf("plik %s nie istnieje", filePath)
 			return "", fmt.Errorf("plik %s nie istnieje", filePath)
 		} else if err != nil {
 			log.Printf("błąd przy sprawdzaniu istnienia pliku %s %v", filePath, err)
@@ -111,7 +111,7 @@ func PrepareText(filePath string) (string, error) {
 		}
 	
 		if len(lines) == 0 {
-			fmt.Println("plik %s jest pusty", filePath)
+			fmt.Printf("plik %s jest pusty", filePath)
 			return "", fmt.Errorf("plik %s jest pusty", filePath)
 		}
 	
