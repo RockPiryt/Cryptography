@@ -236,18 +236,32 @@ func CryptAnalysisVignere(cryptoFile, plainOutputFile, keyOutputFile, decryptedF
 }
 
 
-// findRepeatedSequences finds repeating sequences and returns their distances
+// Function findRepeatedSequences finds repeating sequences and returns their distances.
 func findRepeatedSequences(cryptoText string) map[string][]int {
-	panic("not implemented") // TODO: Implement
+	sequencePositions := make(map[string][]int)
+	sequenceDistances := make(map[string][]int)
+
+	for i := 0; i < len(cryptoText)-2; i++ {
+		seq := cryptoText[i : i+3] // 3-letters sequences
+		if positions, exists := sequencePositions[seq]; exists {
+			sequencePositions[seq] = append(positions, i)
+		} else {
+			sequencePositions[seq] = []int{i}
+		}
+	}
+
+	for seq, positions := range sequencePositions {
+		if len(positions) > 1 {
+			for j := 1; j < len(positions); j++ {
+				distance := positions[j] - positions[j-1]
+				sequenceDistances[seq] = append(sequenceDistances[seq], distance)
+			}
+		}
+	}
+
+	return sequenceDistances
 }
 
-// gcd finds the greatest common divisor (NWD) of two numbers
-func gcd(a, b int) int {
-	for b != 0 {
-		a, b = b, a%b
-	}
-	return a
-}
 
 // estimateKeyLength finds the probable length of the key
 func estimateKeyLength(distances map[string][]int) int {

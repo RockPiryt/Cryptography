@@ -195,3 +195,11 @@ func GetPreparedText(textFile string) (string, error) {
 
 	return text, nil
 }
+
+// Function Gcd finds the greatest common divisor (NWD) of two numbers
+func Gcd(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
