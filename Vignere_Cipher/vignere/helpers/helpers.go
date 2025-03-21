@@ -134,25 +134,20 @@ func PrepareText(filePath string) (string, error) {
 }
 
 // Function to read and validate the key for Vignere cipher
-func ValidateKey(filePath string) (string, error) {
-	key, err := PrepareText(filePath)
-	if err != nil {
-		return "", fmt.Errorf("nie udało się przygotować klucza")
-	}
-
+func ValidateKey(key string) (error) {
 	// Check if the key is empty.
 	if len(key) == 0 {
-		return "", fmt.Errorf("klucz jest pusty")
+		return fmt.Errorf("klucz jest pusty")
 	}
 
 	// Check if the key contains only lowercase English letters.
 	for _, char := range key {
 		if char < 'a' || char > 'z' { // Ensure only 'a' to 'z'
-			return "", fmt.Errorf("klucz zawiera niedozwolony znak: %c", char)
+			return fmt.Errorf("klucz zawiera niedozwolony znak: %c", char)
 		}
 	}
 
-	return key, nil
+	return nil
 }
 
 // Function to convert the key to a slice of shift values.
@@ -170,17 +165,27 @@ func ConverseKey(key string) ([]int, error) {
 
 
 // Function to get the key for Vignere cipher.
-func GetKey(inputKey string) ([]int, error) {
-	// Read alpha key from file and validate key.
-	key, err := ValidateKey(inputKey)
+func GetKey(keyFile string) (string, error) {
+
+	key, err := PrepareText(keyFile)
 	if err != nil {
-		return nil, fmt.Errorf("nie udało się zwalidować klucza")
+		return "", fmt.Errorf("nie udało się przygotować klucza")
+	}
+	// Read alpha key from file and validate key.
+	err = ValidateKey(key)
+	if err != nil {
+		return  "", fmt.Errorf("nie udało się zwalidować klucza")
 	}
 
-	// Convert alpha key to numeric key slice
-	numKey,err := ConverseKey(key)
+	return key, nil
+}
+
+
+func GetPlainText(inputFile string) (string, error) {
+	// Get input text.
+	plainText,err := PrepareText(inputFile)
 	if err != nil {
-		return nil, fmt.Errorf("nie udało się przekonwertować klucza")
+		return "", fmt.Errorf("błąd przy odczycie pliku %s: %v", inputFile, err)
 	}
-	return numKey, nil
+	return plainText, nil
 }

@@ -50,9 +50,9 @@ func main() {
 
 	// Tests
 	// inputText := "files/org.txt"
-	outputFile := "files/plain.txt"
+	//outputFile := "files/plain.txt"
 	inputKey := "files/key.txt"
-	// outputText := "files/crypto.txt"
+	outputCrypto := "files/crypto.txt"
 	plainText := "files/plain.txt"
 
 	// plainText, err := helpers.PrepareText(inputFile)
@@ -105,8 +105,7 @@ func main() {
 	// }
 	// fmt.Println("Odczytany tekst: ", inputText)
 
-	encodedText,err := flagfunc.VigenereEncode(plainText, inputKey, outputFile)
-
+	encodedText,err := flagfunc.EncodeVignere(plainText, inputKey, outputCrypto)
 	if err != nil {
 		fmt.Printf("błąd przy szyfrowaniu tekstu: %v", err)
 	}

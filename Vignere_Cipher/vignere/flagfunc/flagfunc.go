@@ -25,8 +25,8 @@ func ExecuteCipher(operation string) {
 		// Encode the text from plain.txt using the key from key.txt and saves the result to crypto.txt
 		plainText := "files/plain.txt"
 		inputKey := "files/key.txt"
-		outputText := "files/crypto.txt"
-		inputText, err := EncodeVignere(plainText, inputKey, outputText)
+		cryptoFile := "files/crypto.txt"
+		inputText, err := EncodeVignere(plainText, inputKey, cryptoFile)
 		if err != nil {
 			log.Printf("nie udało się odczytać poprawnego tekstu %v", err)
 		}
@@ -36,7 +36,8 @@ func ExecuteCipher(operation string) {
 		inputText := "files/crypto.txt"
 		inputKey := "files/key.txt"
 		outputText := "files/decrypt.txt"
-		DecodeVignere(inputText, inputKey, outputText) 
+		decryptVigenereSimple(inputText, inputKey, outputText)
+		// DecodeVignere(inputText, inputKey, outputText) 
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
 		inputText := "files/crypto.txt"
@@ -95,23 +96,43 @@ func VigenereEncode2(plainText, inputKey, outputText string) (string, error) {
 }
 
 // encryptVigenere encrypts the given text using the Vigenère cipher.
-func EncodeVignere(plainText, key, outputText string) (string, error) {
+func EncodeVignere(plainFile, keyFile, cryptoFile string) (string, error) {
+	
+	fmt.Printf("Plik Klucz: %s\n", keyFile)
+	fmt.Printf("Plik Tekst: %s\n", plainFile)
+	fmt.Printf("cryptoFile: %s\n", cryptoFile)
+	
+	plainText, err := helpers.GetPlainText(plainFile)
+	if err != nil {
+		return "", fmt.Errorf("nie udało się odczytać plain tekstu")
+	}
+
+	key, err := helpers.GetKey(keyFile)
+	if err != nil {
+		return "", fmt.Errorf("nie udało się odczytać klucza")
+	}
+
+	fmt.Printf("Klucz: %s\n", key)
+	fmt.Printf("Plain Tekst: %s\n", plainText)
+	
 	if len(plainText) == 0 || len(key) == 0 {
 		return "", fmt.Errorf("input plainText, or key cannot be empty")
 	}
+	
 	alphabet := "abcdefghijklmnopqrstuvwxyz"
+	alphabetLen := len(alphabet)
 	var result []rune
 
 	for i, char := range plainText {
 		index := strings.IndexRune(alphabet, char)
 		keyIndex := strings.IndexRune(alphabet, rune(key[i % len(key)]))
 
-		encryptedIndex := (index + keyIndex) % len(alphabet)
+		encryptedIndex := (index + keyIndex) % alphabetLen
 		result = append(result, rune(alphabet[encryptedIndex]))
 	}
 
 	// Save the decrypted text to decrypt.txt
-	err := helpers.SaveOutput(string(result), outputText)
+	err = helpers.SaveOutput(string(result), cryptoFile)
 	if err != nil {
 		log.Printf("błąd przy zapisie tekstu: %v", err)
 		return "", fmt.Errorf("błąd przy zapisie tekstu: %v", err)
@@ -120,8 +141,8 @@ func EncodeVignere(plainText, key, outputText string) (string, error) {
 	return string(result), nil
 }
 
-// decryptVigenereSimple decrypts the given plainText using the Vigenère cipher with the provided key.
-func decryptVigenereSimple(plainText, key, alphabet string) (string, error) {
+// decryptVigenereSimple decrypts the given cryptoFile using the Vigenère cipher with the provided key.
+func decryptVigenereSimple(cryptoFile, key, encodedFile string) (string, error) {
 	if len(plainText) == 0 || len(key) == 0 || len(alphabet) == 0 {
 		return "", fmt.Errorf("input plainText, key, or alphabet cannot be empty")
 	}
