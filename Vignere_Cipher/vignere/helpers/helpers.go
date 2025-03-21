@@ -1,3 +1,4 @@
+// Author: Paulina Kimak
 package helpers
 
 import (
@@ -9,7 +10,10 @@ import (
 	"unicode"
 )
 
-// Author: Paulina Kimak
+
+const Alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+var AlphabetLen = len(Alphabet)
 
 // Function to count selected flags
 func CountSelectedFlags(flags []*bool) int {
@@ -133,46 +137,32 @@ func PrepareText(filePath string) (string, error) {
 		return preparedText, nil
 }
 
-// Function to read and validate the key for Vignere cipher
-func ValidateKey(key string) (error) {
+// Function to validate the key for Vignere cipher
+func Validate(text string) (error) {
 	// Check if the key is empty.
-	if len(key) == 0 {
-		return fmt.Errorf("klucz jest pusty")
+	if len(text) == 0 {
+		return fmt.Errorf("klucz/tekst jest pusty")
 	}
 
 	// Check if the key contains only lowercase English letters.
-	for _, char := range key {
+	for _, char := range text {
 		if char < 'a' || char > 'z' { // Ensure only 'a' to 'z'
-			return fmt.Errorf("klucz zawiera niedozwolony znak: %c", char)
+			return fmt.Errorf("klucz/tekst zawiera niedozwolony znak: %c", char)
 		}
 	}
 
 	return nil
 }
 
-// Function to convert the key to a slice of shift values.
-func ConverseKey(key string) ([]int, error) {
-	var convertedKey []int
-
-	for _, char := range key {
-		// Convert letter to shift value (a = 0, b = 1, ..., z = 25)
-		numValue := int(char - 'a')
-		convertedKey = append(convertedKey, numValue)
-	}
-
-	return convertedKey, nil
-}
-
-
 // Function to get the key for Vignere cipher.
-func GetKey(keyFile string) (string, error) {
+func GetPreparedKey(keyFile string) (string, error) {
 
 	key, err := PrepareText(keyFile)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się przygotować klucza")
 	}
 	// Read alpha key from file and validate key.
-	err = ValidateKey(key)
+	err = Validate(key)
 	if err != nil {
 		return  "", fmt.Errorf("nie udało się zwalidować klucza")
 	}
@@ -180,12 +170,17 @@ func GetKey(keyFile string) (string, error) {
 	return key, nil
 }
 
-
-func GetPlainText(inputFile string) (string, error) {
-	// Get input text.
-	plainText,err := PrepareText(inputFile)
+// Function to get the key for Vignere cipher.
+func GetPreparedText(textFile string) (string, error) {
+	text, err := PrepareText(textFile)
 	if err != nil {
-		return "", fmt.Errorf("błąd przy odczycie pliku %s: %v", inputFile, err)
+		return "", fmt.Errorf("nie udało się przygotować klucza")
 	}
-	return plainText, nil
+	// Read alpha key from file and validate key.
+	err = Validate(text)
+	if err != nil {
+		return  "", fmt.Errorf("nie udało się zwalidować klucza")
+	}
+
+	return text, nil
 }

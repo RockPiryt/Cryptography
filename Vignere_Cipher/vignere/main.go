@@ -1,3 +1,4 @@
+//Author: Paulina Kimak
 package main
 
 import (
@@ -8,7 +9,6 @@ import (
 	"vignere/helpers"
 )
 
-//Author: Paulina Kimak
 
 
 func main() {
@@ -49,32 +49,33 @@ func main() {
 	flagfunc.ExecuteCipher(operation)
 
 	// Tests
-	// inputText := "files/org.txt"
-	//outputFile := "files/plain.txt"
-	inputKey := "files/key.txt"
-	outputCrypto := "files/crypto.txt"
-	plainText := "files/plain.txt"
+	//orgFile := "files/org.txt"
+	plainFile := "files/plain.txt"
+	keyFile := "files/key.txt"
+	cryptoFile := "files/crypto.txt"
+	decryptedFile := "files/decrypt.txt"
 
-	// plainText, err := helpers.PrepareText(inputFile)
+
+	// plainFile, err := helpers.PrepareText(inputFile)
 	// if err != nil {
 	// 	log.Printf("błąd przy czyszczeniu tekstu: %v", err)
 	// }
-	// fmt.Println(plainText)
+	// fmt.Println(plainFile)
 
-	// err = helpers.SaveOutput(plainText, outputFile)
+	// err = helpers.SaveOutput(plainFile, plainFile)
 	// if err != nil {
 	// 	log.Printf("błąd przy zapisie tekstu: %v", err)
 	// }	
 
 	
 	// Prepare the text for encryption.
-	// err := flagfunc.CreatePlainFile(inputText, outputFile)
+	// err := flagfunc.CreatePlainFile(orgFile, plainFile)
 	// if err != nil {
 	// 	log.Printf("błąd przy przygotowywaniu tekstu: %v", err)
 	// }
 	
 	
-	// key, err := helpers.ValidateKey(inputKey)
+	// key, err := helpers.ValidateKey(keyFile)
 	// if err != nil {
 	// 	log.Printf("nie udało się zwalidować klucza %v", err)
 	// }
@@ -88,28 +89,35 @@ func main() {
 	// fmt.Println("Skonwersowany Klucz  do liczb: ", numKey)
 
 
-	// numKey, err := flagfunc.GetKey(inputKey)
+	// numKey, err := flagfunc.GetKey(keyFile)
 	// if err != nil {
 	// 	log.Printf("nie udało się przekonwertować klucza %v", err)
 	// }
 	// fmt.Println("Skonwersowany Klucz  do liczb: ", numKey)
 
-	// err := flagfunc.CreatePlainFile(inputText, outputFile)
+	// err := flagfunc.CreatePlainFile(orgFile, plainFile)
 	// 	if err != nil {
 	// 		fmt.Printf("błąd przy przygotowywaniu tekstu: %v", err)
 	// 	}
 
-	// inputText, err = flagfunc.EncodeText(plainText, inputKey, outputText)
+	// orgFile, err = flagfunc.EncodeText(plainFile, keyFile, outputText)
 	// if err != nil {
 	// 	log.Printf("nie udało się odczytać poprawnego tekstu %v", err)
 	// }
-	// fmt.Println("Odczytany tekst: ", inputText)
+	// fmt.Println("Odczytany tekst: ", orgFile)
 
-	encodedText,err := flagfunc.EncodeVignere(plainText, inputKey, outputCrypto)
+	encodedText,err := flagfunc.EncodeVignere(plainFile, keyFile, cryptoFile)
 	if err != nil {
 		fmt.Printf("błąd przy szyfrowaniu tekstu: %v", err)
 	}
 
 	fmt.Println("Zaszyfrowany tekst: ", encodedText)
+
+	decodedText,err := flagfunc.EncodeVignere(cryptoFile, keyFile, decryptedFile)
+	if err != nil {
+		fmt.Printf("błąd przy odszyfrowaniu tekstu: %v", err)
+	}
+
+	fmt.Println("odszyfrowany tekst: ", decodedText)
 
 }
