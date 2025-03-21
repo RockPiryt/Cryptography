@@ -203,3 +203,24 @@ func Gcd(a, b int) int {
 	}
 	return a
 }
+
+// MostFrequentLetter returns the most common letter in the English language
+func MostFrequentLetter() rune {
+	maxFreq := 0
+	var mostCommon rune
+	for letter, freq := range FreqMap {
+		if freq > maxFreq {
+			maxFreq = freq
+			mostCommon = letter
+		}
+	}
+	return mostCommon // Now return 'e'
+}
+
+// Function returns absolute value of a number.
+func Absolute(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}

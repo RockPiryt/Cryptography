@@ -18,7 +18,7 @@ func ExecuteCipher(operation string) {
 		plainFile := "files/plain.txt"
 		err := CreatePlainFile(orgFile, plainFile)
 		if err != nil {
-			fmt.Printf("błąd przy przygotowywaniu tekstu: %v", err)
+			log.Printf("Błąd: nie udało się odczytać klucza: %v", err)
 		}
 	case "e":
 		// Encode the text from plain.txt using the key from key.txt and saves the result to crypto.txt
@@ -38,7 +38,7 @@ func ExecuteCipher(operation string) {
 
 		key, err := helpers.GetPreparedKey(keyFile)
 		if err != nil {
-			fmt.Errorf("nie udało się odczytać klucza")
+			log.Printf("nie udało się odczytać klucza")
 		}
 		fmt.Printf("Klucz: %s\n", key)
 
@@ -204,7 +204,12 @@ func CryptAnalysisVignere(cryptoFile, plainOutputFile, keyOutputFile, decryptedF
 
 
 	repeatedSequences := findRepeatedSequences(cryptoText)
-	keyLength := estimateKeyLength(repeatedSequences)
+	var allDistances []int
+	for _, distList := range repeatedSequences {
+		allDistances = append(allDistances, distList...)
+	}
+
+	keyLength := estimateKeyLength(allDistances)
 	fmt.Printf("Estimated key length: %d\n", keyLength)
 
 	key := findKey(cryptoText, keyLength)
@@ -263,32 +268,14 @@ func findRepeatedSequences(cryptoText string) map[string][]int {
 }
 
 
-// estimateKeyLength finds the probable length of the key
-func estimateKeyLength(distances map[string][]int) int {
-	gcdMap := make(map[int]int)
-
-	for _, distList := range distances {
-		for _, dist := range distList {
-			for d := 2; d <= dist; d++ {
-				if dist%d == 0 {
-					gcdMap[d]++
-				}
-			}
-		}
-	}
-
-	maxCount := 0
-	possibleKeyLength := 1
-
-	for length, count := range gcdMap {
-		if count > maxCount {
-			maxCount = count
-			possibleKeyLength = length
-		}
-	}
-
-	return possibleKeyLength
-}
+// Function estimateKeyLength finds the probable length of the key
+func estimateKeyLength(distances []int) int {
+    result := distances[0]
+    for _, d := range distances[1:] {
+        result = helpers.Gcd(result, d)
+    }
+    return result
+} 
 
 
 // findKey determines the key using frequency analysis
@@ -297,17 +284,18 @@ func findKey(cryptoText string, keyLength int) string {
 
 	for i := 0; i < keyLength; i++ {
 		var subText []rune
+		// Create a subtext from the cryptoText
 		for j := i; j < len(cryptoText); j += keyLength {
 			subText = append(subText, rune(cryptoText[j]))
 		}
 
-		// Assume 'e' is the most frequent letter in the language (English assumption)
+		// Calculate the frequency of each letter in the subtext.
 		letterFrequencies := make(map[rune]int)
 		for _, letter := range subText {
 			letterFrequencies[letter]++
 		}
 
-		// Find the most common letter in this subset
+		// Find	the most common letter in the subtext.
 		mostCommonLetter := 'a'
 		maxCount := 0
 		for letter, count := range letterFrequencies {
@@ -317,8 +305,20 @@ func findKey(cryptoText string, keyLength int) string {
 			}
 		}
 
-		// Determine the shift (assuming 'e' is most frequent)
-		shift := (strings.IndexRune(helpers.Alphabet, mostCommonLetter) - strings.IndexRune(helpers.Alphabet, 'e') + helpers.AlphabetLen) % helpers.AlphabetLen
+		// Find the best match for the most common letter in the subtext.
+		bestMatch := 'e' // Deuault value
+		minDiff := 1000  
+
+		for letter, freq := range helpers.FreqMap {
+			diff := helpers.Absolute(freq - letterFrequencies[mostCommonLetter])
+			if diff < minDiff {
+				minDiff = diff
+				bestMatch = letter
+			}
+		}
+
+		// Calculate the shift for the key.
+		shift := (strings.IndexRune(helpers.Alphabet, mostCommonLetter) - strings.IndexRune(helpers.Alphabet, bestMatch) + helpers.AlphabetLen) % helpers.AlphabetLen
 		key += string(helpers.Alphabet[shift])
 	}
 
