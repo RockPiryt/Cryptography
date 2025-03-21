@@ -265,11 +265,62 @@ func findRepeatedSequences(cryptoText string) map[string][]int {
 
 // estimateKeyLength finds the probable length of the key
 func estimateKeyLength(distances map[string][]int) int {
-	panic("not implemented") // TODO: Implement
+	gcdMap := make(map[int]int)
+
+	for _, distList := range distances {
+		for _, dist := range distList {
+			for d := 2; d <= dist; d++ {
+				if dist%d == 0 {
+					gcdMap[d]++
+				}
+			}
+		}
+	}
+
+	maxCount := 0
+	possibleKeyLength := 1
+
+	for length, count := range gcdMap {
+		if count > maxCount {
+			maxCount = count
+			possibleKeyLength = length
+		}
+	}
+
+	return possibleKeyLength
 }
 
 
 // findKey determines the key using frequency analysis
 func findKey(cryptoText string, keyLength int) string {
-	panic("not implemented") // TODO: Implement
+	key := ""
+
+	for i := 0; i < keyLength; i++ {
+		var subText []rune
+		for j := i; j < len(cryptoText); j += keyLength {
+			subText = append(subText, rune(cryptoText[j]))
+		}
+
+		// Assume 'e' is the most frequent letter in the language (English assumption)
+		letterFrequencies := make(map[rune]int)
+		for _, letter := range subText {
+			letterFrequencies[letter]++
+		}
+
+		// Find the most common letter in this subset
+		mostCommonLetter := 'a'
+		maxCount := 0
+		for letter, count := range letterFrequencies {
+			if count > maxCount {
+				maxCount = count
+				mostCommonLetter = letter
+			}
+		}
+
+		// Determine the shift (assuming 'e' is most frequent)
+		shift := (strings.IndexRune(helpers.Alphabet, mostCommonLetter) - strings.IndexRune(helpers.Alphabet, 'e') + helpers.AlphabetLen) % helpers.AlphabetLen
+		key += string(helpers.Alphabet[shift])
+	}
+
+	return key
 }
