@@ -119,5 +119,13 @@ func main() {
 	// }
 
 	// fmt.Println("odszyfrowany tekst: ", decodedText)
+	//----------------------------------------
+	// cryptoText := "wblbxylhrwblwyh" 
+
+	// // Zakładamy długość klucza na podstawie wcześniejszych analiz (np. 5)
+	// estimatedKeyLength := 5
+	// key := flagfunc.FindKey(cryptoText, estimatedKeyLength)
+
+	// fmt.Printf("Estimated Key: %s\n", key)
 
 }

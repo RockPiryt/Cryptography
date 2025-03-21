@@ -42,7 +42,7 @@ func ExecuteCipher(operation string) {
 		}
 		fmt.Printf("Klucz: %s\n", key)
 
-		decodedText, err := DecryptVigenereSimple(cryptoFile, key, decryptedFile)
+		decodedText, err := DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
 		if err != nil {
 			log.Printf("nie udało się odszyfrować tekstu %v", err)
 		}
@@ -126,7 +126,7 @@ func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, e
 		return "", fmt.Errorf("nie udało się odczytać crypto tekstu")
 	}
 	fmt.Printf("Crypto Tekst: %s\n", cryptoText)
-
+	fmt.Printf("Klucz: %s\n", keyFile)
 	key, err := helpers.GetPreparedKey(keyFile)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się odczytać klucza")
@@ -212,7 +212,7 @@ func CryptAnalysisVignere(cryptoFile, plainOutputFile, keyOutputFile, decryptedF
 	keyLength := estimateKeyLength(allDistances)
 	fmt.Printf("Estimated key length: %d\n", keyLength)
 
-	key := findKey(cryptoText, keyLength)
+	key := FindKey(cryptoText, keyLength)
 	fmt.Printf("Estimated key: %s\n", key)
 
 	decryptedText, err := DecryptVigenereSimple(cryptoText, key, decryptedFile)
@@ -278,24 +278,36 @@ func estimateKeyLength(distances []int) int {
 } 
 
 
-// findKey determines the key using frequency analysis
-func findKey(cryptoText string, keyLength int) string {
+
+// FindKey determines the key using frequency analysis.
+func FindKey(cryptoText string, keyLength int) string {
 	key := ""
+	expectedMostCommon := 'e' // W języku angielskim najczęstsza litera to 'e'
+
+	fmt.Println("Start analizy kryptogramu...")
 
 	for i := 0; i < keyLength; i++ {
 		var subText []rune
-		// Create a subtext from the cryptoText
+
+		// Tworzenie podtekstu (litery szyfrowane tą samą literą klucza)
 		for j := i; j < len(cryptoText); j += keyLength {
 			subText = append(subText, rune(cryptoText[j]))
 		}
 
-		// Calculate the frequency of each letter in the subtext.
+		fmt.Printf("\nPodtekst [%d]: %s\n", i, string(subText))
+
+		// Analiza częstotliwości liter w podtekście
 		letterFrequencies := make(map[rune]int)
 		for _, letter := range subText {
 			letterFrequencies[letter]++
 		}
 
-		// Find	the most common letter in the subtext.
+		fmt.Println("Częstotliwość liter w podtekście:")
+		for letter, count := range letterFrequencies {
+			fmt.Printf("   - '%c': %d razy\n", letter, count)
+		}
+
+		// Znalezienie najczęstszej litery
 		mostCommonLetter := 'a'
 		maxCount := 0
 		for letter, count := range letterFrequencies {
@@ -305,22 +317,83 @@ func findKey(cryptoText string, keyLength int) string {
 			}
 		}
 
-		// Find the best match for the most common letter in the subtext.
-		bestMatch := 'e' // Deuault value
-		minDiff := 1000  
+		fmt.Printf("Najczęściej występująca litera: '%c' (%d razy)\n", mostCommonLetter, maxCount)
 
-		for letter, freq := range helpers.FreqMap {
-			diff := helpers.Absolute(freq - letterFrequencies[mostCommonLetter])
-			if diff < minDiff {
-				minDiff = diff
-				bestMatch = letter
-			}
+		// Sprawdzenie, czy `mostCommonLetter` występuje w FreqMap
+		if _, exists := helpers.FreqMap[mostCommonLetter]; !exists {
+			fmt.Printf("⚠️ Litera '%c' nie istnieje w FreqMap!\n", mostCommonLetter)
+			continue
 		}
 
-		// Calculate the shift for the key.
-		shift := (strings.IndexRune(helpers.Alphabet, mostCommonLetter) - strings.IndexRune(helpers.Alphabet, bestMatch) + helpers.AlphabetLen) % helpers.AlphabetLen
+		// Obliczenie przesunięcia względem 'e'
+		shift := (strings.IndexRune(helpers.Alphabet, mostCommonLetter) - strings.IndexRune(helpers.Alphabet, expectedMostCommon) + helpers.AlphabetLen) % helpers.AlphabetLen
 		key += string(helpers.Alphabet[shift])
+
+		fmt.Printf("Obliczone przesunięcie: %d (litera klucza: '%c')\n", shift, helpers.Alphabet[shift])
 	}
 
+	fmt.Printf("\nOdkryty klucz: %s\n", key)
 	return key
 }
+
+// // Function FindKey determines the key using frequency analysis.
+// func FindKey(cryptoText string, keyLength int) string {
+// 	key := ""
+
+// 	for i := 0; i < keyLength; i++ {
+// 		var subText []rune
+// 		// Create a subtext from the cryptoText
+// 		for j := i; j < len(cryptoText); j += keyLength {
+// 			subText = append(subText, rune(cryptoText[j]))
+// 		}
+
+// 		fmt.Printf("Subtext [%d]: %s\n", i, string(subText))
+
+// 		// Calculate the frequency of each letter in the subtext.
+// 		letterFrequencies := make(map[rune]int)
+// 		for _, letter := range subText {
+// 			letterFrequencies[letter]++
+// 		}
+
+// 		fmt.Println("Letter freq in subtext:")
+// 		for letter, count := range letterFrequencies {
+// 			fmt.Printf("   - '%c': %d razy\n", letter, count)
+// 		}
+
+// 		// Find	the most common letter in the subtext.
+// 		mostCommonLetter := 'a'
+// 		maxCount := 0
+// 		for letter, count := range letterFrequencies {
+// 			if count > maxCount {
+// 				maxCount = count
+// 				mostCommonLetter = letter
+// 			}
+// 		}
+
+// 		fmt.Printf("Most common letter in subtext'%c' (%d razy)\n", mostCommonLetter, maxCount)
+
+
+// 		// Find the best match for the most common letter in the subtext.
+// 		bestMatch := 'e' // Deuault value
+// 		minDiff := 1000  
+
+// 		for letter, freq := range helpers.FreqMap {
+// 			diff := helpers.Absolute(freq - letterFrequencies[mostCommonLetter])
+// 			if diff < minDiff {
+// 				minDiff = diff
+// 				bestMatch = letter
+// 			}
+// 		}
+
+// 		fmt.Printf("Best Match: '%c'\n", bestMatch)
+
+// 		// Calculate the shift for the key.
+// 		shift := (strings.IndexRune(helpers.Alphabet, mostCommonLetter) - strings.IndexRune(helpers.Alphabet, bestMatch) + helpers.AlphabetLen) % helpers.AlphabetLen
+// 		key += string(helpers.Alphabet[shift])
+
+// 		fmt.Printf("Shift: %d\n", shift)
+// 	}
+
+// 	fmt.Printf("\nFounded key: %s\n", key)
+// 	return key
+// }
