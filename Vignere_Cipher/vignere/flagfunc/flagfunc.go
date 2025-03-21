@@ -185,9 +185,9 @@ func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, e
 
 
 //------------------------------------------------------------Kryptoanaliza------------------------------------------------------------
-func CryptAnalysisVignere(cryptoText, outputFile string) error{
+func CryptAnalysisVignere(cryptoFile, outputFile string) error{
 	// Save the decrypted text to decrypt.txt
-	err := helpers.SaveOutput(cryptoText, outputFile)
+	err := helpers.SaveOutput(cryptoFile, outputFile)
 	if err != nil {
 		log.Printf("błąd przy zapisie tekstu: %v", err)
 		return fmt.Errorf("błąd przy zapisie tekstu: %v", err)

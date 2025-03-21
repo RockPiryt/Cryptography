@@ -50,10 +50,10 @@ func main() {
 
 	// Tests
 	//orgFile := "files/org.txt"
-	plainFile := "files/plain.txt"
-	keyFile := "files/key.txt"
-	cryptoFile := "files/crypto.txt"
-	decryptedFile := "files/decrypt.txt"
+	// plainFile := "files/plain.txt"
+	// keyFile := "files/key.txt"
+	// cryptoFile := "files/crypto.txt"
+	// decryptedFile := "files/decrypt.txt"
 
 
 	// plainFile, err := helpers.PrepareText(inputFile)
@@ -106,18 +106,18 @@ func main() {
 	// }
 	// fmt.Println("Odczytany tekst: ", orgFile)
 
-	encodedText,err := flagfunc.EncodeVignere(plainFile, keyFile, cryptoFile)
-	if err != nil {
-		fmt.Printf("błąd przy szyfrowaniu tekstu: %v", err)
-	}
+	// encodedText,err := flagfunc.EncodeVignere(plainFile, keyFile, cryptoFile)
+	// if err != nil {
+	// 	fmt.Printf("błąd przy szyfrowaniu tekstu: %v", err)
+	// }
 
-	fmt.Println("Zaszyfrowany tekst: ", encodedText)
+	// fmt.Println("Zaszyfrowany tekst: ", encodedText)
 
-	decodedText,err := flagfunc.DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
-	if err != nil {
-		fmt.Printf("błąd przy odszyfrowaniu tekstu: %v", err)
-	}
+	// decodedText,err := flagfunc.DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
+	// if err != nil {
+	// 	fmt.Printf("błąd przy odszyfrowaniu tekstu: %v", err)
+	// }
 
-	fmt.Println("odszyfrowany tekst: ", decodedText)
+	// fmt.Println("odszyfrowany tekst: ", decodedText)
 
 }
