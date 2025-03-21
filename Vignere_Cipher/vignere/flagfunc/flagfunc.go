@@ -35,7 +35,14 @@ func ExecuteCipher(operation string) {
 		cryptoFile := "files/crypto.txt"
 		keyFile := "files/key.txt"
 		decryptedFile := "files/decrypt.txt"
-		decodedText, err := DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
+
+		key, err := helpers.GetPreparedKey(keyFile)
+		if err != nil {
+			fmt.Errorf("nie udało się odczytać klucza")
+		}
+		fmt.Printf("Klucz: %s\n", key)
+
+		decodedText, err := DecryptVigenereSimple(cryptoFile, key, decryptedFile)
 		if err != nil {
 			log.Printf("nie udało się odszyfrować tekstu %v", err)
 		}
@@ -44,8 +51,10 @@ func ExecuteCipher(operation string) {
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
 		cryptoFile := "files/crypto.txt"
+		plainOutputFile := "files/plain.txt"  
+		keyOutputFile := "files/key-found.txt"
 		decryptedFile := "files/decrypt.txt"
-		CryptAnalysisVignere(cryptoFile, decryptedFile)   
+		CryptAnalysisVignere(cryptoFile, plainOutputFile, keyOutputFile, decryptedFile)
 
 	default:
 		fmt.Println("Nieobsługiwana operacja.")
@@ -185,13 +194,68 @@ func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, e
 
 
 //------------------------------------------------------------Kryptoanaliza------------------------------------------------------------
-func CryptAnalysisVignere(cryptoFile, outputFile string) error{
+// Function finds the key and decrypts the text
+func CryptAnalysisVignere(cryptoFile, plainOutputFile, keyOutputFile, decryptedFile string) error{
+	cryptoText, err := helpers.GetPreparedText(cryptoFile)
+	if err != nil {
+		return fmt.Errorf("nie udało się odczytać crypto tekstu")
+	}
+	fmt.Printf("Crypto Tekst: %s\n", cryptoText)
+
+
+	repeatedSequences := findRepeatedSequences(cryptoText)
+	keyLength := estimateKeyLength(repeatedSequences)
+	fmt.Printf("Estimated key length: %d\n", keyLength)
+
+	key := findKey(cryptoText, keyLength)
+	fmt.Printf("Estimated key: %s\n", key)
+
+	decryptedText, err := DecryptVigenereSimple(cryptoText, key, decryptedFile)
+	if err != nil {
+		return fmt.Errorf("nie udało się odszyfrować tekstu %v", err)
+	}
+	fmt.Printf("Decrypted Text: %s\n", decryptedText)
+
+	
 	// Save the decrypted text to decrypt.txt
-	err := helpers.SaveOutput(cryptoFile, outputFile)
+	err = helpers.SaveOutput(decryptedText, plainOutputFile)
+	if err != nil {
+		log.Printf("błąd przy zapisie tekstu: %v", err)
+		return fmt.Errorf("błąd przy zapisie tekstu: %v", err)
+	}
+
+	// Save founded key to key-found.txt
+	err = helpers.SaveOutput(key, keyOutputFile)
 	if err != nil {
 		log.Printf("błąd przy zapisie tekstu: %v", err)
 		return fmt.Errorf("błąd przy zapisie tekstu: %v", err)
 	}
 
 	return nil
+	
+}
+
+
+// findRepeatedSequences finds repeating sequences and returns their distances
+func findRepeatedSequences(cryptoText string) map[string][]int {
+	panic("not implemented") // TODO: Implement
+}
+
+// gcd finds the greatest common divisor (NWD) of two numbers
+func gcd(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+// estimateKeyLength finds the probable length of the key
+func estimateKeyLength(distances map[string][]int) int {
+	panic("not implemented") // TODO: Implement
+}
+
+
+// findKey determines the key using frequency analysis
+func findKey(cryptoText string, keyLength int) string {
+	panic("not implemented") // TODO: Implement
 }
