@@ -141,9 +141,11 @@ func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, e
 			return "", fmt.Errorf("invalid character in key")
 		}
 
-		decryptedIndex := (index - keyIndex) % helpers.AlphabetLen
+		decryptedIndex := (index - keyIndex + helpers.AlphabetLen) % helpers.AlphabetLen
 		result = append(result, rune(helpers.Alphabet[decryptedIndex]))
 	}
+
+	fmt.Printf("Odszyfrowany tekst: %s\n", string(result))
 
 	// Save the decrypted text to decrypt.txt
 	err = helpers.SaveOutput(string(result), decryptedFile)

@@ -113,7 +113,7 @@ func main() {
 
 	fmt.Println("Zaszyfrowany tekst: ", encodedText)
 
-	decodedText,err := flagfunc.EncodeVignere(cryptoFile, keyFile, decryptedFile)
+	decodedText,err := flagfunc.DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
 	if err != nil {
 		fmt.Printf("błąd przy odszyfrowaniu tekstu: %v", err)
 	}
