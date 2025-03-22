@@ -63,10 +63,9 @@ func ExecuteCipher(operation string) {
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
 		cryptoFile := "files/crypto.txt"
-		plainOutputFile := "files/plain.txt"  
 		keyOutputFile := "files/key-found.txt"
 		decryptedFile := "files/decrypt.txt"
-		CryptAnalysisVignere(cryptoFile, plainOutputFile, keyOutputFile, decryptedFile)
+		BrakeCipher(cryptoFile, decryptedFile, keyOutputFile)
 
 	default:
 		fmt.Println("Nieobsługiwana operacja.")
@@ -179,49 +178,22 @@ func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, e
 }
 
 
-//------------------------------------------------------------Kryptoanaliza------------------------------------------------------------
+//------------------------------------------------------------CryptoAnalysis------------------------------------------------------------
 // Function finds the key and decrypts the text
-func CryptAnalysisVignere(cryptoFile, plainOutputFile, keyOutputFile, decryptedFile string) error{
-	cryptoText, err := helpers.GetPreparedText(cryptoFile)
-	if err != nil {
-		return fmt.Errorf("nie udało się odczytać crypto tekstu")
-	}
-	fmt.Printf("Crypto Tekst: %s\n", cryptoText)
-
-
-	seqs := findRepeats(cryptoText)
+func CryptoAnalysis(message string) []string {
+	seqs := findRepeats(message)
+	fmt.Printf("Sequences: %v\n", seqs)
 	lengths := findKeyLengths(seqs)
+	fmt.Printf("Lengths: %v\n", lengths)
 
 	var allPossibleKeys []string
     for _, length := range lengths {
-        possibleKey := findKey(cryptoText, length)
+        possibleKey := findKey(message, length)
         possibleKey = removeRepetitions(possibleKey)
         allPossibleKeys = append(allPossibleKeys, possibleKey)
     }
 
-	// decryptedText, err := DecryptVigenereSimple(cryptoText, key, decryptedFile)
-	// if err != nil {
-	// 	return fmt.Errorf("nie udało się odszyfrować tekstu %v", err)
-	// }
-	// fmt.Printf("Decrypted Text: %s\n", decryptedText)
-
-	
-	// // Save the decrypted text to decrypt.txt
-	// err = helpers.SaveOutput(decryptedText, plainOutputFile)
-	// if err != nil {
-	// 	log.Printf("błąd przy zapisie tekstu: %v", err)
-	// 	return fmt.Errorf("błąd przy zapisie tekstu: %v", err)
-	// }
-
-	// // Save founded key to key-found.txt
-	// err = helpers.SaveOutput(key, keyOutputFile)
-	// if err != nil {
-	// 	log.Printf("błąd przy zapisie tekstu: %v", err)
-	// 	return fmt.Errorf("błąd przy zapisie tekstu: %v", err)
-	// }
-
-	return nil
-	
+	return allPossibleKeys
 }
 
 
@@ -355,4 +327,38 @@ func findMaxKey(scoredDict map[rune]float64) rune {
         }
     }
     return maxRune
+}
+
+func BrakeCipher(cryptoFile, decryptedFile, keyOutputFile string){
+	// Read the text from crypto.txt
+	cryptoText, err := helpers.GetText(cryptoFile)
+	if err != nil {
+		log.Fatalf("Błąd odczytu crypto.txt: %v", err)
+	}
+
+	// Make analysis of the text from crypto.txt
+	possibleKeys := CryptoAnalysis(cryptoText)
+	fmt.Println("\nMożliwe klucze:")
+	for _, k := range possibleKeys {
+		fmt.Println(" -", k)
+	}
+
+	if len(possibleKeys) == 0 {
+		fmt.Println("Nie znaleziono żadnych kluczy!")
+		return
+	}
+
+	// Get the best key and save it to key-found.txt
+	bestKey := possibleKeys[0]
+	err = helpers.SaveOutput(bestKey, keyOutputFile)
+	if err != nil {
+		fmt.Printf("błąd przy zapisie tekstu: %v", err)
+	}
+
+	// Decode the text from crypto.txt using the key from key.txt and saves the result to decrypt.txt
+	decrypted, err := DecryptVigenereSimple(cryptoFile, keyOutputFile, decryptedFile)
+	if err != nil {
+		log.Fatalf("Błąd przy deszyfrowaniu: %v", err)
+	}
+	fmt.Println("[INFO] Odszyfrowany tekst (decrypted.txt):", decrypted)
 }
