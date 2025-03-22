@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os"
 	"strings"
 
 	"vigenere/helpers"
@@ -35,6 +36,14 @@ func ExecuteCipher(operation string) {
 	case "e":
 		// Encode the text from plain.txt using the key from key.txt and saves the result to crypto.txt
 		plainFile := "files/plain.txt"
+        if _, err := os.Stat(plainFile); os.IsNotExist(err) {
+            orgFile := "files/org.txt"
+            if e := CreatePlainFile(orgFile, plainFile); e != nil {
+                log.Printf("Błąd podczas tworzenia plain.txt: %v", e)
+                return
+            }
+            fmt.Println("[INFO] Brak plain.txt. Plik plain.txt  automatycznie utworzony za pomocą -p.")
+        }
 		keyFile := "files/key.txt"
 		cryptoFile := "files/crypto.txt"
 		_, err := EncodeVignere(plainFile, keyFile, cryptoFile)
