@@ -233,7 +233,7 @@ func findKeyLengths(sequences map[string][]int) []int {
         potentialKeyAccuracy[length] = counter / secondaryCounter
     }
 
-    fmt.Println("Potential Key Accuracy:", potentialKeyAccuracy)
+    //fmt.Println("Potential Key Accuracy:", potentialKeyAccuracy)
 
     // Filter out the potential key lengths over 60% accuracy
     var potentialKeys []int
@@ -243,7 +243,7 @@ func findKeyLengths(sequences map[string][]int) []int {
         }
     }
 
-    fmt.Println("Chosen key lengths:", potentialKeys)
+    //fmt.Println("Chosen key lengths:", potentialKeys)
     return potentialKeys
 }
 
@@ -338,10 +338,10 @@ func BrakeCipher(cryptoFile, decryptedFile, keyOutputFile string){
 
 	// Make analysis of the text from crypto.txt
 	possibleKeys := CryptoAnalysis(cryptoText)
-	fmt.Println("\nMożliwe klucze:")
-	for _, k := range possibleKeys {
-		fmt.Println(" -", k)
-	}
+	//fmt.Println("\nMożliwe klucze:")
+	// for _, k := range possibleKeys {
+	// 	fmt.Println(" -", k)
+	// }
 
 	if len(possibleKeys) == 0 {
 		fmt.Println("Nie znaleziono żadnych kluczy!")
