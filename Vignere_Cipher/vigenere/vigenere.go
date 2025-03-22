@@ -2,11 +2,12 @@
 package main
 
 import (
+	
 	"flag"
 	"fmt"
 	"os"
-	"vignere/flagfunc"
-	"vignere/helpers"
+	"vigenere/flagfunc"
+	"vigenere/helpers"
 )
 
 
@@ -47,6 +48,4 @@ func main() {
 	}
 
 	flagfunc.ExecuteCipher(operation)
-
-	
 }

@@ -7,7 +7,7 @@ import (
 	"math"
 	"strings"
 
-	"vignere/helpers"
+	"vigenere/helpers"
 )
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz"
@@ -37,11 +37,11 @@ func ExecuteCipher(operation string) {
 		plainFile := "files/plain.txt"
 		keyFile := "files/key.txt"
 		cryptoFile := "files/crypto.txt"
-		encodedText, err := EncodeVignere(plainFile, keyFile, cryptoFile)
+		_, err := EncodeVignere(plainFile, keyFile, cryptoFile)
 		if err != nil {
 			log.Printf("nie udało się zaszyfrować tekstu %v", err)
 		}
-		fmt.Println("Zaszyfrowany tekst: ", encodedText)
+		//fmt.Println("Zaszyfrowany tekst: ", encodedText)
 	case "d":
 		// Decode the text from crypto.txt using the key from key.txt and saves the result to decrypt.txt
 		cryptoFile := "files/crypto.txt"
