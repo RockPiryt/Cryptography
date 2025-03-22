@@ -81,7 +81,7 @@ func SaveOutput(result string, outputFile string) error {
 		return fmt.Errorf("błąd przy zapisywaniu wyniku: %v", err)
 	}
 
-	fmt.Println("Zapisano wynik do pliku:", outputFile)
+	//fmt.Println("Zapisano wynik do pliku:", outputFile)
 	return nil
 }
 

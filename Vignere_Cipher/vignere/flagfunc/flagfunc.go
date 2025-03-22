@@ -48,17 +48,17 @@ func ExecuteCipher(operation string) {
 		keyFile := "files/key.txt"
 		decryptedFile := "files/decrypt.txt"
 
-		key, err := helpers.GetPreparedKey(keyFile)
+		_, err := helpers.GetPreparedKey(keyFile)
 		if err != nil {
 			log.Printf("nie udało się odczytać klucza")
 		}
-		fmt.Printf("Klucz: %s\n", key)
+		//fmt.Printf("Klucz decode: %s\n", key)
 
-		decodedText, err := DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
+		_, err = DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
 		if err != nil {
 			log.Printf("nie udało się odszyfrować tekstu %v", err)
 		}
-		fmt.Println("Odszyfrowany tekst: ", decodedText)
+		//fmt.Println("Odszyfrowany tekst: ", decodedText)
 		// DecodeVignere(cryptoFile, keyFile, decryptedFile) 
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
@@ -103,8 +103,8 @@ func EncodeVignere(plainFile, keyFile, cryptoFile string) (string, error) {
 		return "", fmt.Errorf("nie udało się odczytać klucza")
 	}
 
-	fmt.Printf("Klucz: %s\n", key)
-	fmt.Printf("Plain Tekst: %s\n", plainText)
+	//fmt.Printf("Klucz: %s\n", key)
+	//fmt.Printf("Plain Tekst: %s\n", plainText)
 	
 	if len(plainText) == 0 || len(key) == 0 {
 		return "", fmt.Errorf("input plainText, or key cannot be empty")
@@ -136,13 +136,13 @@ func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, e
 	if err != nil {
 		return "", fmt.Errorf("nie udało się odczytać crypto tekstu")
 	}
-	fmt.Printf("Crypto Tekst: %s\n", cryptoText)
-	fmt.Printf("Klucz: %s\n", keyFile)
+	//fmt.Printf("Crypto Tekst: %s\n", cryptoText)
+	//fmt.Printf("Klucz: %s\n", keyFile)
 	key, err := helpers.GetPreparedKey(keyFile)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się odczytać klucza")
 	}
-	fmt.Printf("Klucz: %s\n", key)
+	//fmt.Printf("Klucz: %s\n", key)
 	if len(cryptoText) == 0 || len(key) == 0 {
 		return "", fmt.Errorf("input plainText, key, or ALPHABET cannot be empty")
 	}
@@ -165,7 +165,7 @@ func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, e
 		result = append(result, rune(ALPHABET[decryptedIndex]))
 	}
 
-	fmt.Printf("Odszyfrowany tekst: %s\n", string(result))
+	//fmt.Printf("Odszyfrowany tekst: %s\n", string(result))
 
 	// Save the decrypted text to decrypt.txt
 	err = helpers.SaveOutput(string(result), decryptedFile)
@@ -182,9 +182,9 @@ func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, e
 // Function finds the key and decrypts the text
 func CryptoAnalysis(message string) []string {
 	seqs := findRepeats(message)
-	fmt.Printf("Sequences: %v\n", seqs)
+	//fmt.Printf("Sequences: %v\n", seqs)
 	lengths := findKeyLengths(seqs)
-	fmt.Printf("Lengths: %v\n", lengths)
+	//fmt.Printf("Lengths: %v\n", lengths)
 
 	var allPossibleKeys []string
     for _, length := range lengths {
@@ -356,9 +356,9 @@ func BrakeCipher(cryptoFile, decryptedFile, keyOutputFile string){
 	}
 
 	// Decode the text from crypto.txt using the key from key.txt and saves the result to decrypt.txt
-	decrypted, err := DecryptVigenereSimple(cryptoFile, keyOutputFile, decryptedFile)
+	_, err = DecryptVigenereSimple(cryptoFile, keyOutputFile, decryptedFile)
 	if err != nil {
 		log.Fatalf("Błąd przy deszyfrowaniu: %v", err)
 	}
-	fmt.Println("[INFO] Odszyfrowany tekst (decrypted.txt):", decrypted)
+	//fmt.Println("[INFO] Odszyfrowany tekst (decrypted.txt):", decrypted)
 }
