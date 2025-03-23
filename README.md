@@ -61,3 +61,5 @@ For detailed descriptions of the Caesar and Affine ciphers, refer to the documen
 For detailed descriptions of the Vignere cipher, refer to the documentation:
 - [Vignere Cipher](./descriptions/vignere.md)
 
+For detailed descriptions of the Vignere cipher, refer to the documentation:
+- [One-time-pad Cipher](./descriptions/one_time_pad.md)

@@ -1,0 +1,30 @@
+Instrukcja uruchomienia programu Go
+
+Aby uruchomić program Go na komputerze z systemem Windows, wykonaj poniższe kroki:
+
+---Krok 1: Zainstalowanie Go wersja 1.23.5
+Pobierz Go z oficjalnej strony: https://go.dev/doc/install
+Zainstaluj Go, postępując zgodnie z instrukcjami na stronie.
+Po zainstalowaniu Go sprawdź, czy instalacja zakończyła się pomyślnie. Otwórz PowerShell i wpisz:
+```go version````
+
+Jeśli instalacja zakończyła się sukcesem, zobaczysz wersję Go w odpowiedzi, np.:
+```go version go1.23.5 windows/amd64```
+
+---Krok 2: Ustawienie ścieżki w systemie
+Jeśli polecenie go version nie działa, oznacza to, że Go nie jest dodane do zmiennej środowiskowej PATH. Aby to naprawić:
+
+Otwórz Ustawienia systemu.
+Przejdź do System > Zaawansowane ustawienia systemu > Zmienna środowiskowa.
+Zaktualizuj zmienną PATH, dodając ścieżkę do folderu, w którym zainstalowany jest Go (np. C:\Go\bin).
+
+---Krok 3: Uruchomienie programu
+Zakładając, że masz już pliki swojego projektu na komputerze w folderze:
+Przejdz do katalogo vigenere
+cd vigenere
+
+Użyj polecenia go run w terminalu PowerShell, aby uruchomić program Go z odpowiednimi flagami
+np.
+```go run .\vigenere.go -p```
+
+
