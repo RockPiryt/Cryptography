@@ -1,11 +1,9 @@
-//Author: Paulina Kimak
+// Author: Paulina Kimak
 package main
 
 import (
-	
 	"flag"
-	"fmt"
-	"os"
+	"log"
 	"onetime/flagfunc"
 	"onetime/helpers"
 )
@@ -27,8 +25,7 @@ func main() {
 
 
 	if operationCount != 1 {
-		fmt.Println("Błąd: Musisz wybrać dokładnie jedną operację (-p, -e, -d lub -k).")
-		os.Exit(1)
+		log.Fatalf("Error: You must choose exactly one operation: -p, -e, -d or -k.")
 	}
 
 	// Determine the operation
@@ -43,26 +40,28 @@ func main() {
 	case *cryptAnalysisFlag:
 		operation = "k"
 	default:
-		fmt.Println("Błąd: Nie wybrano poprawnej operacji (-p, -e, -d, -k).")
-		os.Exit(1)
+		log.Fatalf("Error: Invalid operation selected.")
 	}
 
-	flagfunc.ExecuteCipher(operation)
-
-	orgFile := "files/org.txt"
-	plainFile := "files/plain.txt"
-
-	plainText, err := helpers.PrepareText(orgFile)
+	err := flagfunc.ExecuteCipher(operation)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalf("Execution error: %v", err)
 	}
 
-	err = helpers.SaveOutput(plainText, plainFile)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
+	// orgFile := "files/org.txt"
+	// plainFile := "files/plain.txt"
 
-	fmt.Println("Text prepared and saved to plain.txt successfully.")
+	// plainText, err := helpers.PrepareText(orgFile)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// err = helpers.SaveOutput(plainText, plainFile)
+	// if err != nil {
+	// 	fmt.Println("Error:", err)
+	// 	return
+	// }
+
+	// fmt.Println("Text prepared and saved to plain.txt successfully.")
 }

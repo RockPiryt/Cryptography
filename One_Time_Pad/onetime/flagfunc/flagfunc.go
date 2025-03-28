@@ -11,6 +11,17 @@ import (
 	"onetime/helpers"
 )
 
+
+const (
+	orgFile       = "files/org.txt"
+	plainFile     = "files/plain.txt"
+	keyFile       = "files/key.txt"
+	keyOutputFile = "files/key-found.txt"
+	cryptoFile    = "files/crypto.txt"
+	decryptedFile = "files/decrypt.txt"
+	keyFoundFile  = "files/key-found.txt"
+)
+
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz"
 var AlphabetLen = len(ALPHABET)
 
@@ -22,65 +33,54 @@ var frequency = map[rune]float64{
     'y': 2.0, 'z': 0.074,
 }
 
-// Generic function to handle Vignere cipher
-func ExecuteCipher(operation string) {
+func ExecuteCipher(operation string) error {
 	switch operation {
 	case "p":
 		// Prepare the text for encryption and save it to plain.txt
-		orgFile := "files/org.txt"
-		plainFile := "files/plain.txt"
 		err := CreatePlainFile(orgFile, plainFile)
 		if err != nil {
-			log.Printf("Błąd: nie udało się odczytać klucza: %v", err)
+			return fmt.Errorf("error during text preparation %v", err)
 		}
+		log.Println("[INFO] plain.txt has been successfully created.")
+		return nil
+
 	case "e":
-		// Encode the text from plain.txt using the key from key.txt and saves the result to crypto.txt
-		plainFile := "files/plain.txt"
-        if _, err := os.Stat(plainFile); os.IsNotExist(err) {
-            orgFile := "files/org.txt"
-            if e := CreatePlainFile(orgFile, plainFile); e != nil {
-                log.Printf("Błąd podczas tworzenia plain.txt: %v", e)
-                return
-            }
-            fmt.Println("[INFO] Brak plain.txt. Plik plain.txt  automatycznie utworzony za pomocą -p.")
-        }
-		keyFile := "files/key.txt"
-		cryptoFile := "files/crypto.txt"
+		// Ensure plain.txt exists, if not, create it
+		if _, err := os.Stat(plainFile); os.IsNotExist(err) {
+			if err := CreatePlainFile(orgFile, plainFile); err != nil {
+				return fmt.Errorf("error creating plain.txt automatically: %v", err)
+			}
+			log.Println("[INFO] plain.txt not found. It was automatically created using -p.")
+		}
+
 		_, err := EncodeVignere(plainFile, keyFile, cryptoFile)
 		if err != nil {
-			log.Printf("nie udało się zaszyfrować tekstu %v", err)
+			return fmt.Errorf("failed to encrypt the text: %v", err)
 		}
-		//fmt.Println("Zaszyfrowany tekst: ", encodedText)
+		log.Println("[INFO] Text successfully encrypted into crypto.txt.")
+		return nil
+		
 	case "d":
-		// Decode the text from crypto.txt using the key from key.txt and saves the result to decrypt.txt
-		cryptoFile := "files/crypto.txt"
-		keyFile := "files/key.txt"
-		decryptedFile := "files/decrypt.txt"
-
+		// Decrypt crypto.txt using key.txt
 		_, err := helpers.GetPreparedKey(keyFile)
 		if err != nil {
-			log.Printf("nie udało się odczytać klucza")
+			return fmt.Errorf("failed to read the key: %v", err)
 		}
-		//fmt.Printf("Klucz decode: %s\n", key)
 
 		_, err = DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
 		if err != nil {
-			log.Printf("nie udało się odszyfrować tekstu %v", err)
+			return fmt.Errorf("failed to decrypt the text: %v", err)
 		}
-		//fmt.Println("Odszyfrowany tekst: ", decodedText)
-		// DecodeVignere(cryptoFile, keyFile, decryptedFile) 
+		fmt.Println("[INFO] Text successfully decrypted into decrypt.txt.")
+		return nil 
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
-		cryptoFile := "files/crypto.txt"
-		keyOutputFile := "files/key-found.txt"
-		decryptedFile := "files/decrypt.txt"
 		BrakeCipher(cryptoFile, decryptedFile, keyOutputFile)
 
 	default:
-		fmt.Println("Nieobsługiwana operacja.")
-		return
+		return fmt.Errorf("unsupported operation: %s", operation)
 	}	
-
+	return nil
 }
 
 // Function to create a new file (plain.txt) containing prepared text for encryption.
