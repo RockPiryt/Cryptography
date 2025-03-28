@@ -4,6 +4,7 @@ package helpers
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -279,4 +280,25 @@ func HexToBytes(hex string) ([]byte, error) {
 		bytes[i/2] = byte(val)
 	}
 	return bytes, nil
+}
+
+// Function to compute XOR between two byte slices
+func XORBytes(b1, b2 []byte) []byte {
+	result := make([]byte, len(b1))
+	for i := 0; i < len(b1); i++ {
+		result[i] = b1[i] ^ b2[i]
+	}
+	return result
+}
+
+
+// Read the crypto.txt file
+func ReadCiphertext(fileName string) ([]string, error) {
+	data, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+	lines := strings.Split(string(data), "\n")
+	// Return the list of lines
+	return lines, nil
 }
