@@ -8,26 +8,22 @@ import (
 	"onetime/helpers"
 )
 
-
-
 func main() {
 	helpers.SetLogger()
-	
+
 	//Set flags
-	prepareFlag := flag.Bool("p", false, "przygotowanie tekstu jawnego do szyfrowania")
-	encryptFlag := flag.Bool("e", false, "szyfrowanie")
-	decryptFlag := flag.Bool("d", false, "deszyfrowanie")
-	cryptAnalysisFlag := flag.Bool("k", false, "kryptoanaliza wyłącznie w oparciu o kryptogram")
+	prepareFlag := flag.Bool("p", false, "prepare plaintext for encryption")
+	encryptFlag := flag.Bool("e", false, "encrypt the plaintext")
+	cryptAnalysisFlag := flag.Bool("k", false, "perform cryptanalysis based only on ciphertext")
 
 	flag.Parse()
 
 	// Check flags
-	operationFlags := []*bool{prepareFlag,encryptFlag, decryptFlag, cryptAnalysisFlag}
+	operationFlags := []*bool{prepareFlag, encryptFlag, cryptAnalysisFlag}
 	operationCount := helpers.CountSelectedFlags(operationFlags)
 
-
 	if operationCount != 1 {
-		log.Fatalf("Error: You must choose exactly one operation: -p, -e, -d or -k.")
+		log.Fatalf("Error: You must choose exactly one operation: -p, -e or -k.")
 	}
 
 	// Determine the operation
@@ -37,8 +33,6 @@ func main() {
 		operation = "p"
 	case *encryptFlag:
 		operation = "e"
-	case *decryptFlag:
-		operation = "d"
 	case *cryptAnalysisFlag:
 		operation = "k"
 	default:
@@ -50,20 +44,4 @@ func main() {
 		log.Fatalf("Execution error: %v", err)
 	}
 
-	// orgFile := "files/org.txt"
-	// plainFile := "files/plain.txt"
-
-	// plainText, err := helpers.PrepareText(orgFile)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-
-	// err = helpers.SaveOutput(plainText, plainFile)
-	// if err != nil {
-	// 	fmt.Println("Error:", err)
-	// 	return
-	// }
-
-	// fmt.Println("Text prepared and saved to plain.txt successfully.")
 }
