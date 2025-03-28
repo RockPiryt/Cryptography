@@ -25,6 +25,6 @@ cd vigenere
 
 Użyj polecenia go run w terminalu PowerShell, aby uruchomić program Go z odpowiednimi flagami
 np.
-```go run .\vigenere.go -p```
+```go run .\onetime.go -p```
 
 

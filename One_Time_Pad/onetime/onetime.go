@@ -48,4 +48,21 @@ func main() {
 	}
 
 	flagfunc.ExecuteCipher(operation)
+
+	orgFile := "files/org.txt"
+	plainFile := "files/plain.txt"
+
+	plainText, err := helpers.PrepareText(orgFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = helpers.SaveOutput(plainText, plainFile)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Println("Text prepared and saved to plain.txt successfully.")
 }

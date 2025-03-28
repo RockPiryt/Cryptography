@@ -80,11 +80,11 @@ The cryptanalysis (`-k` option) works as follows:
 
 ```bash
 # Prepare plain.txt from orig.txt
-go run ./onetime.go -p
+go run .\onetime.go -p
 
 # Encrypt plain.txt using key.txt into crypto.txt
-go run ./onetime.go -e
+go run .\onetime.go -e
 
 # Perform cryptanalysis based only on crypto.txt
-go run ./onetime.go -k
+go run .\onetime.go -k
 

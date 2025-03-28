@@ -4,7 +4,6 @@ package helpers
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"unicode"
@@ -27,7 +26,7 @@ func CountSelectedFlags(flags []*bool) int {
 	return count
 }
 
-// Function to read text from txt file
+// Function to read text from txt file.
 func ReadText(filename string) ([]string, error) {
 	var lines []string
 
@@ -35,16 +34,15 @@ func ReadText(filename string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Close file no matter what
+	defer file.Close() 
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		lines = append(lines, line)
 	}
 
-	err = file.Close()
-	if err != nil {
-		return nil, err
-	}
 
 	if scanner.Err() != nil{
 		return nil, scanner.Err()
@@ -60,18 +58,16 @@ func SaveOutput(result string, outputFile string) error {
 		// Create the file if it does not exist
 		file, err := os.Create(outputFile)
 		if err != nil {
-			return fmt.Errorf("błąd przy tworzeniu pliku: %v", err)
+			return fmt.Errorf("error creating file: %v", err)
 		}
 		file.Close()
 	}
 
-	// Write the result to the file
 	err := os.WriteFile(outputFile, []byte(result), 0644)
 	if err != nil {
-		return fmt.Errorf("błąd przy zapisywaniu wyniku: %v", err)
+		return fmt.Errorf("error writing result to file: %v", err)
 	}
 
-	//fmt.Println("Zapisano wynik do pliku:", outputFile)
 	return nil
 }
 
@@ -99,41 +95,66 @@ func CleanText(input string) (string, error) {
 func GetText(filePath string) (string, error) {
 	_, err := os.Stat(filePath)
 		if os.IsNotExist(err) {
-			fmt.Printf("plik %s nie istnieje", filePath)
-			return "", fmt.Errorf("plik %s nie istnieje", filePath)
+			return "", fmt.Errorf("file %s does not exist", filePath)
 		} else if err != nil {
-			log.Printf("błąd przy sprawdzaniu istnienia pliku %s %v", filePath, err)
-			return "", fmt.Errorf("błąd przy sprawdzaniu istnienia pliku %s: %v", filePath, err)
+			return "", fmt.Errorf("error checking existence of file %s: %v", filePath, err)
 		}
 	
 		lines, err := ReadText(filePath)
 		if err != nil {
-			fmt.Printf("błąd przy odczycie pliku %s: %v", filePath, err)
-			return "", fmt.Errorf("błąd przy odczycie pliku %s: %v",filePath, err)
+			return "", fmt.Errorf("error reading file %s: %v", filePath, err)
 		}
 	
 		if len(lines) == 0 {
-			fmt.Printf("plik %s jest pusty", filePath)
-			return "", fmt.Errorf("plik %s jest pusty", filePath)
+			return "", fmt.Errorf("file %s is empty", filePath)
 		}
 	
 		inputText := strings.Join(lines, "\n")
 		return inputText, nil
 }
 
+// Cut text to 15 lines of 64 characters each.
+func cutText(text string) (string, error) {
+	const lineLength = 64
+	const maxLines = 15
+	maxChars := lineLength * maxLines
+
+	// Cut the text to 15 lines of 64 characters each
+	if len(text) > maxChars {
+		text = text[:maxChars]
+	}
+
+	// Fill the text with spaces to make it a multiple of lineLength
+	if len(text) < maxChars {
+		text += strings.Repeat(" ", maxChars-len(text))
+	}
+
+	var lines []string
+	for i := 0; i < maxChars; i += lineLength {
+		lines = append(lines, text[i:i+lineLength])
+	}
+
+	result := strings.Join(lines, "\n")
+
+	return result, nil
+}
+
 // Function to prepare text for encryption, cleans non-letter characters and converts to lowercase.
 func PrepareText(filePath string) (string, error) {
-		// Get input text.
 		inputText,err := GetText(filePath)
 		if err != nil {
-			return "", fmt.Errorf("błąd przy odczycie pliku %s: %v", filePath, err)
+			return "", fmt.Errorf("error reading file %s: %v", filePath, err)
 		}
 		preparedText, err := CleanText(inputText)
 		if err != nil {
-			log.Printf("błąd przy czyszczeniu tekstu: %v", err)
-			return "", fmt.Errorf("błąd przy czyszczeniu tekstu: %v", err)
+			return "", fmt.Errorf("error cleaning text: %v", err)
 		}
-		return preparedText, nil
+
+		cuttedText, err := cutText(preparedText)
+		if err != nil {	
+			return "", fmt.Errorf("error trimming text: %v", err)
+		}
+		return cuttedText, nil
 }
 
 // Function to validate the key for Vignere cipher
