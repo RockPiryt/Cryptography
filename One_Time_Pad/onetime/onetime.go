@@ -3,12 +3,21 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"onetime/flagfunc"
 	"onetime/helpers"
 )
 
-
+const (
+	orgFile       = "files/org.txt"
+	plainFile     = "files/plain.txt"
+	keyFile       = "files/key.txt"
+	keyOutputFile = "files/key-found.txt"
+	cryptoFile    = "files/crypto.txt"
+	decryptedFile = "files/decrypt.txt"
+	keyFoundFile  = "files/key-found.txt"
+)
 
 func main() {
 	helpers.SetLogger()
@@ -45,5 +54,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Execution error: %v", err)
 	}
+
+	// Tests
+	cryptogram, err := flagfunc.XORCipher(plainFile, keyFile, cryptoFile)
+	if err != nil {
+		log.Fatalf("XORCipher function error: %v", err)
+	}
+
+	fmt.Println("Cryptogram (Hex):", cryptogram)
 
 }

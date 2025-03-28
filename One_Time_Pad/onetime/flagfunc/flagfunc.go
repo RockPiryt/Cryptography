@@ -39,7 +39,7 @@ func ExecuteCipher(operation string) error {
 			log.Println("[INFO] plain.txt not found. It was automatically created using -p.")
 		}
 
-		_, err := EncryptOneTimePad(plainFile, keyFile, cryptoFile)
+		_, err := XORCipher(plainFile, keyFile, cryptoFile) 
 		if err != nil {
 			return fmt.Errorf("failed to encrypt the text: %v", err)
 		}
@@ -73,8 +73,9 @@ func CreatePlainFile(inputFile string, outputFile string) error {
 	return nil
 }
 
-// Function to encrypt the plainText using the Vigenère cipher with the provided key.
-func EncryptOneTimePad(plainFile, keyFile, cryptoFile string) (string, error) {
+
+// XOR Cipher function to encrypt the plainText using the key
+func XORCipher(plainFile, keyFile, cryptoFile string) (string, error) {
 	plainText, err := helpers.GetPreparedText(plainFile)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się odczytać plain tekstu")
@@ -88,20 +89,41 @@ func EncryptOneTimePad(plainFile, keyFile, cryptoFile string) (string, error) {
 	log.Printf("Plain text: %s\n", plainText)
 	log.Printf("Key: %s\n", key)
 
-	if len(plainText) == 0 || len(key) == 0 {
-		return "", fmt.Errorf("input plainText, or key cannot be empty")
+	// Convert the text and key to hexadecimal representations
+	plainHex := helpers.TextToHex(plainText)
+	keyHex := helpers.TextToHex(key)
+
+	// Convert to bytes
+	plainBytes, err := helpers.HexToBytes(plainHex)
+	if err != nil {
+		return "", fmt.Errorf("error converting text to bytes: %v", err)
 	}
 
-	var result []rune
+	keyBytes, err := helpers.HexToBytes(keyHex)
+	if err != nil {
+		return "", fmt.Errorf("error converting key to bytes: %v", err)
+	}
+
+	// Generate the cryptogram in hexadecimal format
+	var cryptogram []byte
+	for i := 0; i < len(plainBytes); i++ {
+		cryptogram = append(cryptogram, plainBytes[i]^keyBytes[i%len(keyBytes)])
+	}
+
+	var cryptogramHex string
+	for _, byteVal := range cryptogram {
+		cryptogramHex += fmt.Sprintf("%02X", byteVal)
+	}
 
 	// Save the decrypted text to crypto.txt
-	err = helpers.SaveOutput(string(result), cryptoFile)
+	err = helpers.SaveOutput(cryptogramHex, cryptoFile)
 	if err != nil {
-		return "", fmt.Errorf("błąd przy zapisie tekstu: %v", err)
+		return "", fmt.Errorf("error saving cryptogram: %v", err)
 	}
 
-	return string(result), nil
+	return cryptogramHex, nil
 }
+
 
 // decryptVigenereSimple decrypts the given cryptoFile using the Vigenère cipher with the provided key.
 func DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile string) (string, error) {

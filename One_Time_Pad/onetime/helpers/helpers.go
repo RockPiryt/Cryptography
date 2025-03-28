@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -255,4 +256,27 @@ func GetPreparedText(textFile string) (string, error) {
 	}
 
 	return text, nil
+}
+
+
+// Function to convert text to hexadecimal representation
+func TextToHex(text string) string {
+	var hexString string
+	for i := 0; i < len(text); i++ {
+		hexString += fmt.Sprintf("%02X", text[i])
+	}
+	return hexString
+}
+
+// Function to convert a hexadecimal string to bytes
+func HexToBytes(hex string) ([]byte, error) {
+	bytes := make([]byte, len(hex)/2)
+	for i := 0; i < len(hex); i += 2 {
+		val, err := strconv.ParseUint(hex[i:i+2], 16, 8)
+		if err != nil {
+			return nil, err
+		}
+		bytes[i/2] = byte(val)
+	}
+	return bytes, nil
 }
