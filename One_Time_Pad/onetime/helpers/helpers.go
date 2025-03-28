@@ -4,6 +4,7 @@ package helpers
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"unicode"
@@ -14,6 +15,17 @@ const Alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 var AlphabetLen = len(Alphabet)
 
+func SetLogger(){
+	os.MkdirAll("logs", os.ModePerm)
+	logFile, err := os.OpenFile("logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatalf("Failed to open log file: %v", err)
+	}
+
+	log.SetOutput(logFile)
+	log.SetPrefix("[ONE TIME PAD]")
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+}
 
 // Function to count selected flags
 func CountSelectedFlags(flags []*bool) int {

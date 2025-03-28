@@ -87,13 +87,11 @@ func ExecuteCipher(operation string) error {
 func CreatePlainFile(inputFile string, outputFile string) error {
 	plainText, err := helpers.PrepareText(inputFile)
 	if err != nil {
-		log.Printf("błąd przy czyszczeniu tekstu: %v", err)
 		return fmt.Errorf("błąd przy czyszczeniu tekstu: %v", err)
 	}
 
 	err = helpers.SaveOutput(plainText, outputFile)
 	if err != nil {
-		log.Printf("błąd przy zapisie tekstu: %v", err)
 		return fmt.Errorf("błąd przy zapisie tekstu: %v", err)
 	}
 

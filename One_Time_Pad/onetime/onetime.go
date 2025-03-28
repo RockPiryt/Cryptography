@@ -11,6 +11,8 @@ import (
 
 
 func main() {
+	helpers.SetLogger()
+	
 	//Set flags
 	prepareFlag := flag.Bool("p", false, "przygotowanie tekstu jawnego do szyfrowania")
 	encryptFlag := flag.Bool("e", false, "szyfrowanie")
