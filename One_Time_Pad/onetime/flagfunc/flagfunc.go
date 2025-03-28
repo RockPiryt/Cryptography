@@ -53,26 +53,15 @@ func ExecuteCipher(operation string) error {
 			log.Println("[INFO] plain.txt not found. It was automatically created using -p.")
 		}
 
-		_, err := EncodeVignere(plainFile, keyFile, cryptoFile)
+		_, err := EncryptOneTimePad(plainFile, keyFile, cryptoFile) 
 		if err != nil {
 			return fmt.Errorf("failed to encrypt the text: %v", err)
 		}
+	
 		log.Println("[INFO] Text successfully encrypted into crypto.txt.")
 		return nil
+	
 		
-	case "d":
-		// Decrypt crypto.txt using key.txt
-		_, err := helpers.GetPreparedKey(keyFile)
-		if err != nil {
-			return fmt.Errorf("failed to read the key: %v", err)
-		}
-
-		_, err = DecryptVigenereSimple(cryptoFile, keyFile, decryptedFile)
-		if err != nil {
-			return fmt.Errorf("failed to decrypt the text: %v", err)
-		}
-		fmt.Println("[INFO] Text successfully decrypted into decrypt.txt.")
-		return nil 
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
 		BrakeCipher(cryptoFile, decryptedFile, keyOutputFile)
@@ -85,21 +74,22 @@ func ExecuteCipher(operation string) error {
 
 // Function to create a new file (plain.txt) containing prepared text for encryption.
 func CreatePlainFile(inputFile string, outputFile string) error {
-	plainText, err := helpers.PrepareText(inputFile)
+	maxLines := 15
+	plainText, err := helpers.PrepareText(inputFile, maxLines)
 	if err != nil {
-		return fmt.Errorf("błąd przy czyszczeniu tekstu: %v", err)
+		return fmt.Errorf("error while cleaning the text: %v", err)
 	}
 
 	err = helpers.SaveOutput(plainText, outputFile)
 	if err != nil {
-		return fmt.Errorf("błąd przy zapisie tekstu: %v", err)
+		return fmt.Errorf("error while saving the text: %v", err)
 	}
 
 	return nil
 }
 
 // Function to encrypt the plainText using the Vigenère cipher with the provided key.
-func EncodeVignere(plainFile, keyFile, cryptoFile string) (string, error) {
+func EncryptOneTimePad(plainFile, keyFile, cryptoFile string) (string, error) {
 	plainText, err := helpers.GetPreparedText(plainFile)
 	if err != nil {
 		return "", fmt.Errorf("nie udało się odczytać plain tekstu")
@@ -130,7 +120,6 @@ func EncodeVignere(plainFile, keyFile, cryptoFile string) (string, error) {
 	// Save the decrypted text to crypto.txt
 	err = helpers.SaveOutput(string(result), cryptoFile)
 	if err != nil {
-		log.Printf("błąd przy zapisie tekstu: %v", err)
 		return "", fmt.Errorf("błąd przy zapisie tekstu: %v", err)
 	}
 

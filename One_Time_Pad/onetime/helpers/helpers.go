@@ -11,10 +11,7 @@ import (
 )
 
 
-const Alphabet = "abcdefghijklmnopqrstuvwxyz"
-
-var AlphabetLen = len(Alphabet)
-
+// Function to set logger.
 func SetLogger(){
 	os.MkdirAll("logs", os.ModePerm)
 	logFile, err := os.OpenFile("logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
@@ -125,18 +122,15 @@ func GetText(filePath string) (string, error) {
 		return inputText, nil
 }
 
-// Cut text to 15 lines of 64 characters each.
-func cutText(text string) (string, error) {
+// Cut text to specified number of lines with 64 characters each.
+func formatText(text string, maxLines int) (string, error) {
 	const lineLength = 64
-	const maxLines = 15
 	maxChars := lineLength * maxLines
 
-	// Cut the text to 15 lines of 64 characters each
 	if len(text) > maxChars {
 		text = text[:maxChars]
 	}
 
-	// Fill the text with spaces to make it a multiple of lineLength
 	if len(text) < maxChars {
 		text += strings.Repeat(" ", maxChars-len(text))
 	}
@@ -146,74 +140,110 @@ func cutText(text string) (string, error) {
 		lines = append(lines, text[i:i+lineLength])
 	}
 
-	result := strings.Join(lines, "\n")
-
-	return result, nil
+	return strings.Join(lines, "\n"), nil
 }
 
-// Function to prepare text for encryption, cleans non-letter characters and converts to lowercase.
-func PrepareText(filePath string) (string, error) {
-		inputText,err := GetText(filePath)
-		if err != nil {
-			return "", fmt.Errorf("error reading file %s: %v", filePath, err)
-		}
-		preparedText, err := CleanText(inputText)
-		if err != nil {
-			return "", fmt.Errorf("error cleaning text: %v", err)
-		}
-
-		cuttedText, err := cutText(preparedText)
-		if err != nil {	
-			return "", fmt.Errorf("error trimming text: %v", err)
-		}
-		return cuttedText, nil
-}
-
-// Function to validate the key for Vignere cipher
-func Validate(text string) (error) {
-	// Check if the key is empty.
-	if len(text) == 0 {
-		return fmt.Errorf("klucz/tekst jest pusty")
+// PrepareText prepares the input text: reads it, cleans it, and formats to given line count.
+func PrepareText(filePath string, maxLines int) (string, error) {
+	inputText, err := GetText(filePath)
+	if err != nil {
+		return "", fmt.Errorf("error reading file %s: %v", filePath, err)
 	}
 
-	// Check if the key contains only lowercase English letters.
+	preparedText, err := CleanText(inputText)
+	if err != nil {
+		return "", fmt.Errorf("error cleaning text: %v", err)
+	}
+
+	formattedText, err := formatText(preparedText, maxLines)
+	if err != nil {
+		return "", fmt.Errorf("error formatting text: %v", err)
+	}
+
+	return formattedText, nil
+}
+
+// Function to validate the key.
+func ValidateKey(text string) (error) {
+	if len(text) == 0 {
+		return fmt.Errorf("key/text is empty")
+	}
+
+	// Check if the key contains only uppercase, lowercase letters, and spaces.
 	for _, char := range text {
-		if char < 'a' || char > 'z' { // Ensure only 'a' to 'z'
-			return fmt.Errorf("klucz/tekst zawiera niedozwolony znak: %c", char)
+		if (char < 'a' || char > 'z') && (char < 'A' || char > 'Z') && char != ' ' {
+			return fmt.Errorf("key/text contains invalid character: %c", char)
+		}
+	}
+
+	// Check if the key is a single line.
+	if strings.Contains(text, "\n") {
+		return fmt.Errorf("key/text contains multiple lines")
+	}
+
+	// Check if the key is exactly 64 characters.
+	if len(text) != 64 {
+		return fmt.Errorf("key/text must be exactly 64 characters")
+	}
+
+	return nil
+}
+
+// Function to get the prepared key.
+func GetPreparedKey(keyFile string) (string, error) {
+	key, err := PrepareText(keyFile, 1)
+	if err != nil {
+		return "", fmt.Errorf("failed to prepare key")
+	}
+
+	err = ValidateKey(key)
+	if err != nil {
+		return "", fmt.Errorf("failed to validate key")
+	}
+
+	return key, nil
+}
+
+// Function to validate the text (for Vigenère cipher).
+func ValidateText(text string) (error) {
+	if len(text) == 0 {
+		return fmt.Errorf("text is empty")
+	}
+
+	// Check if the key contains only uppercase, lowercase letters, and spaces.
+	for _, char := range text {
+		if (char < 'a' || char > 'z') && (char < 'A' || char > 'Z') && char != ' ' {
+			return fmt.Errorf("key/text contains invalid character: %c", char)
+		}
+	}
+
+	// Check if the text contains exactly 15 lines.
+	lines := strings.Split(text, "\n")
+	if len(lines) != 15 {
+		return fmt.Errorf("text must have exactly 15 lines")
+	}
+
+	// Ensure each line contains exactly 64 characters.
+	for _, line := range lines {
+		if len(line) != 64 {
+			return fmt.Errorf("each line must contain exactly 64 characters, found a line with %d characters", len(line))
 		}
 	}
 
 	return nil
 }
 
-// Function to get the key for Vignere cipher.
-func GetPreparedKey(keyFile string) (string, error) {
-
-	key, err := PrepareText(keyFile)
-	if err != nil {
-		return "", fmt.Errorf("nie udało się przygotować klucza")
-	}
-	// Read alpha key from file and validate key.
-	err = Validate(key)
-	if err != nil {
-		return  "", fmt.Errorf("nie udało się zwalidować klucza")
-	}
-
-	return key, nil
-}
-
-// Function to get the key for Vignere cipher.
+// Function to get the prepared text for Vigenère cipher.
 func GetPreparedText(textFile string) (string, error) {
-	text, err := PrepareText(textFile)
+	text, err := PrepareText(textFile, 15)
 	if err != nil {
-		return "", fmt.Errorf("nie udało się przygotować klucza")
+		return "", fmt.Errorf("failed to prepare text")
 	}
-	// Read alpha key from file and validate key.
-	err = Validate(text)
+
+	err = ValidateText(text)
 	if err != nil {
-		return  "", fmt.Errorf("nie udało się zwalidować klucza")
+		return "", fmt.Errorf("failed to validate text")
 	}
 
 	return text, nil
 }
-
