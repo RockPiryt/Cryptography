@@ -1,11 +1,9 @@
-//Author: Paulina Kimak
+// Author: Paulina Kimak
 package main
 
 import (
-	
 	"flag"
-	"fmt"
-	"os"
+	"log"
 	"vigenere/flagfunc"
 	"vigenere/helpers"
 )
@@ -14,10 +12,10 @@ import (
 
 func main() {
 	//Set flags
-	prepareFlag := flag.Bool("p", false, "przygotowanie tekstu jawnego do szyfrowania")
-	encryptFlag := flag.Bool("e", false, "szyfrowanie")
-	decryptFlag := flag.Bool("d", false, "deszyfrowanie")
-	cryptAnalysisFlag := flag.Bool("k", false, "kryptoanaliza wyłącznie w oparciu o kryptogram")
+	prepareFlag := flag.Bool("p", false, "prepare plaintext for encryption")
+	encryptFlag := flag.Bool("e", false, "encrypt the plaintext")
+	decryptFlag := flag.Bool("d", false, "decrypt the ciphertext")
+	cryptAnalysisFlag := flag.Bool("k", false, "perform cryptanalysis based only on ciphertext")
 
 	flag.Parse()
 
@@ -27,8 +25,7 @@ func main() {
 
 
 	if operationCount != 1 {
-		fmt.Println("Błąd: Musisz wybrać dokładnie jedną operację (-p, -e, -d lub -k).")
-		os.Exit(1)
+		log.Fatalf("Error: You must choose exactly one operation: -p, -e, -d or -k.")
 	}
 
 	// Determine the operation
@@ -43,9 +40,11 @@ func main() {
 	case *cryptAnalysisFlag:
 		operation = "k"
 	default:
-		fmt.Println("Błąd: Nie wybrano poprawnej operacji (-p, -e, -d, -k).")
-		os.Exit(1)
+		log.Fatalf("Error: Invalid operation selected.")
 	}
 
-	flagfunc.ExecuteCipher(operation)
+	err := flagfunc.ExecuteCipher(operation)
+	if err != nil {
+		log.Fatalf("Execution error: %v", err)
+	}
 }
