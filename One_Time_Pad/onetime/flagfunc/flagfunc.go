@@ -133,37 +133,38 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 	lines := strings.Split(cryptoText, "\n")
 	numLines := len(lines)
 	if numLines < 2 {
-		return "", fmt.Errorf("potrzeba przynajmniej dwóch linii do analizy")
+		return "", fmt.Errorf("minimum 2 lines to crypto analyze")
 	}
 
-	// Dekoduj linie z HEX do bajtów
-	var decoded [][]byte
+	// Encode each line from hex to bytes
+	var cryptoBinary [][]byte
 	lineLength := 0
 	for _, hexLine := range lines {
 		bytesLine, err := hex.DecodeString(hexLine)
 		if err != nil {
-			return "", fmt.Errorf("błąd dekodowania hex: %v", err)
+			return "", fmt.Errorf("encoded error hex: %v", err)
 		}
 		if lineLength == 0 {
 			lineLength = len(bytesLine)
 		} else if len(bytesLine) != lineLength {
-			return "", fmt.Errorf("linie mają różną długość")
+			return "", fmt.Errorf("length of lines is not the same")
 		}
-		decoded = append(decoded, bytesLine)
+		cryptoBinary = append(cryptoBinary, bytesLine)
 	}
 
-	// Zainicjalizuj macierz prawdopodobnych spacji
+	// Create a 2D slice to store guesses for spaces
 	spaceGuesses := make([][]bool, numLines)
 	for i := range spaceGuesses {
 		spaceGuesses[i] = make([]bool, lineLength)
 	}
 
-	// XOR każdej linii z każdą i szukaj pozycji mogących zawierać spacje
+	// Make XOR of each line with every other line and look for positions that could contain spaces
 	for i := 0; i < numLines; i++ {
 		for j := i + 1; j < numLines; j++ {
 			for k := 0; k < lineLength; k++ {
-				x := decoded[i][k] ^ decoded[j][k]
+				x := cryptoBinary[i][k] ^ cryptoBinary[j][k]
 				// Spacja XOR litera ASCII [a-z] daje wynik z 3-cim bitem ustawionym (czyli x & 0x20 == 0x20)
+				// XOR space with ASCII letters gives a result with the 3rd bit set (x & 0x20 == 0x20 == 0010.000)
 				if (x >= 0x41 && x <= 0x7A) || (x >= 0x01 && x <= 0x1F) {
 					// Możliwe, że jedno z nich to spacja – zaznacz kandydata
 					spaceGuesses[i][k] = true
@@ -181,7 +182,7 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 		for k := 0; k < lineLength; k++ {
 			if spaceGuesses[i][k] {
 				// Jeśli zakładamy, że to spacja (0x20), to klucz = crypto ^ 0x20
-				guessedKeyByte := decoded[i][k] ^ 0x20
+				guessedKeyByte := cryptoBinary[i][k] ^ 0x20
 				// Zaznacz jako znany tylko jeśli jeszcze nie mamy klucza w tym miejscu
 				if !knownKey[k] {
 					key[k] = guessedKeyByte
@@ -191,9 +192,9 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 		}
 	}
 
-	// Deszyfruj każdą linię
+	// Decrypt each line using the guessed key
 	var output []string
-	for _, line := range decoded {
+	for _, line := range cryptoBinary {
 		var lineText string
 		for i, b := range line {
 			if knownKey[i] {
@@ -203,16 +204,16 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 				} else if ch == 0x20 {
 					lineText += " "
 				} else {
-					lineText += "_" // wątpliwe
+					lineText += "_" // doubtful character
 				}
 			} else {
-				lineText += "_" // nie znamy bajtu klucza
+				lineText += "_" //don't know the key byte
 			}
 		}
 		output = append(output, lineText)
 	}
 
-	// Zbuduj wynik jako tekst z zachowaniem linii
+	// Create lines
 	result := strings.Join(output, "\n")
 	return result, nil
 }
