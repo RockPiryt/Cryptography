@@ -125,7 +125,7 @@ func EncryptXOR(plainFile, keyFile, cryptoFile string) (string, error) {
 
 // Analyze the ciphertext and try to guess spaces and letters
 func AnalyzeXOR(cryptoFile string) (string, error) {
-	cryptoText, err := helpers.GetPreparedText(cryptoFile)
+	cryptoText, err := helpers.GetText(cryptoFile)
 	if err != nil {
 		return "", fmt.Errorf("error during reading crypto text: %v", err)
 	}
@@ -135,7 +135,7 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 	if numLines < 2 {
 		return "", fmt.Errorf("minimum 2 lines to crypto analyze")
 	}
-
+	fmt.Printf("Cryptogram:\n%s\n", cryptoText)
 	// Encode each line from hex to bytes
 	var cryptoBinary [][]byte
 	lineLength := 0

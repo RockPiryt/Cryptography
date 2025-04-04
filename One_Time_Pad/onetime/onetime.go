@@ -56,21 +56,18 @@ func main() {
 	}
 
 	// Tests Encryption
-	cryptogram, err := flagfunc.EncryptXOR(plainFile, keyFile, cryptoFile)
-	if err != nil {
-		log.Fatalf("EncryptXOR function error: %v", err)
-	}
+	// cryptogram, err := flagfunc.EncryptXOR(plainFile, keyFile, cryptoFile)
+	// if err != nil {
+	// 	log.Fatalf("EncryptXOR function error: %v", err)
+	// }
 
-	fmt.Println("Cryptogram (Hex):", cryptogram)
+	// // fmt.Println("Cryptogram (Hex):\n", cryptogram)
 
 	// Tests crypto analysis
-	cipherText, err := helpers.ReadCiphertext("files/crypto.txt")
+	decryptedText, err := flagfunc.AnalyzeXOR("files/crypto.txt")
 	if err != nil {
-		log.Fatalf("Error reading ciphertext: %v", err)
+		log.Fatalf("Error during analysis: %v", err)
 	}
-
-	decryptedText := flagfunc.AnalyzeXOR(cipherText)
-
-	fmt.Println("Decrypted Text: ", decryptedText)
+	fmt.Println("\n\nPlain text after analysis:\n", decryptedText)
 
 }
