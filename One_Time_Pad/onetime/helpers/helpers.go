@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
@@ -302,3 +303,147 @@ func ReadCiphertext(fileName string) ([]string, error) {
 	// Return the list of lines
 	return lines, nil
 }
+
+func ValidateCryptoHexFile(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	lineNum := 1
+	var expectedLength int = -1
+	validHex := regexp.MustCompile(`^[0-9A-Fa-f]+$`)
+
+	hasError := false
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if !validHex.MatchString(line) {
+			fmt.Printf("Line %d contains invalid characters: %s\n", lineNum, line)
+			hasError = true
+		}
+
+		if len(line)%2 != 0 {
+			fmt.Printf("Line %d has odd length: %d\n", lineNum, len(line))
+			hasError = true
+		}
+
+		if expectedLength == -1 {
+			expectedLength = len(line)
+		} else if len(line) != expectedLength {
+			fmt.Printf("Line %d has a different length (%d) than expected (%d)\n", lineNum, len(line), expectedLength)
+			hasError = true
+		}
+
+		lineNum++
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error while reading the file: %w", err)
+	}
+
+	if hasError {
+		return fmt.Errorf("file contains errors")
+	}
+
+	return nil
+}
+
+// Function to print the positions of spaces in each line of a text file
+func PrintSpacePositions(filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("error during open file: %v", err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	lineNumber := 1
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		fmt.Printf("Linie numer %2d (len: %d): ", lineNumber, len(line))
+		var spacePositions []int
+		for i, ch := range line {
+			if ch == ' ' {
+				spacePositions = append(spacePositions, i)
+			}
+		}
+		if len(spacePositions) == 0 {
+			fmt.Println("no space")
+		} else {
+			fmt.Printf("spaces: %v\n", spacePositions)
+		}
+		lineNumber++
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("eroor during reading file: %v", err)
+	}
+	return nil
+}
+
+
+// Function to find columns without spaces in a text file
+func FindColumnsWithoutSpaces(filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("error during open file: %v", err)
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error during read file: %v", err)
+	}
+
+	if len(lines) == 0 {
+		return fmt.Errorf("file is empty")
+	}
+
+	lineLength := len(lines[0])
+	// Check if all lines have the same length
+	for i, line := range lines {
+		if len(line) != lineLength {
+			return fmt.Errorf("line %d has lenght %d, exepected %d", i+1, len(line), lineLength)
+		}
+	}
+
+	noSpaceCols := make([]bool, lineLength)
+	for i := 0; i < lineLength; i++ {
+		noSpaceCols[i] = true
+	}
+
+	// check each line for spaces
+	for _, line := range lines {
+		for i, ch := range line {
+			if ch == ' ' {
+				noSpaceCols[i] = false
+			}
+		}
+	}
+
+	var result []int
+	for i, isClean := range noSpaceCols {
+		if isClean {
+			result = append(result, i)
+		}
+	}
+
+	if len(result) == 0 {
+		fmt.Println("Each column contains at least one space.")
+	} else {
+		fmt.Printf("Column without spaces:\n%v\n", result)
+	}
+
+	return nil
+}
+

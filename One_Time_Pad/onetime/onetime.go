@@ -9,16 +9,6 @@ import (
 	"onetime/helpers"
 )
 
-const (
-	orgFile       = "files/org.txt"
-	plainFile     = "files/plain.txt"
-	keyFile       = "files/key.txt"
-	keyOutputFile = "files/key-found.txt"
-	cryptoFile    = "files/crypto.txt"
-	decryptedFile = "files/decrypt.txt"
-	keyFoundFile  = "files/key-found.txt"
-)
-
 func main() {
 	helpers.SetLogger()
 
@@ -55,13 +45,15 @@ func main() {
 		log.Fatalf("Execution error: %v", err)
 	}
 
-	// Tests Encryption
-	// cryptogram, err := flagfunc.EncryptXOR(plainFile, keyFile, cryptoFile)
-	// if err != nil {
-	// 	log.Fatalf("EncryptXOR function error: %v", err)
-	// }
+	err = helpers.FindColumnsWithoutSpaces("files/plain.txt")
+	if err != nil {
+		fmt.Println("Błąd:", err)
+	}
 
-	// // fmt.Println("Cryptogram (Hex):\n", cryptogram)
+	err = helpers.PrintSpacePositions("files/plain.txt")
+	if err != nil {
+		fmt.Println("Błąd:", err)
+	}
 
 	// Tests crypto analysis
 	decryptedText, err := flagfunc.AnalyzeXOR("files/crypto.txt")

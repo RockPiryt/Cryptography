@@ -3,6 +3,7 @@ package flagfunc
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,6 +11,8 @@ import (
 
 	"onetime/helpers"
 )
+// CharType – rozpoznajemy: Unknown (jeszcze nie wiemy), Space (0x20), Letter (A-Z lub a-z).
+type CharType int
 
 const (
 	orgFile       = "files/org.txt"
@@ -19,6 +22,9 @@ const (
 	cryptoFile    = "files/crypto.txt"
 	decryptedFile = "files/decrypt.txt"
 	keyFoundFile  = "files/key-found.txt"
+	Unknown CharType = iota
+	Space
+	Letter
 )
 
 func ExecuteCipher(operation string) error {
@@ -123,97 +129,158 @@ func EncryptXOR(plainFile, keyFile, cryptoFile string) (string, error) {
 	return cryptogramHex, nil
 }
 
-// Analyze the ciphertext and try to guess spaces and letters
+// AnalyzeXOR – kryptoanaliza XOR z założeniem, że plaintext ma tylko spacje i litery (A-Z, a-z).
 func AnalyzeXOR(cryptoFile string) (string, error) {
-	cryptoText, err := helpers.GetText(cryptoFile)
+	// 1. Wczytanie pliku
+	raw, err := os.ReadFile(cryptoFile)
 	if err != nil {
-		return "", fmt.Errorf("error during reading crypto text: %v", err)
+		return "", fmt.Errorf("nie udało się wczytać pliku %s: %v", cryptoFile, err)
 	}
-
-	lines := strings.Split(cryptoText, "\n")
+	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
 	numLines := len(lines)
 	if numLines < 2 {
-		return "", fmt.Errorf("minimum 2 lines to crypto analyze")
+		return "", errors.New("potrzebne co najmniej 2 linie do analizy")
 	}
-	fmt.Printf("Cryptogram:\n%s\n", cryptoText)
-	// Encode each line from hex to bytes
-	var cryptoBinary [][]byte
-	lineLength := 0
-	for _, hexLine := range lines {
-		bytesLine, err := hex.DecodeString(hexLine)
+
+	// 2. Dekodowanie hex -> []byte
+	decoded := make([][]byte, numLines)
+	lineLen := 0
+	for i, line := range lines {
+		bs, err := hex.DecodeString(line)
 		if err != nil {
-			return "", fmt.Errorf("encoded error hex: %v", err)
+			return "", fmt.Errorf("błąd dekodowania w linii %d: %v", i+1, err)
 		}
-		if lineLength == 0 {
-			lineLength = len(bytesLine)
-		} else if len(bytesLine) != lineLength {
-			return "", fmt.Errorf("length of lines is not the same")
+		if i == 0 {
+			lineLen = len(bs)
+		} else if len(bs) != lineLen {
+			return "", fmt.Errorf("wszystkie linie muszą mieć tę samą długość; linia %d ma %d bajtów, a 1. linia %d",
+				i+1, len(bs), lineLen)
 		}
-		cryptoBinary = append(cryptoBinary, bytesLine)
+		decoded[i] = bs
 	}
 
-	// Create a 2D slice to store guesses for spaces
-	spaceGuesses := make([][]bool, numLines)
-	for i := range spaceGuesses {
-		spaceGuesses[i] = make([]bool, lineLength)
-	}
-
-	// Make XOR of each line with every other line and look for positions that could contain spaces
+	// 3. charType – czy to (Unknown, Space, Letter) w każdym miejscu
+	charType := make([][]CharType, numLines)
 	for i := 0; i < numLines; i++ {
-		for j := i + 1; j < numLines; j++ {
-			for k := 0; k < lineLength; k++ {
-				x := cryptoBinary[i][k] ^ cryptoBinary[j][k]
-				// Spacja XOR litera ASCII [a-z] daje wynik z 3-cim bitem ustawionym (czyli x & 0x20 == 0x20)
-				// XOR space with ASCII letters gives a result with the 3rd bit set (x & 0x20 == 0x20 == 0010.000)
-				if (x >= 0x41 && x <= 0x7A) || (x >= 0x01 && x <= 0x1F) {
-					// Możliwe, że jedno z nich to spacja – zaznacz kandydata
-					spaceGuesses[i][k] = true
-					spaceGuesses[j][k] = true
+		charType[i] = make([]CharType, lineLen)
+		for k := 0; k < lineLen; k++ {
+			charType[i][k] = Unknown
+		}
+	}
+
+	// Pomocnicza funkcja: najwyższe 3 bity
+	top3 := func(x byte) byte {
+		return (x & 0xE0) >> 5
+	}
+
+	// 4. Iteracyjna propagacja
+	changed := true
+	rounds := 0
+	for changed {
+		changed = false
+		rounds++
+
+		// Wszystkie pary (i, j)
+		for i := 0; i < numLines; i++ {
+			for j := i + 1; j < numLines; j++ {
+				for k := 0; k < lineLen; k++ {
+					x := decoded[i][k] ^ decoded[j][k]
+					switch top3(x) {
+					case 0, 1:
+						// Może to być litera⊕litera (różne lub te same), albo spacja⊕spacja (tylko x=0).
+						// - jeśli x == 0 => obie takie same: (spacja-spacja) lub (litera-litera).
+						if x == 0x00 {
+							// jeżeli w (i, k) już wiemy: letter => j też letter,
+							// jeżeli w (i, k) już wiemy: space => j też space.
+							if charType[i][k] == Space && charType[j][k] == Unknown {
+								charType[j][k] = Space
+								changed = true
+							} else if charType[i][k] == Letter && charType[j][k] == Unknown {
+								charType[j][k] = Letter
+								changed = true
+							} else if charType[j][k] == Space && charType[i][k] == Unknown {
+								charType[i][k] = Space
+								changed = true
+							} else if charType[j][k] == Letter && charType[i][k] == Unknown {
+								charType[i][k] = Letter
+								changed = true
+							}
+							// Jeśli obie Unknown, nic nie wnioskujemy.
+
+						} else {
+							// x != 0, top3(x) <= 1 => wskazuje raczej litera⊕litera (inne litery),
+							// bo spacja⊕spacja = 0.
+							// Jeżeli ktoś jest Space -> sprzeczność (teoretycznie).
+							if charType[i][k] == Space {
+								// Kolizja heurystyki; zostawiamy – w pełnej analityce można by to oznaczyć jako błąd
+							} else if charType[i][k] == Unknown {
+								charType[i][k] = Letter
+								changed = true
+							}
+							if charType[j][k] == Space {
+								// Kolizja
+							} else if charType[j][k] == Unknown {
+								charType[j][k] = Letter
+								changed = true
+							}
+						}
+					case 2, 3:
+						// litera⊕spacja
+						// => (i, k) = letter, (j, k) = space LUB (i, k) = space, (j, k) = letter
+						// jeśli już wiemy jedną stronę -> determinujemy drugą
+						if charType[i][k] == Letter && charType[j][k] != Space {
+							charType[j][k] = Space
+							changed = true
+						} else if charType[i][k] == Space && charType[j][k] != Letter {
+							charType[j][k] = Letter
+							changed = true
+						} else if charType[j][k] == Letter && charType[i][k] != Space {
+							charType[i][k] = Space
+							changed = true
+						} else if charType[j][k] == Space && charType[i][k] != Letter {
+							charType[i][k] = Letter
+							changed = true
+						}
+						// Jeśli obie Unknown, w tej iteracji nic nie rozstrzygamy –
+						// być może inna para powie, która jest spacja, która litera
+					}
 				}
 			}
 		}
 	}
+	log.Printf("Propagacja zakończona po %d rundach.\n", rounds)
 
-	// Zgadywanie klucza tam, gdzie jesteśmy pewni spacji
-	key := make([]byte, lineLength)
-	knownKey := make([]bool, lineLength)
+	// 5. Wyliczamy klucz tam, gdzie pewnie Space
+	key := make([]byte, lineLen)
+	knownKey := make([]bool, lineLen)
 
 	for i := 0; i < numLines; i++ {
-		for k := 0; k < lineLength; k++ {
-			if spaceGuesses[i][k] {
-				// Jeśli zakładamy, że to spacja (0x20), to klucz = crypto ^ 0x20
-				guessedKeyByte := cryptoBinary[i][k] ^ 0x20
-				// Zaznacz jako znany tylko jeśli jeszcze nie mamy klucza w tym miejscu
-				if !knownKey[k] {
-					key[k] = guessedKeyByte
-					knownKey[k] = true
-				}
+		for k := 0; k < lineLen; k++ {
+			if charType[i][k] == Space && !knownKey[k] {
+				key[k] = decoded[i][k] ^ 0x20 // 0x20 = spacja
+				knownKey[k] = true
 			}
 		}
 	}
 
-	// Decrypt each line using the guessed key
+	// 6. Deszyfrujemy
 	var output []string
-	for _, line := range cryptoBinary {
-		var lineText string
-		for i, b := range line {
-			if knownKey[i] {
-				ch := b ^ key[i]
-				if ch >= 0x61 && ch <= 0x7A { // a-z
-					lineText += string(ch)
-				} else if ch == 0x20 {
-					lineText += " "
+	for i := 0; i < numLines; i++ {
+		var sb strings.Builder
+		for k := 0; k < lineLen; k++ {
+			if knownKey[k] {
+				ch := decoded[i][k] ^ key[k]
+				if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == ' ' {
+					sb.WriteByte(ch)
 				} else {
-					lineText += "_" // doubtful character
+					sb.WriteByte('_')
 				}
 			} else {
-				lineText += "_" //don't know the key byte
+				sb.WriteByte('_')
 			}
 		}
-		output = append(output, lineText)
+		output = append(output, sb.String())
 	}
 
-	// Create lines
-	result := strings.Join(output, "\n")
-	return result, nil
+	return strings.Join(output, "\n"), nil
 }
