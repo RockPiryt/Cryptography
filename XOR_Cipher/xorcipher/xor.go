@@ -44,4 +44,8 @@ func main() {
 		log.Fatalf("Execution error: %v", err)
 	}
 
+	err = flagfunc.CheckPlain("files/plain.txt")
+	if err != nil {
+		log.Fatalf("error during CheckPlain: %v", err)
+	}
 }

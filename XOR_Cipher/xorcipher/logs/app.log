@@ -1,3 +1,20 @@
-[ONE TIME PAD]2025/04/05 16:11:54 flagfunc.go:585: There are 15 blocks, each 64 bytes.
-[ONE TIME PAD]2025/04/05 16:11:54 flagfunc.go:678: Propagation finished after 3 rounds.
-[ONE TIME PAD]2025/04/05 16:11:54 flagfunc.go:64: [INFO] Text successfully decrypted into decrypt.txt.
+[ONE TIME PAD]2025/04/05 21:21:54 flagfunc.go:585: There are 15 blocks, each 64 bytes.
+[ONE TIME PAD]2025/04/05 21:21:54 flagfunc.go:678: Propagation finished after 3 rounds.
+[ONE TIME PAD]2025/04/05 21:21:54 flagfunc.go:64: [INFO] Text successfully decrypted into decrypt.txt.
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:441: Columns without spaces:
+[9 13 25 30 43 46]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [6 12 20 24 32 37 45 48 59]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [3 11 14 18 27 34 39 42 44 51 54]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [1 5 7 12 18 21 27 28 36 37 44 55 61]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [7 10 14 24 28 37 45 50 56 60]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [5 12 15 24 29 40 44 54 63]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [6 15 18 19 26 33 39 44 48 53 58 62]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [4 8 17 22 26 32 35 37 47 51 55]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [1 8 16 23 27 37 44 48 57 61]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [3 14 17 27 35 41 44 53 56 60]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [0 6 10 14 19 23 27 31 38 48 52]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [2 14 20 24 33 38 41 52 56 63]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [8 11 22 26 35 38 45 49 53 62]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [1 5 16 26 36 47 52 56 60]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [1 5 16 21 29 36 40 44 50 59 63]
+[ONE TIME PAD]2025/04/05 21:21:54 helpers.go:376: spaces: [8 15 21 28 34 40 44 49 54 58 63]

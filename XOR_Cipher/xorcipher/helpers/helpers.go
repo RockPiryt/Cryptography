@@ -363,7 +363,7 @@ func PrintSpacePositions(filePath string) error {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		fmt.Printf("Linie numer %2d (len: %d): ", lineNumber, len(line))
+		// log.Printf("Linie numer %2d (len: %d): ", lineNumber, len(line))
 		var spacePositions []int
 		for i, ch := range line {
 			if ch == ' ' {
@@ -373,7 +373,7 @@ func PrintSpacePositions(filePath string) error {
 		if len(spacePositions) == 0 {
 			fmt.Println("no space")
 		} else {
-			fmt.Printf("spaces: %v\n", spacePositions)
+			log.Printf("spaces: %v\n", spacePositions)
 		}
 		lineNumber++
 	}
@@ -436,9 +436,9 @@ func FindColumnsWithoutSpaces(filePath string) error {
 	}
 
 	if len(result) == 0 {
-		fmt.Println("Each column contains at least one space.")
+		log.Println("Each column contains at least one space.")
 	} else {
-		fmt.Printf("Column without spaces:\n%v\n", result)
+		log.Printf("Columns without spaces:\n%v\n", result)
 	}
 
 	return nil
