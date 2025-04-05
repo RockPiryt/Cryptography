@@ -11,11 +11,11 @@ import (
 
 	"onetime/helpers"
 )
-// CharType – rozpoznajemy: Unknown (jeszcze nie wiemy), Space (0x20), Letter (A-Z lub a-z).
+// Chartype  to store the type of character in the text. Unknown, Space (0x20), Letter (A-Z or a-z).
 type CharType int
 
 const (
-	orgFile       = "files/org.txt"
+	orgFile       = "files/orig.txt"
 	plainFile     = "files/plain.txt"
 	keyFile       = "files/key.txt"
 	keyOutputFile = "files/key-found.txt"
@@ -57,7 +57,13 @@ func ExecuteCipher(operation string) error {
 
 	case "k":
 		// Make cryptanalysis of the text from crypto.txt and saves the result to decrypt.txt
-		// BrakeCipher(cryptoFile, decryptedFile, keyOutputFile)
+		_, err := AnalyzeXOR(cryptoFile)
+		if err != nil {
+			return fmt.Errorf("failed to decrypt the text: %v", err)
+		}
+
+		log.Println("[INFO] Text successfully decrypted into decrypt.txt.")
+		return nil
 
 	default:
 		return fmt.Errorf("unsupported operation: %s", operation)
@@ -129,37 +135,36 @@ func EncryptXOR(plainFile, keyFile, cryptoFile string) (string, error) {
 	return cryptogramHex, nil
 }
 
-// AnalyzeXOR – kryptoanaliza XOR z założeniem, że plaintext ma tylko spacje i litery (A-Z, a-z).
+// Function to decrypt the text using XOR cipher, cryptotext in hex format
 func AnalyzeXOR(cryptoFile string) (string, error) {
-	// 1. Wczytanie pliku
 	raw, err := os.ReadFile(cryptoFile)
 	if err != nil {
-		return "", fmt.Errorf("nie udało się wczytać pliku %s: %v", cryptoFile, err)
+		return "", fmt.Errorf("error during reading file %s: %v", cryptoFile, err)
 	}
 	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
 	numLines := len(lines)
 	if numLines < 2 {
-		return "", errors.New("potrzebne co najmniej 2 linie do analizy")
+		return "", errors.New("minimum 2 lines required")
 	}
 
-	// 2. Dekodowanie hex -> []byte
+	// Decode hex format to []byte
 	decoded := make([][]byte, numLines)
 	lineLen := 0
 	for i, line := range lines {
 		bs, err := hex.DecodeString(line)
 		if err != nil {
-			return "", fmt.Errorf("błąd dekodowania w linii %d: %v", i+1, err)
+			return "", fmt.Errorf("error during encoding %d: %v", i+1, err)
 		}
 		if i == 0 {
 			lineLen = len(bs)
 		} else if len(bs) != lineLen {
-			return "", fmt.Errorf("wszystkie linie muszą mieć tę samą długość; linia %d ma %d bajtów, a 1. linia %d",
+			return "", fmt.Errorf("all lines should has the same lenght, line %d has %d bytes, but 1. line %d",
 				i+1, len(bs), lineLen)
 		}
 		decoded[i] = bs
 	}
 
-	// 3. charType – czy to (Unknown, Space, Letter) w każdym miejscu
+	// Create a 2D slice to store the character types for each line and each character (Unknown, Space, Letter)
 	charType := make([][]CharType, numLines)
 	for i := 0; i < numLines; i++ {
 		charType[i] = make([]CharType, lineLen)
@@ -168,12 +173,12 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 		}
 	}
 
-	// Pomocnicza funkcja: najwyższe 3 bity
+	// Three top bits of the byte
 	top3 := func(x byte) byte {
 		return (x & 0xE0) >> 5
 	}
 
-	// 4. Iteracyjna propagacja
+	// Propagation of the character types
 	changed := true
 	rounds := 0
 	for changed {
@@ -248,22 +253,22 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 			}
 		}
 	}
-	log.Printf("Propagacja zakończona po %d rundach.\n", rounds)
+	log.Printf("Propagation fished after %d rounds.\n", rounds)
 
-	// 5. Wyliczamy klucz tam, gdzie pewnie Space
+	// Calculate key with known spaces
 	key := make([]byte, lineLen)
 	knownKey := make([]bool, lineLen)
 
 	for i := 0; i < numLines; i++ {
 		for k := 0; k < lineLen; k++ {
 			if charType[i][k] == Space && !knownKey[k] {
-				key[k] = decoded[i][k] ^ 0x20 // 0x20 = spacja
+				key[k] = decoded[i][k] ^ 0x20 // 0x20 = space
 				knownKey[k] = true
 			}
 		}
 	}
 
-	// 6. Deszyfrujemy
+	// Decrypt the text using the key
 	var output []string
 	for i := 0; i < numLines; i++ {
 		var sb strings.Builder
@@ -281,6 +286,13 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 		}
 		output = append(output, sb.String())
 	}
+	decryptText := strings.Join(output, "\n")
 
-	return strings.Join(output, "\n"), nil
+	// Save crypto text in hex format to decrypt.txt
+	err = helpers.SaveOutput(decryptText, decryptedFile)
+	if err != nil {
+		return "", fmt.Errorf("error during saving decryptText: %v", err)
+	}
+
+	return decryptText, nil
 }
