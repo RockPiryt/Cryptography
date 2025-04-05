@@ -45,16 +45,6 @@ func main() {
 		log.Fatalf("Execution error: %v", err)
 	}
 
-	err = helpers.FindColumnsWithoutSpaces("files/plain.txt")
-	if err != nil {
-		fmt.Println("Błąd:", err)
-	}
-
-	err = helpers.PrintSpacePositions("files/plain.txt")
-	if err != nil {
-		fmt.Println("Błąd:", err)
-	}
-
 	// Tests crypto analysis
 	decryptedText, err := flagfunc.AnalyzeXOR("files/crypto.txt")
 	if err != nil {

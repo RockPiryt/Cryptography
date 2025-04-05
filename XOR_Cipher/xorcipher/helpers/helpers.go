@@ -260,7 +260,6 @@ func GetPreparedText(textFile string) (string, error) {
 	return text, nil
 }
 
-
 // Function to convert text to hexadecimal representation
 func TextToHex(text string) string {
 	var hexString string
@@ -291,7 +290,6 @@ func XORBytes(b1, b2 []byte) []byte {
 	}
 	return result
 }
-
 
 // Read the crypto.txt file
 func ReadCiphertext(fileName string) ([]string, error) {
@@ -386,7 +384,6 @@ func PrintSpacePositions(filePath string) error {
 	return nil
 }
 
-
 // Function to find columns without spaces in a text file
 func FindColumnsWithoutSpaces(filePath string) error {
 	file, err := os.Open(filePath)
@@ -446,4 +443,3 @@ func FindColumnsWithoutSpaces(filePath string) error {
 
 	return nil
 }
-

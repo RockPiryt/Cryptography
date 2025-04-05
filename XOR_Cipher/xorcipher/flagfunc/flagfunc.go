@@ -11,18 +11,19 @@ import (
 
 	"xorcipher/helpers"
 )
+
 // Chartype  to store the type of character in the text. Unknown, Space (0x20), Letter (A-Z or a-z).
 type CharType int
 
 const (
-	orgFile       = "files/orig.txt"
-	plainFile     = "files/plain.txt"
-	keyFile       = "files/key.txt"
-	keyOutputFile = "files/key-found.txt"
-	cryptoFile    = "files/crypto.txt"
-	decryptedFile = "files/decrypt.txt"
-	keyFoundFile  = "files/key-found.txt"
-	Unknown CharType = iota
+	orgFile                = "files/orig.txt"
+	plainFile              = "files/plain.txt"
+	keyFile                = "files/key.txt"
+	keyOutputFile          = "files/key-found.txt"
+	cryptoFile             = "files/crypto.txt"
+	decryptedFile          = "files/decrypt.txt"
+	keyFoundFile           = "files/key-found.txt"
+	Unknown       CharType = iota
 	Space
 	Letter
 )
@@ -101,7 +102,7 @@ func EncryptXOR(plainFile, keyFile, cryptoFile string) (string, error) {
 
 	log.Printf("Plain text: %s\n", plainText)
 	log.Printf("Key: %s\n", key)
-	
+
 	// Convert plain text and key to byte slices.
 	keyBytes := []byte(key)
 	lines := strings.Split(plainText, "\n")
@@ -295,4 +296,18 @@ func AnalyzeXOR(cryptoFile string) (string, error) {
 	}
 
 	return decryptText, nil
+}
+
+func CheckPlain(plainText string) error {
+	err := helpers.FindColumnsWithoutSpaces(plainText)
+	if err != nil {
+		return fmt.Errorf("error during FindColumnsWithoutSpaces : %v", err)
+	}
+
+	err = helpers.PrintSpacePositions(plainText)
+	if err != nil {
+		return fmt.Errorf("error durig PrintSpacePositions: %v", err)
+	}
+
+	return nil
 }
