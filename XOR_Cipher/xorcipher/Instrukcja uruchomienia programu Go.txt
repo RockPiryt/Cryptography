@@ -20,11 +20,11 @@ Zaktualizuj zmienną PATH, dodając ścieżkę do folderu, w którym zainstalowa
 
 ---Krok 3: Uruchomienie programu
 Zakładając, że masz już pliki swojego projektu na komputerze w folderze:
-Przejdz do katalogo vigenere
-cd vigenere
+Przejdz do katalogo xorcipher
+cd xorcipher
 
 Użyj polecenia go run w terminalu PowerShell, aby uruchomić program Go z odpowiednimi flagami
 np.
-```go run .\onetime.go -p```
+```go run .\xor.go -p```
 
 

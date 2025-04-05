@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"onetime/helpers"
+	"xorcipher/helpers"
 )
 // Chartype  to store the type of character in the text. Unknown, Space (0x20), Letter (A-Z or a-z).
 type CharType int

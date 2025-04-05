@@ -5,8 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"onetime/flagfunc"
-	"onetime/helpers"
+	"xorcipher/flagfunc"
+	"xorcipher/helpers"
 )
 
 func main() {
