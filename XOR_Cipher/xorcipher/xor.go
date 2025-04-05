@@ -44,11 +44,4 @@ func main() {
 		log.Fatalf("Execution error: %v", err)
 	}
 
-	// // Tests crypto analysis
-	// decryptedText, err := flagfunc.AnalyzeXOR("files/crypto.txt")
-	// if err != nil {
-	// 	log.Fatalf("Error during analysis: %v", err)
-	// }
-	// fmt.Println("\n\nPlain text after analysis:\n", decryptedText)
-
 }
