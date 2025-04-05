@@ -103,6 +103,12 @@ func EncryptXOR(plainFile, keyFile, cryptoFile string) (string, error) {
 	log.Printf("Plain text: %s\n", plainText)
 	log.Printf("Key: %s\n", key)
 
+	// Save prepared key to key.txt
+	err = helpers.SaveOutput(key, keyFile)
+	if err != nil {
+		return "", fmt.Errorf("error during saving cryptogram: %v", err)
+	}
+
 	// Convert plain text and key to byte slices.
 	keyBytes := []byte(key)
 	lines := strings.Split(plainText, "\n")
