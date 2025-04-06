@@ -22,7 +22,7 @@ func SetLogger() {
 	}
 
 	log.SetOutput(logFile)
-	log.SetPrefix("[ONE TIME PAD]")
+	log.SetPrefix("[XOR Cipher] ")
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 }
 
