@@ -1,0 +1,58 @@
+[zapisuje z nazwa pliku]
+md5sum personal.txt      >  hash.txt
+sha1sum personal.txt     >> hash.txt
+sha224sum personal.txt   >> hash.txt
+sha256sum personal.txt   >> hash.txt
+sha384sum personal.txt   >> hash.txt
+sha512sum personal.txt   >> hash.txt
+b2sum personal.txt       >> hash.txt
+
+[wersja z cat - bez nazwy pliku]
+cat personal.txt | md5sum  >  hash.txt
+cat personal.txt | sha1sum  >> hash.txt
+cat personal.txt | sha224sum  >> hash.txt
+cat personal.txt | sha256sum  >> hash.txt
+cat personal.txt | sha384sum  >> hash.txt
+cat personal.txt | sha512sum  >> hash.txt
+cat personal.txt | b2sum  >> hash.txt
+
+[wersja z enterem]
+cat personal_.txt | md5sum  >>  hash.txt
+cat personal_.txt | sha1sum  >> hash.txt
+cat personal_.txt | sha224sum  >> hash.txt
+cat personal_.txt | sha256sum  >> hash.txt
+cat personal_.txt | sha384sum  >> hash.txt
+cat personal_.txt | sha512sum  >> hash.txt
+cat personal_.txt | b2sum  >> hash.txt
+
+
+[z linią]
+md5sum personal_.txt      >>  hash.txt
+sha1sum personal_.txt     >> hash.txt
+sha224sum personal_.txt   >> hash.txt
+sha256sum personal_.txt   >> hash.txt
+sha384sum personal_.txt   >> hash.txt
+sha512sum personal_.txt   >> hash.txt
+b2sum personal_.txt       >> hash.txt
+
+[połacznie z plikiem]
+cat hash-.pdf personal.txt   | md5sum      > hash.txt
+cat hash-.pdf personal_.txt  | md5sum      >> hash.txt
+
+cat hash-.pdf personal.txt   | sha1sum     >> hash.txt
+cat hash-.pdf personal_.txt  | sha1sum     >> hash.txt
+
+cat hash-.pdf personal.txt   | sha224sum   >> hash.txt
+cat hash-.pdf personal_.txt  | sha224sum   >> hash.txt
+
+cat hash-.pdf personal.txt   | sha256sum   >> hash.txt
+cat hash-.pdf personal_.txt  | sha256sum   >> hash.txt
+
+cat hash-.pdf personal.txt   | sha384sum   >> hash.txt
+cat hash-.pdf personal_.txt  | sha384sum   >> hash.txt
+
+cat hash-.pdf personal.txt   | sha512sum   >> hash.txt
+cat hash-.pdf personal_.txt  | sha512sum   >> hash.txt
+
+cat hash-.pdf personal.txt   | b2sum       >> hash.txt
+cat hash-.pdf personal_.txt  | b2sum       >> hash.txt
