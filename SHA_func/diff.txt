@@ -1,0 +1,42 @@
+cat hash-.pdf personal.txt | md5sum
+cat hash-.pdf personal_.txt | md5sum
+3148b65c2ac7250acd5d05158749541a
+0a07f0c32899712096af1132d38e3a8a
+Number of differing bits: 62 out of 128 (48.44%)
+
+cat hash-.pdf personal.txt | sha1sum
+cat hash-.pdf personal_.txt | sha1sum
+474c6e374c04465f8212ff06b40424f4f7927991
+a7b8e4e76ce8c8e7f4f9db7b83ebaed95837f155
+Number of differing bits: 81 out of 160 (50.62%)
+
+cat hash-.pdf personal.txt | sha224sum
+cat hash-.pdf personal_.txt | sha224sum
+1e46b3e55d3413c3b59bc08fe98ba2d252bb8d0d8ee3ac10eb771b41
+36dacd32d3e098f31a53d3cbe331097272863914fe3e77d74052c21c
+Number of differing bits: 111 out of 224 (49.55%)
+
+cat hash-.pdf personal.txt | sha256sum
+cat hash-.pdf personal_.txt | sha256sum
+348dbeca783dc414c337a76c26c9e732d2c58336ad21e6f527dcedb8b69154cb
+0dce76f475dd891b814b3bc99209355342b8c5109494bc6bd5ab10533cab86d1
+Number of differing bits: 127 out of 256 (49.61%)
+
+cat hash-.pdf personal.txt | sha384sum
+cat hash-.pdf personal_.txt | sha384sum
+6d21db55b8da0df0aaa122e4601c0e423c935089b069a5551022170d6105d12959cf8534ab2c96bb75559e5094499647
+5153d58bf6fe3c6526a8d06c6aa53cb628f5a9c195e288938ac90f37d182780d2efa534c938c4898e8613798a345ba6c
+Number of differing bits: 177 out of 384 (46.09%)
+
+cat hash-.pdf personal.txt | sha512sum
+cat hash-.pdf personal_.txt | sha512sum
+b5a57b39d0abb80a4dc58f08c74d43cb664e82d31452de181c39fb2d808228d9f24ea3c47aa01c03cbf70a5cebc9729cee7006b5d1d92720f89d2617bd503f19
+6bc93211c84cfde87c09240b32d9b9cb507ec0575ee8dda7e364dbf46b86ea171a9d1f93644828a2696de98a9d6cf09d70e1d1f294e10e02ebdb41192b19e642
+Number of differing bits: 242 out of 512 (47.27%)
+
+cat hash-.pdf personal.txt | b2sum
+cat hash-.pdf personal_.txt | b2sum
+86f59c96a2ae46d2d94805760e4ad200667eb3197ad4efd1e67e04a9635b2697c6614e18d9a0eab2bd740b76ad0c0a33f6e7615f748fc7199333e25c6de03935
+6099e16062f07a5472bc426a568b0d58b063e64561400df3e521750416aeffc1ccdcb0cdb6314b7b45f462ae071b22fe7a016c1c0749d806bb421a5f4c8fdcce
+Number of differing bits: 266 out of 512 (51.95%)
+
