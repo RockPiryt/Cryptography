@@ -1,0 +1,36 @@
+name: Test & Format Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Go Test & Formatting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Check formatting (go fmt)
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "Poniższe pliki wymagają formatowania:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: Run unit tests
+        run: go test -v ./...
+
+      - name: Run unit tests with coverage
+        run: go test -cover ./...
