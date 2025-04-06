@@ -8,8 +8,6 @@ linters:
     - staticcheck
     - gosimple
     - unused
-    - structcheck
-    - deadcode
 
 issues:
   exclude-use-default: false
