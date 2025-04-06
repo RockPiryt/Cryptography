@@ -56,54 +56,69 @@ func parseHashFromOutput(output string) (string, error) {
     return hashHex, nil
 }
 
-// Function compareAndWriteDiffs compares the hashes of two files using different hash commands and writes the results to a file.
-func compareAndWriteDiffs(outFile *os.File, hashCommands []string, file1 string, file2 string) error {
+// Funcction compareAllHashes compares the hashes of two files using different hash commands and writes the results to a file.
+func compareAllHashes(hashFile, diffFile *os.File, hashCommands []string, file1, file2 string) error {
     for _, hashCmd := range hashCommands {
         // First command
         cmd1 := fmt.Sprintf("cat %s | %s", file1, hashCmd)
-        fmt.Fprintln(outFile, cmd1) 
+        fmt.Fprintln(hashFile, cmd1) 
 
         out1, err := runCommand(cmd1)
         if err != nil {
-            return fmt.Errorf("error running cmd1: %v", err)
+            return fmt.Errorf("error running cmd1: %w", err)
         }
         hash1, err := parseHashFromOutput(out1)
         if err != nil {
-            return fmt.Errorf("error parsing hash1: %v", err)
+            return fmt.Errorf("error parsing hash1: %w", err)
         }
 
         // Second command
         cmd2 := fmt.Sprintf("cat %s | %s", file2, hashCmd)
-        fmt.Fprintln(outFile, cmd2)
+        fmt.Fprintln(hashFile, cmd2) 
 
         out2, err := runCommand(cmd2)
         if err != nil {
-            return fmt.Errorf("error running cmd2: %v", err)
+            return fmt.Errorf("error running cmd2: %w", err)
         }
         hash2, err := parseHashFromOutput(out2)
         if err != nil {
-            return fmt.Errorf("error parsing hash2: %v", err)
+            return fmt.Errorf("error parsing hash2: %w", err)
         }
-
-        fmt.Fprintln(outFile, hash1)
-        fmt.Fprintln(outFile, hash2)
 
         diffBits, totalBits, diffPercent, err := compareHexBitDiff(hash1, hash2)
         if err != nil {
-            return fmt.Errorf("error comparing hex: %v", err)
+            log.Fatalf("Error comparing hex: %v", err)
         }
+		// Save data to hash.txt
+        fmt.Fprintln(hashFile, hash1)
+        fmt.Fprintln(hashFile, hash2)
+		fmt.Fprintln(hashFile)
 
-        fmt.Fprintf(outFile, "Number of differing bits: %d out of %d (%.2f%%)\n\n",
+
+        // Save data to diff.txt
+        fmt.Fprintln(diffFile, cmd1)
+        fmt.Fprintln(diffFile, cmd2)
+        fmt.Fprintln(diffFile, hash1)
+        fmt.Fprintln(diffFile, hash2)
+        fmt.Fprintf(diffFile, "Number of differing bits: %d out of %d (%.2f%%)\n\n",
             diffBits, totalBits, diffPercent)
     }
+
     return nil
 }
 
 func main() {
-	// Create a file to store the output
+    hashFile, err := os.Create("hash.txt")
+    if err != nil {
+        fmt.Println("Could not create hash.txt:", err)
+        return
+    }
+    defer hashFile.Close()
+
     diffFile, err := os.Create("diff.txt")
     if err != nil {
-        log.Fatalf("Could not create output file: %v", err)
+        fmt.Println("Could not create diff.txt:", err)
+        return
     }
     defer diffFile.Close()
 
@@ -120,10 +135,8 @@ func main() {
     file1 := "hash-.pdf personal.txt"
     file2 := "hash-.pdf personal_.txt"
 
-    
-    if err := compareAndWriteDiffs(diffFile, hashCommands, file1, file2); err != nil {
-        log.Fatalf("Error: %v", err)
+    if err := compareAllHashes(hashFile, diffFile, hashCommands, file1, file2); err != nil {
+        fmt.Println("Error comparing all hashes:", err)
+        return
     }
-
-	fmt.Println("Done. Check diff.txt for results.")
 }
