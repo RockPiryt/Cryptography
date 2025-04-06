@@ -108,14 +108,25 @@ func compareAllHashes(hashFile, diffFile *os.File, hashCommands []string, file1,
 }
 
 func main() {
-    hashFile, err := os.Create("hash.txt")
+
+	outputDir := "files"
+	err := os.MkdirAll(outputDir, os.ModePerm)
+	if err != nil {
+		fmt.Println("Failed to create output directory:", err)
+		return
+	}
+
+	hashFilePath := outputDir + "/hash.txt"
+	diffFilePath := outputDir + "/diff.txt"
+
+    hashFile, err := os.Create(hashFilePath)
     if err != nil {
         fmt.Println("Could not create hash.txt:", err)
         return
     }
     defer hashFile.Close()
 
-    diffFile, err := os.Create("diff.txt")
+    diffFile, err := os.Create(diffFilePath)
     if err != nil {
         fmt.Println("Could not create diff.txt:", err)
         return
@@ -132,8 +143,8 @@ func main() {
         "b2sum",
     }
 
-    file1 := "hash-.pdf personal.txt"
-    file2 := "hash-.pdf personal_.txt"
+    file1 := "files/hash-.pdf files/personal.txt"
+	file2 := "files/hash-.pdf files/personal_.txt"
 
     if err := compareAllHashes(hashFile, diffFile, hashCommands, file1, file2); err != nil {
         fmt.Println("Error comparing all hashes:", err)
