@@ -1,3 +1,4 @@
+// Author: Paulina Kimak
 package main
 
 import (
