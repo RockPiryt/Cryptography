@@ -1,10 +1,10 @@
 # XOR Cipher Cryptanalysis Tool
 
-This Go program demonstrates the weaknesses of the one-time pad cipher when the same key is reused. It allows encryption, decryption (partial), and basic cryptanalysis of multiple ciphertexts encrypted with the same key using XOR.
+This Go program demonstrates the weaknesses of the XOR (one-time pad) cipher when the same key is reused. It allows encryption, decryption (partial), and basic cryptanalysis of multiple ciphertexts encrypted with the same key using XOR.
 
 ## Principle of the Cipher
 
-The one-time pad (OTP) cipher relies on the **non-reusability of the key**. Encryption and decryption are performed with the XOR operation:
+The one-time pad (OTP) / XOR cipher relies on the **non-reusability of the key**. Encryption and decryption are performed with the XOR operation:
 
 - **Encryption**: `E(k, m) = k ⊕ m`
 - **Decryption**: `D(k, c) = k ⊕ c`
@@ -80,11 +80,11 @@ The cryptanalysis (`-k` option) works as follows:
 
 ```bash
 # Prepare plain.txt from orig.txt
-go run .\onetime.go -p
+go run .\xor.go -p
 
 # Encrypt plain.txt using key.txt into crypto.txt
-go run .\onetime.go -e
+go run .\xor.go -e
 
 # Perform cryptanalysis based only on crypto.txt
-go run .\onetime.go -k
+go run .\xor.go -k
 
