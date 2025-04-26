@@ -79,5 +79,32 @@ func ProcessECB(img *image.Gray, key []byte) *image.Gray {
 	return out
 }
 
+// xorBlocks takes two equal-length byte slices and returns a new slice
+// where each byte is the result of XOR'ing corresponding bytes from both inputs.
+func xorBlocks(a, b []byte) []byte {
+	res := make([]byte, len(a))
+
+	for i := range a {
+		res[i] = a[i] ^ b[i]
+	}
+
+	return res
+}
+
+
 func ProcessCBC(img *image.Gray, key []byte) *image.Gray {
+	out := image.NewGray(img.Bounds())
+	iv := make([]byte, blockSize*blockSize) // init vector = 0s
+	prev := iv
+
+	for y := 0; y < img.Bounds().Dy(); y += blockSize {
+		for x := 0; x < img.Bounds().Dx(); x += blockSize {
+			block := getBlock(img, x, y)
+			xored := xorBlocks(block, prev)
+			encrypted := shaEncrypt(xored, key)
+			writeBlock(out, x, y, encrypted)
+			prev = encrypted
+		}
+	}
+	return out
 }
