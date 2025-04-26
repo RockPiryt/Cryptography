@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"block/helpers"
+	"block/funcblock"
 )
 
 func main() {
@@ -19,5 +20,15 @@ func main() {
 
 	// Read the key from the file
 	key := helpers.ReadKey("files/key.txt") 
+
+	// Process the image using ECB and CBC modes
+	ecb := funcblock.ProcessECB(grayImg, key)
+	cbc := funcblock.ProcessCBC(grayImg, key)
+
+	// Save the processed images
+	helpers.SaveImage("ecb_crypto.bmp", ecb)
+	helpers.SaveImage("cbc_crypto.bmp", cbc)
+
+	fmt.Println("ECB and CBC images saved.")
 
 }

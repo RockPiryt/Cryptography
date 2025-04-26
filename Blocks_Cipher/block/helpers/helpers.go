@@ -3,7 +3,7 @@ package helpers
 
 import (
 	"image"
-	_ "golang.org/x/image/bmp" 
+	"golang.org/x/image/bmp" 
 	"os"
 )
 
@@ -46,4 +46,18 @@ func ReadKey(path string) []byte {
 		return []byte("default-key")
 	}
 	return key
+}
+
+// saveImage creates the file, encodes the image in BMP format, and writes it to disk.
+func SaveImage(path string, img *image.Gray) error {
+	// Try to create (or overwrite) the file at the given path
+	out, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Encode the grayscale image as a BMP file and write it to disk
+	// bmp.Encode will write binary BMP format into the 'out' file
+	return bmp.Encode(out, img)
 }
