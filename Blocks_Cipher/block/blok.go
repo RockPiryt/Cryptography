@@ -29,6 +29,6 @@ func main() {
 	helpers.SaveImage("files/ecb_crypto.bmp", ecb)
 	helpers.SaveImage("files/cbc_crypto.bmp", cbc)
 
-	fmt.Println("ECB and CBC images saved.")
+	fmt.Println("ECB and CBC images saved in files directory.")
 
 }
