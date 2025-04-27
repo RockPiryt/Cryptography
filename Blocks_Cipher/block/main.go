@@ -26,8 +26,8 @@ func main() {
 	cbc := funcblock.ProcessCBC(grayImg, key)
 
 	// Save the processed images
-	helpers.SaveImage("ecb_crypto.bmp", ecb)
-	helpers.SaveImage("cbc_crypto.bmp", cbc)
+	helpers.SaveImage("files/ecb_crypto.bmp", ecb)
+	helpers.SaveImage("files/cbc_crypto.bmp", cbc)
 
 	fmt.Println("ECB and CBC images saved.")
 
