@@ -2,6 +2,7 @@
 package funcblock
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"image"
 	"image/color"
@@ -44,24 +45,20 @@ func writeBlock(img *image.Gray, x, y int, data []byte) {
 	}
 }
 
-// shaEncrypt simulates block encryption using SHA-256.
-// It combines the input block and a key, hashes them, and returns
-// the first N bytes (where N = 8*8 = 64) as the "encrypted" output.
+// shaEncrypt simulates block encryption using SHA-256. It hashes the block + key, repeats the hash if needed, and returns
+// the first N bytes (N = 8*8 = 64) to represent the encrypted block.
 func shaEncrypt(block, key []byte) []byte {
-	// Create a new SHA-256 hash object
-	hashObj := sha256.New()
+	// Combine block and key, then hash them with SHA-256
+	hash := sha256.Sum256(append(block, key...)) // 32-byte result
 
-	// Feed the block data into the hash
-	hashObj.Write(block)
+	// Prepare output slice of 64 bytes (8x8 block)
+	out := make([]byte, blockSize*blockSize) 
 
-	// Also feed the key into the hash to simulate key-based encryption
-	hashObj.Write(key)
+	// Repeat the hash bytes as needed to fill the output
+	copy(out, bytes.Repeat(hash[:], (len(out)/len(hash[:]))+1))
 
-	// Finalize the hash and take only the first 64 bytes
-	// (because we want an 8x8 grayscale block = 64 pixels)
-	return hashObj.Sum(nil)[:blockSize*blockSize] // truncate to block size
+	return out
 }
-
 
 func ProcessECB(img *image.Gray, key []byte) *image.Gray {
 	out := image.NewGray(img.Bounds())
