@@ -26,4 +26,26 @@ func main() {
 	if operationCount != 1 {
 		log.Fatalf("Error: You must choose exactly one operation: -k, -e, -d, -s or v.")
 	}
+
+	// Determine the operation
+	var operation string
+	switch {
+	case *keysFlag:
+		operation = "k"
+	case *encryptFlag:
+		operation = "e"
+	case *decryptFlag:
+		operation = "d"
+	case *signatureFlag:
+		operation = "s"
+	case *verifyFlag:
+		operation = "v"
+	default:
+		log.Fatalf("Error: Invalid operation selected.")
+	}
+
+	err := flagfunc.ExecuteCipher(operation)
+	if err != nil {
+		log.Fatalf("Execution error: %v", err)
+	}
 }
