@@ -2,10 +2,24 @@
 package main
 
 import (
-	"flag"
-	"log"
 	"elgamal/flagfunc"
 	"elgamal/helpers"
+	"flag"
+	"fmt"
+	"log"
+	"math/big"
+)
+
+const (
+	plainFile      = "files/plain.txt"
+	messageFile    = "files/message.txt"
+	elgamalFile    = "files/elgamal.txt"
+	privateKeyFile = "files/private.txt"
+	publicKeyFile  = "files/publicKey.txt"
+	cryptoFile     = "files/crypto.txt"
+	decryptedFile  = "files/decrypt.txt"
+	signatureFile  = "files/signature.txt"
+	verifyFile     = "files/verify.txt"
 )
 
 func main() {
@@ -48,4 +62,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Execution error: %v", err)
 	}
+
+	// Read first number p and generator g from file
+	params, _ := helpers.ReadBigIntsFromFile(elgamalFile, 2)
+	p, g := params[0], params[1]
+
+	fmt.Printf("p=%d g=%d", p, g)
+
+	
+
+	// Write big num to file
+	helpers.WriteBigIntsToFile(privateKeyFile, []*big.Int{p, g})
+	
 }
