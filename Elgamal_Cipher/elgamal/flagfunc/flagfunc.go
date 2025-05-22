@@ -4,6 +4,9 @@ package flagfunc
 import (
 	"fmt"
 	"log"
+	"math/big"
+
+	"elgamal/helpers"
 )
 
 const (
@@ -68,30 +71,16 @@ func ExecuteCipher(operation string) error {
 	return nil
 }
 
-// func GenerateKeys(elgamalFile string) error {
-// 	params, _ := helpers.ReadBigIntsFromFile(elgamalFile, 2)
-// 	p, g := params[0], params[1]
-// 	b, _ := helpers.RandomBigInt(new(big.Int).Sub(p, big.NewInt(2)))
-// 	b = b.Add(b, big.NewInt(1)) // Ensure 1 <= b < p-1
-
-// 	beta := new(big.Int).Exp(g, b, p)
-
-// 	helpers.WriteBigIntsToFile(privateKeyFile, []*big.Int{p, g, b})
-// 	helpers.WriteBigIntsToFile(publicKeyFile, []*big.Int{p, g, beta})
-
-// 	return nil
-// }
-
 func GenerateKeys(elgamalFile string) error {
-	// params, _ := helpers.ReadBigIntsFromFile(elgamalFile, 2)
-	// p, g := params[0], params[1]
-	// b, _ := helpers.RandomBigInt(new(big.Int).Sub(p, big.NewInt(2)))
-	// b = b.Add(b, big.NewInt(1)) // Ensure 1 <= b < p-1
+	params, _ := helpers.ReadBigIntsFromFile(elgamalFile, 2)
+	p, g := params[0], params[1]
+	b, _ := helpers.RandomBigInt(new(big.Int).Sub(p, big.NewInt(2)))
+	b = b.Add(b, big.NewInt(1)) // Ensure 1 <= b < p-1
 
-	// beta := new(big.Int).Exp(g, b, p)
+	beta := new(big.Int).Exp(g, b, p)
 
-	// helpers.WriteBigIntsToFile(privateKeyFile, []*big.Int{p, g, b})
-	// helpers.WriteBigIntsToFile(publicKeyFile, []*big.Int{p, g, beta})
+	helpers.WriteBigIntsToFile(privateKeyFile, []*big.Int{p, g, b})
+	helpers.WriteBigIntsToFile(publicKeyFile, []*big.Int{p, g, beta})
 
 	return nil
 }
