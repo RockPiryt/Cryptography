@@ -84,3 +84,18 @@ func RandomBigInt(max *big.Int) (*big.Int, error) {
 	}
 	return r, nil
 }
+
+// Function saves a string message as a big.Int to plain.txt
+func SavePlainMessageAsBigInt(message string, filePath string) error {
+	// Convert string to []byte, then to big.Int
+	m := new(big.Int).SetBytes([]byte(message))
+
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(m.String() + "\n")
+	return err
+}

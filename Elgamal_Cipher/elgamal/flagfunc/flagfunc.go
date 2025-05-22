@@ -5,27 +5,27 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-
+	
 	"elgamal/helpers"
 )
 
 const (
-	plainFile      = "files/plain.txt"
-	messageFile    = "files/message.txt"
-	elgamalFile    = "files/elgamal.txt"
-	privateKeyFile = "files/private.txt"
-	publicKeyFile  = "files/publicKey.txt"
-	cryptoFile     = "files/crypto.txt"
-	decryptedFile  = "files/decrypt.txt"
-	signatureFile  = "files/signature.txt"
-	verifyFile     = "files/verify.txt"
+	PlainFile      = "files/plain.txt"
+	MessageFile    = "files/message.txt"
+	ElgamalFile    = "files/elgamal.txt"
+	PrivateKeyFile = "files/private.txt"
+	PublicKeyFile  = "files/publicKey.txt"
+	CryptoFile     = "files/crypto.txt"
+	DecryptedFile  = "files/decrypt.txt"
+	SignatureFile  = "files/signature.txt"
+	VerifyFile     = "files/verify.txt"
 )
 
 func ExecuteCipher(operation string) error {
 	switch operation {
 	case "k":
 		// Generate public and private key for Bolek
-		err := GenerateKeys(elgamalFile)
+		err := GenerateKeys(ElgamalFile)
 		if err != nil {
 			return fmt.Errorf("error during generation of public and private keys %v", err)
 		}
@@ -33,7 +33,7 @@ func ExecuteCipher(operation string) error {
 		return nil
 
 	case "e":
-		err := EncryptElgamal(plainFile, publicKeyFile)
+		err := EncryptElgamal(PlainFile, PublicKeyFile)
 		if err != nil {
 			return fmt.Errorf("failed to encrypt the text: %v", err)
 		}
@@ -42,7 +42,7 @@ func ExecuteCipher(operation string) error {
 
 	case "d":
 		// Decrypt crypto.txt using key.txt
-		_, err := DecryptElgamal(cryptoFile, privateKeyFile, decryptedFile)
+		_, err := DecryptElgamal(CryptoFile, PrivateKeyFile, DecryptedFile)
 		if err != nil {
 			return fmt.Errorf("failed to decrypt the text: %v", err)
 		}
@@ -50,7 +50,7 @@ func ExecuteCipher(operation string) error {
 		return nil
 	case "s":
 		// Sign the message
-		_, err := SignMsg(messageFile, privateKeyFile)
+		_, err := SignMsg(MessageFile, PrivateKeyFile)
 		if err != nil {
 			return fmt.Errorf("failed to sing the message: %v", err)
 		}
@@ -58,7 +58,7 @@ func ExecuteCipher(operation string) error {
 		return nil
 	case "v":
 		// Verify the signed message
-		_, err := VerifySignature(messageFile, publicKeyFile, signatureFile)
+		_, err := VerifySignature(MessageFile, PublicKeyFile, SignatureFile)
 		if err != nil {
 			return fmt.Errorf("failed to verify the sign: %v", err)
 		}
@@ -71,9 +71,9 @@ func ExecuteCipher(operation string) error {
 	return nil
 }
 
-func GenerateKeys(elgamalFile string) error {
+func GenerateKeys(ElgamalFile string) error {
 	// Read p and g from file
-	params, _ := helpers.ReadBigIntsFromFile(elgamalFile, 2)
+	params, _ := helpers.ReadBigIntsFromFile(ElgamalFile, 2)
 	p, g := params[0], params[1]
 	b, _ := helpers.RandomBigInt(new(big.Int).Sub(p, big.NewInt(2)))
 	b = b.Add(b, big.NewInt(1)) // Ensure 1 <= b < p-1
@@ -83,19 +83,19 @@ func GenerateKeys(elgamalFile string) error {
 
 	// Save public and private keys
 	fmt.Printf("Public and private keys were saved to file")
-	helpers.WriteBigIntsToFile(privateKeyFile, []*big.Int{p, g, b})
-	helpers.WriteBigIntsToFile(publicKeyFile, []*big.Int{p, g, beta})
+	helpers.WriteBigIntsToFile(PrivateKeyFile, []*big.Int{p, g, b})
+	helpers.WriteBigIntsToFile(PublicKeyFile, []*big.Int{p, g, beta})
 
 	return nil
 }
 
-func EncryptElgamal(plainFile, publicKeyFile string) (error) {
+func EncryptElgamal(PlainFile, PublicKeyFile string) (error) {
 	// Read public key with 3 values
-	params, _ := helpers.ReadBigIntsFromFile(publicKeyFile, 3)
+	params, _ := helpers.ReadBigIntsFromFile(PublicKeyFile, 3)
 	p, g, beta := params[0], params[1], params[2]
 
 	// Read message
-	messages, _ := helpers.ReadBigIntsFromFile(plainFile, 1)
+	messages, _ := helpers.ReadBigIntsFromFile(PlainFile, 1)
 	m := messages[0]
 
 	// Check if m < pa
@@ -119,18 +119,18 @@ func EncryptElgamal(plainFile, publicKeyFile string) (error) {
 	c2.Mod(c2, p)
 
 	//Save cryptogram as 2 values to file
-	helpers.WriteBigIntsToFile(cryptoFile, []*big.Int{c1, c2})
+	helpers.WriteBigIntsToFile(CryptoFile, []*big.Int{c1, c2})
 	return  nil
 }
 
-func DecryptElgamal(cryptoFile, privateKeyFile, decryptedFile string) (string, error) {
+func DecryptElgamal(CryptoFile, PrivateKeyFile, DecryptedFile string) (string, error) {
 	return "", nil
 }
 
-func SignMsg(messageFile, privateKeyFile string) (string, error) {
+func SignMsg(MessageFile, PrivateKeyFile string) (string, error) {
 	return "", nil
 }
 
-func VerifySignature(messageFile, publicKeyFile, signatureFile string) (string, error) {
+func VerifySignature(MessageFile, PublicKeyFile, SignatureFile string) (string, error) {
 	return "", nil
 }
