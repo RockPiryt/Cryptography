@@ -1,0 +1,3 @@
+[Elgamal] 2025/05/23 13:48:26 helpers.go:140: [INFO] Converted text "Haha" was saved to files/plain.txt
+[Elgamal] 2025/05/23 13:48:26 flagfunc.go:133: m < p was successfully checked
+[Elgamal] 2025/05/23 13:48:26 flagfunc.go:45: [INFO] Text successfully encrypted into crypto.txt.

@@ -131,3 +131,12 @@ func IsCoprime(a, b *big.Int) bool {
 
 	return isOne
 }
+
+func ConvertStringToBigInt(text, filename string) error {
+	err := SavePlainMessageAsBigInt(text, filename)
+	if err != nil {
+		return fmt.Errorf("error saving %s to %s: %v", text, filename, err)
+	}
+	log.Printf("[INFO] Converted text \"%s\" was saved to %s", text, filename)
+	return nil
+}

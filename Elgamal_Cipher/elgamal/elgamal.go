@@ -3,9 +3,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
-	"math/big"
 
 	"elgamal/flagfunc"
 	"elgamal/helpers"
@@ -52,35 +50,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Execution error: %v", err)
 	}
-
-	///Checks-----------------------------------------------------
-
-	// Read first number p and generator g from file
-	params, _ := helpers.ReadBigIntsFromFile(flagfunc.ElgamalFile, 2)
-	p, g := params[0], params[1]
-
-	fmt.Printf("p=%d g=%d", p, g)
-
-	// Write big num to file
-	helpers.WriteBigIntsToFile(flagfunc.PrivateKeyFile, []*big.Int{p, g})
-
-	// Encrypting part
-	// Save string message as BigInt to file
-	plainTextString := "Haha"
-	err = helpers.SavePlainMessageAsBigInt(plainTextString, flagfunc.PlainFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("[INFO] Coverted text %s was saved to plaintext.txt", plainTextString)
-
-	// Signing part
-	// Save string message as BigInt to file 
-	message := "Bla"
-	err = helpers.SavePlainMessageAsBigInt(message, flagfunc.MessageFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("[INFO] Coverted text %s was saved to message.txt", message)
 
 
 }

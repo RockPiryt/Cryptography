@@ -21,6 +21,9 @@ const (
 	VerifyFile     = "files/verify.txt"
 )
 
+var PlainTextString string = "Haha"
+var MessageString string = "Bla"
+
 func ExecuteCipher(operation string) error {
 	switch operation {
 	case "k":
@@ -74,11 +77,13 @@ func ExecuteCipher(operation string) error {
 	return nil
 }
 
+// Encrypting part------------------------------------------------------------------------------------------
 // Function generate 2 keys: beta is public key, b is private key and saves these values to file
 func GenerateKeys(ElgamalFile string) error {
 	// Read p and g from file
 	params, _ := helpers.ReadBigIntsFromFile(ElgamalFile, 2)
 	p, g := params[0], params[1]
+
 	// Generate b (random), where  1 <= b < p-1
 	upperLimit := new(big.Int).Sub(p, big.NewInt(2)) // p - 2
 	b, err := helpers.RandomBigInt(upperLimit)       // 0 <= b < p-2
@@ -114,6 +119,8 @@ func EncryptElgamal(PlainFile, PublicKeyFile string) (error) {
 	params, _ := helpers.ReadBigIntsFromFile(PublicKeyFile, 3)
 	p, g, beta := params[0], params[1], params[2]
 
+	// Convert sample message to Big Int
+	helpers.ConvertStringToBigInt(PlainTextString, PlainFile)
 	// Read message
 	messages, _ := helpers.ReadBigIntsFromFile(PlainFile, 1)
 	m := messages[0]
@@ -180,12 +187,17 @@ func DecryptElgamal(CryptoFile, PrivateKeyFile string) (error) {
 	return nil
 }
 
+// Signing part------------------------------------------------------------------------------------------
 func SignMsg(MessageFile, PrivateKeyFile string) (string, error) {
+	// Read p,g,b from private key file
 	params, _ := helpers.ReadBigIntsFromFile(PrivateKeyFile, 3)
 	p, g, b := params[0], params[1], params[2]
 	pm1 := new(big.Int).Sub(p, big.NewInt(1))
 
-	messages, _ := helpers.ReadBigIntsFromFile("message.txt", 1)
+	// Convert sample string to Big Int
+	helpers.ConvertStringToBigInt(MessageString, MessageFile)
+	//Read message to signing
+	messages, _ := helpers.ReadBigIntsFromFile(MessageFile, 1)
 	m := messages[0]
 
 	var k, kInv *big.Int
@@ -206,7 +218,8 @@ func SignMsg(MessageFile, PrivateKeyFile string) (string, error) {
 	x.Mul(x, kInv)
 	x.Mod(x, pm1)
 
-	helpers.WriteBigIntsToFile("signature.txt", []*big.Int{r, x})
+	// Sava signature
+	helpers.WriteBigIntsToFile(SignatureFile, []*big.Int{r, x})
 	return "", nil
 }
 
