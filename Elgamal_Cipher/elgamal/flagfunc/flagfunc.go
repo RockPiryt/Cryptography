@@ -56,7 +56,7 @@ func ExecuteCipher(operation string) error {
 		return nil
 	case "s":
 		// Sign the message
-		_, err := SignMsg(MessageFile, PrivateKeyFile)
+		err := SignMsg(MessageString, MessageFile, PrivateKeyFile)
 		if err != nil {
 			return fmt.Errorf("failed to sing the message: %v", err)
 		}
@@ -188,11 +188,11 @@ func DecryptElgamal(CryptoFile, PrivateKeyFile string) (error) {
 }
 
 // Signing part------------------------------------------------------------------------------------------
-func SignMsg(MessageFile, PrivateKeyFile string) (string, error) {
+func SignMsg(MessageString, MessageFile, PrivateKeyFile string) error {
 	// Read p,g,b from private key file
 	params, _ := helpers.ReadBigIntsFromFile(PrivateKeyFile, 3)
 	p, g, b := params[0], params[1], params[2]
-	pm1 := new(big.Int).Sub(p, big.NewInt(1))
+	pm1 := new(big.Int).Sub(p, big.NewInt(1))// p-1
 
 	// Convert sample string to Big Int
 	helpers.ConvertStringToBigInt(MessageString, MessageFile)
@@ -200,27 +200,42 @@ func SignMsg(MessageFile, PrivateKeyFile string) (string, error) {
 	messages, _ := helpers.ReadBigIntsFromFile(MessageFile, 1)
 	m := messages[0]
 
+	//k is random, where 1 ≤ k < p-1, and gcd(k, p-1) = 1 (IsCoprime)
 	var k, kInv *big.Int
 	for {
-		kCandidate, _ := helpers.RandomBigInt(pm1)
-		kCandidate = kCandidate.Add(kCandidate, big.NewInt(1))
+		kCandidate, err := helpers.RandomBigInt(pm1) // 0 <= k < p-1
+		if err != nil {
+			return fmt.Errorf("failed to generate random k: %v", err)
+		}
+		kCandidate.Add(kCandidate, big.NewInt(1)) // 1 <= k < p
 		if helpers.IsCoprime(kCandidate, pm1) {
 			k = kCandidate
 			break
 		}
 	}
+	//k_inv = inversed k mod (p−1)
+	kInv, err := helpers.ModInverse(k, pm1)
+	if err != nil || kInv == nil {
+		return fmt.Errorf("failed to compute modular inverse of k")
+	}
 
+	// Calculate signature (r,x)
+	// caculate r = g^k mod p
 	r := new(big.Int).Exp(g, k, p)
-	kInv, _ = helpers.ModInverse(k, pm1)
-
+	//x = (m - b·r)·k_inv mod (p−1)
 	x := new(big.Int).Mul(b, r)
 	x.Sub(m, x)
 	x.Mul(x, kInv)
 	x.Mod(x, pm1)
 
-	// Sava signature
-	helpers.WriteBigIntsToFile(SignatureFile, []*big.Int{r, x})
-	return "", nil
+	// Save signature
+	err = helpers.WriteBigIntsToFile(SignatureFile, []*big.Int{r, x})
+	if err != nil {
+		return fmt.Errorf("failed to save signature: %v", err)
+	}
+
+	log.Printf("[INFO] Signed message and saved signature (r, x) to %s", SignatureFile)
+	return nil
 }
 
 func VerifySignature(MessageFile, PublicKeyFile, SignatureFile string) (string, error) {
