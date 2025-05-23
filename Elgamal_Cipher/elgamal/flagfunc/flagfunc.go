@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 
 	"elgamal/helpers"
 )
@@ -56,7 +57,7 @@ func ExecuteCipher(operation string) error {
 		return nil
 	case "s":
 		// Sign the message
-		err := SignMsg(MessageString, MessageFile, PrivateKeyFile)
+		err := SignMsg(MessageFile, PrivateKeyFile)
 		if err != nil {
 			return fmt.Errorf("failed to sing the message: %v", err)
 		}
@@ -64,7 +65,7 @@ func ExecuteCipher(operation string) error {
 		return nil
 	case "v":
 		// Verify the signed message
-		_, err := VerifySignature(MessageFile, PublicKeyFile, SignatureFile)
+		err := VerifySignature(MessageFile, PublicKeyFile, SignatureFile)
 		if err != nil {
 			return fmt.Errorf("failed to verify the sign: %v", err)
 		}
@@ -171,7 +172,10 @@ func DecryptElgamal(CryptoFile, PrivateKeyFile string) (error) {
 	m := new(big.Int).Mul(c2, sInv)
 	m.Mod(m, p)
 	// Save decrypted message
-	helpers.WriteBigIntsToFile(DecryptedFile, []*big.Int{m})
+	err = helpers.WriteBigIntsToFile(DecryptedFile, []*big.Int{m})
+	if err != nil {
+		return fmt.Errorf("failed to save decrypted message: %v", err)
+	}
 	
 	// Compare with original plaintext
 	original, _ := helpers.ReadBigIntsFromFile(PlainFile, 1)
@@ -188,7 +192,7 @@ func DecryptElgamal(CryptoFile, PrivateKeyFile string) (error) {
 }
 
 // Signing part------------------------------------------------------------------------------------------
-func SignMsg(MessageString, MessageFile, PrivateKeyFile string) error {
+func SignMsg(MessageFile, PrivateKeyFile string) error {
 	// Read p,g,b from private key file
 	params, _ := helpers.ReadBigIntsFromFile(PrivateKeyFile, 3)
 	p, g, b := params[0], params[1], params[2]
@@ -238,6 +242,32 @@ func SignMsg(MessageString, MessageFile, PrivateKeyFile string) error {
 	return nil
 }
 
-func VerifySignature(MessageFile, PublicKeyFile, SignatureFile string) (string, error) {
-	return "", nil
+func VerifySignature(MessageFile, PublicKeyFile, SignatureFile string) error {
+	//Read p,g,beta from public key
+	params, _ := helpers.ReadBigIntsFromFile(PublicKeyFile, 3)
+	p, g, beta := params[0], params[1], params[2]
+
+	// Read oryginal message
+	messages, _ := helpers.ReadBigIntsFromFile(MessageFile, 1)
+	m := messages[0]
+	// Read signature 
+	sig, _ := helpers.ReadBigIntsFromFile(SignatureFile, 2)
+	r, x := sig[0], sig[1]
+	
+	//g^m ≡ r^x · β^r mod p
+	left := new(big.Int).Exp(g, m, p)
+	right1 := new(big.Int).Exp(r, x, p)
+	right2 := new(big.Int).Exp(beta, r, p)
+	right := new(big.Int).Mul(right1, right2)
+	right.Mod(right, p)
+
+	result := "N"
+	if left.Cmp(right) == 0 {
+		result = "T"
+	}
+
+	// Save result
+	os.WriteFile(VerifyFile, []byte(result), 0644)
+	fmt.Println(result)
+	return nil
 }

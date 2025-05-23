@@ -1,3 +1,1 @@
-[Elgamal] 2025/05/23 14:07:05 helpers.go:140: [INFO] Converted text "Bla" was saved to files/message.txt
-[Elgamal] 2025/05/23 14:07:05 flagfunc.go:237: [INFO] Signed message and saved signature (r, x) to files/signature.txt
-[Elgamal] 2025/05/23 14:07:05 flagfunc.go:63: [INFO] Message successfully signed into signature.txt.
+[Elgamal] 2025/05/23 15:16:52 flagfunc.go:72: [INFO] Signature successfully verified.
