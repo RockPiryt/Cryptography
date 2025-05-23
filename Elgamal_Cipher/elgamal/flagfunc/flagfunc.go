@@ -71,15 +71,32 @@ func ExecuteCipher(operation string) error {
 	return nil
 }
 
+// Function generate 2 keys: beta is public key, b is private key and saves these values to file
 func GenerateKeys(ElgamalFile string) error {
 	// Read p and g from file
 	params, _ := helpers.ReadBigIntsFromFile(ElgamalFile, 2)
 	p, g := params[0], params[1]
-	b, _ := helpers.RandomBigInt(new(big.Int).Sub(p, big.NewInt(2)))
-	b = b.Add(b, big.NewInt(1)) // Ensure 1 <= b < p-1
+	// Generate b (random), where  1 <= b < p-1
+	upperLimit := new(big.Int).Sub(p, big.NewInt(2)) // p - 2
+	b, err := helpers.RandomBigInt(upperLimit)       // 0 <= b < p-2
+	if err != nil {
+		return fmt.Errorf("error generating random b: %v", err)
+	}
+	b.Add(b, big.NewInt(1)) // 1 <= b < p-1
+	fmt.Printf("Generated private key b = %s\n", b.String())
 	
 	// Calculate Beta (gᵇ mod p)
 	beta := new(big.Int).Exp(g, b, p)
+
+	// Checks b < p, beta < p
+	if b.Cmp(p) >= 0 {
+		return fmt.Errorf("invalid private key: b >= p")
+	}
+	if beta.Cmp(p) >= 0 {
+		return fmt.Errorf("invalid public key: beta >= p")
+	}
+
+	log.Println("private b and public beta are < p")
 
 	// Save public and private keys
 	fmt.Printf("Public and private keys were saved to file")
@@ -97,12 +114,13 @@ func EncryptElgamal(PlainFile, PublicKeyFile string) (error) {
 	// Read message
 	messages, _ := helpers.ReadBigIntsFromFile(PlainFile, 1)
 	m := messages[0]
-
 	// Check if m < pa
 	if m.Cmp(p) >= 0 {
 		fmt.Println("message must be less than p")
 		log.Fatal("message must be less than p")
 	}
+
+	log.Println("m<p was checked")
 
 	//Get random number k, where 1 ≤ k < p − 1
 	upperLimit := new(big.Int).Sub(p, big.NewInt(2))// Calculate upper limit: p - 2

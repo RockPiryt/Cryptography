@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	
+
 	"elgamal/flagfunc"
 	"elgamal/helpers"
 )
 
 func main() {
+	helpers.SetLogger()
+
 	//Set flags
 	keysFlag := flag.Bool("k", false, "prepare public and private keys")
 	encryptFlag := flag.Bool("e", false, "encrypt the message")
@@ -22,9 +24,8 @@ func main() {
 	flag.Parse()
 
 	// Check flags
-	operationFlags := []*bool{keysFlag,encryptFlag, decryptFlag, signatureFlag, verifyFlag}
+	operationFlags := []*bool{keysFlag, encryptFlag, decryptFlag, signatureFlag, verifyFlag}
 	operationCount := helpers.CountSelectedFlags(operationFlags)
-
 
 	if operationCount != 1 {
 		log.Fatalf("Error: You must choose exactly one operation: -k, -e, -d, -s or v.")
@@ -63,12 +64,20 @@ func main() {
 	// Write big num to file
 	helpers.WriteBigIntsToFile(flagfunc.PrivateKeyFile, []*big.Int{p, g})
 
-
+	// Encrypting part
 	// Save string message as BigInt to file
-	message := "Haha"
-	err = helpers.SavePlainMessageAsBigInt(message, flagfunc.PlainFile)
+	plainTextString := "Haha"
+	err = helpers.SavePlainMessageAsBigInt(plainTextString, flagfunc.PlainFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
+	// Signing part
+	// Save string message as BigInt to file 
+	message := "Bla"
+	err = helpers.SavePlainMessageAsBigInt(message, flagfunc.MessageFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
