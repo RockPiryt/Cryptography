@@ -71,6 +71,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("[INFO] Coverted text %s was saved to plaintext.txt", plainTextString)
 
 	// Signing part
 	// Save string message as BigInt to file 
@@ -79,5 +80,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("[INFO] Coverted text %s was saved to message.txt", message)
+
 
 }

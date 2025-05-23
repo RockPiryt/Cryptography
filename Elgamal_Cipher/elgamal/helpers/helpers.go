@@ -88,7 +88,7 @@ func RandomBigInt(max *big.Int) (*big.Int, error) {
 
 // Function saves a string message as a big.Int to plain.txt
 func SavePlainMessageAsBigInt(message string, filePath string) error {
-	fmt.Println("Coverted text was saved to plain.txt")
+	
 	// Convert string to []byte, then to big.Int
 	m := new(big.Int).SetBytes([]byte(message))
 
@@ -99,7 +99,7 @@ func SavePlainMessageAsBigInt(message string, filePath string) error {
 	defer file.Close()
 
 	_, err = file.WriteString(m.String() + "\n")
-	fmt.Println("Coverted text was saved to plain.txt")
+
 	
 	return err
 }

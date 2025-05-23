@@ -25,6 +25,7 @@ func ExecuteCipher(operation string) error {
 	switch operation {
 	case "k":
 		// Generate public and private key for Bolek
+		// IN ElgamalFile, OUT PrivateKeyFile, PublicKeyFile 
 		err := GenerateKeys(ElgamalFile)
 		if err != nil {
 			return fmt.Errorf("error during generation of public and private keys %v", err)
@@ -33,6 +34,7 @@ func ExecuteCipher(operation string) error {
 		return nil
 
 	case "e":
+		// IN PlainFile, PublicKeyFile, OUT CryptoFile
 		err := EncryptElgamal(PlainFile, PublicKeyFile)
 		if err != nil {
 			return fmt.Errorf("failed to encrypt the text: %v", err)
@@ -41,8 +43,9 @@ func ExecuteCipher(operation string) error {
 		return nil
 
 	case "d":
-		// Decrypt crypto.txt using key.txt
-		_, err := DecryptElgamal(CryptoFile, PrivateKeyFile, DecryptedFile)
+		// Decrypt crypto.txt using private.txt
+		// IN CryptoFile, PrivateKeyFile, OUT DecryptedFile
+		err := DecryptElgamal(CryptoFile, PrivateKeyFile)
 		if err != nil {
 			return fmt.Errorf("failed to decrypt the text: %v", err)
 		}
@@ -120,7 +123,7 @@ func EncryptElgamal(PlainFile, PublicKeyFile string) (error) {
 		log.Fatal("message must be less than p")
 	}
 
-	log.Println("m<p was checked")
+	log.Println("m < p was successfully checked")
 
 	//Get random number k, where 1 ≤ k < p − 1
 	upperLimit := new(big.Int).Sub(p, big.NewInt(2))// Calculate upper limit: p - 2
@@ -141,7 +144,7 @@ func EncryptElgamal(PlainFile, PublicKeyFile string) (error) {
 	return  nil
 }
 
-func DecryptElgamal(CryptoFile, PrivateKeyFile, DecryptedFile string) (string, error) {
+func DecryptElgamal(CryptoFile, PrivateKeyFile string) (error) {
 	//Read params from private key file
 	params, _ := helpers.ReadBigIntsFromFile(PrivateKeyFile, 3)
 	p, _, b := params[0], params[1], params[2]
@@ -160,12 +163,50 @@ func DecryptElgamal(CryptoFile, PrivateKeyFile, DecryptedFile string) (string, e
 	// Get oryginal message (calculate m = c2 · s^(-1) mod p)
 	m := new(big.Int).Mul(c2, sInv)
 	m.Mod(m, p)
-
+	// Save decrypted message
 	helpers.WriteBigIntsToFile(DecryptedFile, []*big.Int{m})
-	return "", nil
+	
+	// Compare with original plaintext
+	original, _ := helpers.ReadBigIntsFromFile(PlainFile, 1)
+	originalMsg := original[0]
+
+	if m.Cmp(originalMsg) != 0 {
+		log.Println("Plaintext and decrypted text are NOT the same.")
+		return fmt.Errorf("decryption mismatch: decrypted != original")
+	}
+
+	log.Println("Plaintext and decrypted text are the same.")
+
+	return nil
 }
 
 func SignMsg(MessageFile, PrivateKeyFile string) (string, error) {
+	params, _ := helpers.ReadBigIntsFromFile(PrivateKeyFile, 3)
+	p, g, b := params[0], params[1], params[2]
+	pm1 := new(big.Int).Sub(p, big.NewInt(1))
+
+	messages, _ := helpers.ReadBigIntsFromFile("message.txt", 1)
+	m := messages[0]
+
+	var k, kInv *big.Int
+	for {
+		kCandidate, _ := helpers.RandomBigInt(pm1)
+		kCandidate = kCandidate.Add(kCandidate, big.NewInt(1))
+		if helpers.IsCoprime(kCandidate, pm1) {
+			k = kCandidate
+			break
+		}
+	}
+
+	r := new(big.Int).Exp(g, k, p)
+	kInv, _ = helpers.ModInverse(k, pm1)
+
+	x := new(big.Int).Mul(b, r)
+	x.Sub(m, x)
+	x.Mul(x, kInv)
+	x.Mod(x, pm1)
+
+	helpers.WriteBigIntsToFile("signature.txt", []*big.Int{r, x})
 	return "", nil
 }
 
