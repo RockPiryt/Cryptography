@@ -65,7 +65,7 @@ func main() {
 
 
 	// Save string message as BigInt to file
-	message := "Hi"
+	message := "Haha"
 	err = helpers.SavePlainMessageAsBigInt(message, flagfunc.PlainFile)
 	if err != nil {
 		log.Fatal(err)

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	
+
 	"elgamal/helpers"
 )
 
@@ -124,6 +124,26 @@ func EncryptElgamal(PlainFile, PublicKeyFile string) (error) {
 }
 
 func DecryptElgamal(CryptoFile, PrivateKeyFile, DecryptedFile string) (string, error) {
+	//Read params from private key file
+	params, _ := helpers.ReadBigIntsFromFile(PrivateKeyFile, 3)
+	p, _, b := params[0], params[1], params[2]
+
+	//Read cryptogram (c1,c2)
+	cipher, _ := helpers.ReadBigIntsFromFile(CryptoFile, 2)
+	c1, c2 := cipher[0], cipher[1]
+
+	// Calculate s = c1^b mod p
+	s := new(big.Int).Exp(c1, b, p)
+	// Calculate s^(-1)
+	sInv, err := helpers.ModInverse(s, p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Get oryginal message (calculate m = c2 · s^(-1) mod p)
+	m := new(big.Int).Mul(c2, sInv)
+	m.Mod(m, p)
+
+	helpers.WriteBigIntsToFile(DecryptedFile, []*big.Int{m})
 	return "", nil
 }
 

@@ -4,6 +4,7 @@ package helpers
 import (
 	"bufio"
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -87,6 +88,7 @@ func RandomBigInt(max *big.Int) (*big.Int, error) {
 
 // Function saves a string message as a big.Int to plain.txt
 func SavePlainMessageAsBigInt(message string, filePath string) error {
+	fmt.Println("Coverted text was saved to plain.txt")
 	// Convert string to []byte, then to big.Int
 	m := new(big.Int).SetBytes([]byte(message))
 
@@ -97,5 +99,35 @@ func SavePlainMessageAsBigInt(message string, filePath string) error {
 	defer file.Close()
 
 	_, err = file.WriteString(m.String() + "\n")
+	fmt.Println("Coverted text was saved to plain.txt")
+	
 	return err
+}
+
+// Use Extended Euklides Algorithm to find modular inverse 
+func ModInverse(a, m *big.Int) (*big.Int, error) {
+	g := new(big.Int)
+	x := new(big.Int)
+	y := new(big.Int)
+
+	//x is modular inverse a mod m, if g=gcd(a, m) == 1
+	g.GCD(x, y, a, m)
+	//cmp if 2 numbers are equal then return 0
+	if g.Cmp(big.NewInt(1)) != 0 {
+		return nil, errors.New("no inverse exists")
+	}
+	return x.Mod(x, m), nil
+}
+
+//This function checks whether two numbers a and b are coprime, 
+//meaning their greatest common divisor (GCD) is equal to 1.
+func IsCoprime(a, b *big.Int) bool {
+	gcd := new(big.Int)
+
+	// Calculate GCD (x i y are not used so nil)
+	gcd.GCD(nil, nil, a, b)
+
+	isOne := gcd.Cmp(big.NewInt(1)) == 0
+
+	return isOne
 }
