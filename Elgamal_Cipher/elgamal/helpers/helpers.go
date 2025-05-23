@@ -4,6 +4,8 @@ package helpers
 import (
 	"bufio"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
@@ -132,11 +134,21 @@ func IsCoprime(a, b *big.Int) bool {
 	return isOne
 }
 
+
+// Function calculates SHA256 hash of the input string, converts it to a big int, and saves it.
 func ConvertStringToBigInt(text, filename string) error {
-	err := SavePlainMessageAsBigInt(text, filename)
+	// Oblicz skrót SHA256
+	hash := sha256.Sum256([]byte(text))
+
+	// Zamień skrót (bytes) na BigInt
+	m := new(big.Int).SetBytes(hash[:])
+
+	// Zapisz big.Int do pliku
+	err := WriteBigIntsToFile(filename, []*big.Int{m})
 	if err != nil {
-		return fmt.Errorf("error saving %s to %s: %v", text, filename, err)
+		return fmt.Errorf("failed to write hashed message to file: %v", err)
 	}
-	log.Printf("[INFO] Converted text \"%s\" was saved to %s", text, filename)
+
+	log.Printf("[INFO] Hashed text \"%s\" → SHA256 = %s\nSaved to %s", text, hex.EncodeToString(hash[:]), filename)
 	return nil
 }

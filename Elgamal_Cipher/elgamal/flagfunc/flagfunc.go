@@ -34,7 +34,7 @@ func ExecuteCipher(operation string) error {
 		if err != nil {
 			return fmt.Errorf("error during generation of public and private keys %v", err)
 		}
-		log.Println("[INFO] keys have been successfully created.")
+		log.Println("[INFO] Keys have been successfully created.")
 		return nil
 
 	case "e":
@@ -53,10 +53,11 @@ func ExecuteCipher(operation string) error {
 		if err != nil {
 			return fmt.Errorf("failed to decrypt the text: %v", err)
 		}
-		fmt.Println("[INFO] Text successfully decrypted into decrypt.txt.")
+		log.Println("[INFO] Text successfully decrypted into decrypt.txt.")
 		return nil
 	case "s":
 		// Sign the message
+		// IN MessageFile, PrivateKeyFile, OUT SignatureFile
 		err := SignMsg(MessageFile, PrivateKeyFile)
 		if err != nil {
 			return fmt.Errorf("failed to sing the message: %v", err)
@@ -65,6 +66,7 @@ func ExecuteCipher(operation string) error {
 		return nil
 	case "v":
 		// Verify the signed message
+		// IN MessageFile, PublicKeyFile, SignatureFile, OUT VerifyFile
 		err := VerifySignature(MessageFile, PublicKeyFile, SignatureFile)
 		if err != nil {
 			return fmt.Errorf("failed to verify the sign: %v", err)
@@ -92,7 +94,7 @@ func GenerateKeys(ElgamalFile string) error {
 		return fmt.Errorf("error generating random b: %v", err)
 	}
 	b.Add(b, big.NewInt(1)) // 1 <= b < p-1
-	fmt.Printf("Generated private key b = %s\n", b.String())
+	log.Printf("[INFO] Generated private key b = %s\n", b.String())
 	
 	// Calculate Beta (gᵇ mod p)
 	beta := new(big.Int).Exp(g, b, p)
@@ -105,10 +107,10 @@ func GenerateKeys(ElgamalFile string) error {
 		return fmt.Errorf("invalid public key: beta >= p")
 	}
 
-	log.Println("private b and public beta are < p")
+	log.Println("[INFO] Private b and public beta are < p")
 
 	// Save public and private keys
-	fmt.Printf("Public and private keys were saved to file")
+	log.Printf("[INFO] Public and private keys were saved to file")
 	helpers.WriteBigIntsToFile(PrivateKeyFile, []*big.Int{p, g, b})
 	helpers.WriteBigIntsToFile(PublicKeyFile, []*big.Int{p, g, beta})
 
@@ -128,10 +130,10 @@ func EncryptElgamal(PlainFile, PublicKeyFile string) (error) {
 	// Check if m < pa
 	if m.Cmp(p) >= 0 {
 		fmt.Println("message must be less than p")
-		log.Fatal("message must be less than p")
+		log.Fatal("[FATAL] message must be less than p")
 	}
 
-	log.Println("m < p was successfully checked")
+	log.Println("[INFO] m < p was successfully checked")
 
 	//Get random number k, where 1 ≤ k < p − 1
 	upperLimit := new(big.Int).Sub(p, big.NewInt(2))// Calculate upper limit: p - 2
@@ -182,11 +184,11 @@ func DecryptElgamal(CryptoFile, PrivateKeyFile string) (error) {
 	originalMsg := original[0]
 
 	if m.Cmp(originalMsg) != 0 {
-		log.Println("Plaintext and decrypted text are NOT the same.")
+		log.Fatal("[FATAL] Plaintext and decrypted text are NOT the same.")
 		return fmt.Errorf("decryption mismatch: decrypted != original")
 	}
 
-	log.Println("Plaintext and decrypted text are the same.")
+	log.Println("[INFO] Plaintext and decrypted text are the same.")
 
 	return nil
 }
@@ -254,7 +256,7 @@ func VerifySignature(MessageFile, PublicKeyFile, SignatureFile string) error {
 	sig, _ := helpers.ReadBigIntsFromFile(SignatureFile, 2)
 	r, x := sig[0], sig[1]
 	
-	//g^m ≡ r^x · β^r mod p
+	//g^m  ≡ r^x · β^r mod p
 	left := new(big.Int).Exp(g, m, p)
 	right1 := new(big.Int).Exp(r, x, p)
 	right2 := new(big.Int).Exp(beta, r, p)
