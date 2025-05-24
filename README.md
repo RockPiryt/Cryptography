@@ -17,6 +17,9 @@
 ## General Information
 - Create a program with various cryptographic forms.
 * [Caesar and Affine Cipher Encryption / Decryption Program](#cipher-descriptions)
+* [Vignere Cipher Encryption / Decryption Program](#cipher-descriptions)
+* [XOR Cipher Encryption / Decryption Program](#cipher-descriptions)
+* [Elgamal Cipher Encryption / Decryption Program](#cipher-descriptions)
 
 ## Technologies Used
 - Go 1.23.5
@@ -61,5 +64,8 @@ For detailed descriptions of the Caesar and Affine ciphers, refer to the documen
 For detailed descriptions of the Vignere cipher, refer to the documentation:
 - [Vignere Cipher](./descriptions/vignere.md)
 
-For detailed descriptions of the Vignere cipher, refer to the documentation:
-- [One-time-pad Cipher](./descriptions/one_time_pad.md)
+For detailed descriptions of the xor cipher, refer to the documentation:
+- [Xor Cipher](./descriptions/xor.md)
+
+For detailed descriptions of the Elgamal cipher, refer to the documentation:
+- [Elgamal Cipher](./descriptions/elgamal.md)
