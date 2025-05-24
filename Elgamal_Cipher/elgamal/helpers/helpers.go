@@ -11,6 +11,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"strings"
 )
 
 // Function to set logger.
@@ -48,7 +49,10 @@ func ReadBigIntsFromFile(path string, count int) ([]*big.Int, error) {
 	scanner := bufio.NewScanner(file)
 	var values []*big.Int
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := strings.TrimSpace(scanner.Text()) 
+		if line == "" {
+			continue 
+		}
 		n := new(big.Int)
 		n, ok := n.SetString(line, 10)
 		if !ok {
@@ -89,7 +93,7 @@ func RandomBigInt(max *big.Int) (*big.Int, error) {
 }
 
 // Function saves a string message as a big.Int to plain.txt
-func SavePlainMessageAsBigInt(message string, filePath string) error {
+func ConvertStringToBigInt(message string, filePath string) error {
 	
 	// Convert string to []byte, then to big.Int
 	m := new(big.Int).SetBytes([]byte(message))
@@ -136,7 +140,7 @@ func IsCoprime(a, b *big.Int) bool {
 
 
 // Function calculates SHA256 hash of the input string, converts it to a big int, and saves it.
-func ConvertStringToBigInt(text, filename string) error {
+func CreateShortcutSHA(text, filename string) error {
 	// Oblicz skrót SHA256
 	hash := sha256.Sum256([]byte(text))
 

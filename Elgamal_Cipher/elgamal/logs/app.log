@@ -1,2 +1,1 @@
-[Elgamal] 2025/05/23 15:49:28 flagfunc.go:189: [INFO] Plaintext and decrypted text are the same.
-[Elgamal] 2025/05/23 15:49:28 flagfunc.go:56: [INFO] Text successfully decrypted into decrypt.txt.
+[Elgamal] 2025/05/24 14:41:37 flagfunc.go:75: [INFO] Signature successfully verified.

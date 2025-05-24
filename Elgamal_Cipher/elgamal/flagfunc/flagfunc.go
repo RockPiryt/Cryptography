@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"strings"
 
 	"elgamal/helpers"
 )
@@ -22,7 +23,7 @@ const (
 	VerifyFile     = "files/verify.txt"
 )
 
-var PlainTextString string = "Haha"
+
 var MessageString string = "Bla"
 
 func ExecuteCipher(operation string) error {
@@ -77,7 +78,6 @@ func ExecuteCipher(operation string) error {
 	default:
 		return fmt.Errorf("unsupported operation: %s", operation)
 	}
-	return nil
 }
 
 // Encrypting part------------------------------------------------------------------------------------------
@@ -122,11 +122,22 @@ func EncryptElgamal(PlainFile, PublicKeyFile string) (error) {
 	params, _ := helpers.ReadBigIntsFromFile(PublicKeyFile, 3)
 	p, g, beta := params[0], params[1], params[2]
 
-	// Convert sample message to Big Int
-	helpers.ConvertStringToBigInt(PlainTextString, PlainFile)
-	// Read message
-	messages, _ := helpers.ReadBigIntsFromFile(PlainFile, 1)
-	m := messages[0]
+	// Read raw content from plain.txt
+	content, err := os.ReadFile(PlainFile)
+	if err != nil {
+		return err
+	}
+	raw := strings.TrimSpace(string(content))
+
+	m := new(big.Int)
+
+	// Try to parse as number
+	_, ok := m.SetString(raw, 10)
+	if !ok {
+		// If parsing as number failed, treat as string
+		m.SetBytes([]byte(raw))
+	}
+	
 	// Check if m < pa
 	if m.Cmp(p) >= 0 {
 		fmt.Println("message must be less than p")
@@ -173,19 +184,60 @@ func DecryptElgamal(CryptoFile, PrivateKeyFile string) (error) {
 	// Get oryginal message (calculate m = c2 · s^(-1) mod p)
 	m := new(big.Int).Mul(c2, sInv)
 	m.Mod(m, p)
+
+	// Get oryginal string 
+	// Attempt to convert decrypted big.Int to ASCII string
+	byteMsg := m.Bytes()
+	decodedStr := string(byteMsg)
+
+	// Check if all bytes are printable ASCII (32–126)
+	isPrintable := true
+	for _, b := range byteMsg {
+		if b < 32 || b > 126 {
+			isPrintable = false
+			break
+		}
+	}
+
+	var output string
+	if isPrintable && len(decodedStr) > 0 {
+		output = decodedStr // treat as ASCII string
+		log.Println("[INFO] Decrypted message interpreted as string.")
+	} else {
+		output = m.String() // fallback to number
+		log.Println("[INFO] Decrypted message interpreted as number.")
+	}
+
+
 	// Save decrypted message
-	err = helpers.WriteBigIntsToFile(DecryptedFile, []*big.Int{m})
+	err = os.WriteFile(DecryptedFile, []byte(output+"\n"), 0644)
 	if err != nil {
-		return fmt.Errorf("failed to save decrypted message: %v", err)
+		return fmt.Errorf("failed to write decrypted message: %v", err)
 	}
 	
-	// Compare with original plaintext
-	original, _ := helpers.ReadBigIntsFromFile(PlainFile, 1)
-	originalMsg := original[0]
+	// -------- Compare to plain.txt --------
+	plainRaw, err := os.ReadFile(PlainFile)
+	if err != nil {
+		return fmt.Errorf("failed to read original plaintext: %v", err)
+	}
+	plainContent := strings.TrimSpace(string(plainRaw))
 
-	if m.Cmp(originalMsg) != 0 {
-		log.Fatal("[FATAL] Plaintext and decrypted text are NOT the same.")
-		return fmt.Errorf("decryption mismatch: decrypted != original")
+	// Try match as number
+	plainNum := new(big.Int)
+	if _, ok := plainNum.SetString(plainContent, 10); ok {
+		// Was number: compare big.Int values
+		if m.Cmp(plainNum) != 0 {
+			log.Fatal("[FATAL] Decrypted number does not match original number.")
+			return fmt.Errorf("decryption mismatch: numeric value differs")
+		}
+		log.Println("[INFO] Decrypted number matches original.")
+	} else {
+		// Was string: compare decodedStr with plain text
+		if output != plainContent {
+			log.Fatal("[FATAL] Decrypted string does not match original string.")
+			return fmt.Errorf("decryption mismatch: string differs")
+		}
+		log.Println("[INFO] Decrypted string matches original.")
 	}
 
 	log.Println("[INFO] Plaintext and decrypted text are the same.")
@@ -201,7 +253,7 @@ func SignMsg(MessageFile, PrivateKeyFile string) error {
 	pm1 := new(big.Int).Sub(p, big.NewInt(1))// p-1
 
 	// Convert sample string to Big Int
-	helpers.ConvertStringToBigInt(MessageString, MessageFile)
+	helpers.CreateShortcutSHA(MessageString, MessageFile)
 	//Read message to signing
 	messages, _ := helpers.ReadBigIntsFromFile(MessageFile, 1)
 	m := messages[0]
