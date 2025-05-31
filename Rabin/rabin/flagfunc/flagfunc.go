@@ -4,6 +4,7 @@ package flagfunc
 import (
 	"fmt"
 	"log"
+	"os"
 )
 
 const (
@@ -30,7 +31,7 @@ func ExecuteCipher(operation string) error {
 		if err != nil {
 			return fmt.Errorf("failed during Rabin-Miller test: %v", err)
 		}
-		log.Println("[INFO] Rabin Millertest executed")
+		log.Println("[INFO] Rabin-Miller test executed")
 		return nil
 	default:
 		return fmt.Errorf("unsupported operation: %s", operation)
@@ -43,6 +44,13 @@ func FermatTest(EntryFile string) error {
 }
 
 func RabinMillerTest(EntryFile string) error {
-	fmt.Println("rabin")
+	log.Println("Rabin-Miller test start")
+
+	data, err := os.ReadFile(EntryFile)
+	if err != nil {
+		return fmt.Errorf("could not read input file: %v", err)
+	}
+	fmt.Printf("inputs data: %s", data)
+
 	return nil
 }
