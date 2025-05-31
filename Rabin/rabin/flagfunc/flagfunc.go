@@ -4,7 +4,8 @@ package flagfunc
 import (
 	"fmt"
 	"log"
-	"os"
+
+	"rabin/helpers"
 )
 
 const (
@@ -39,18 +40,48 @@ func ExecuteCipher(operation string) error {
 }
 
 func FermatTest(EntryFile string) error {
-	fmt.Println("fermat")
+	log.Println("Fermat test start")
+
+	// Read data
+	lines, err := helpers.ReadData("files/wejscie.txt")
+	if err != nil {
+		log.Fatalf("Failed to read input file: %v", err)
+	}
+
+	n, r, err := helpers.ParseInput(lines)
+	if err != nil {
+		log.Fatalf("Failed to parse input: %v", err)
+	}
+
+	fmt.Println("n =", n)
+	if r != nil {
+		fmt.Println("r =", r)
+	} else {
+		fmt.Println("No exponent r provided.")
+	}
 	return nil
 }
 
 func RabinMillerTest(EntryFile string) error {
 	log.Println("Rabin-Miller test start")
 
-	data, err := os.ReadFile(EntryFile)
+	//Read data
+	lines, err := helpers.ReadData(EntryFile)
 	if err != nil {
-		return fmt.Errorf("could not read input file: %v", err)
+		log.Fatalf("Failed to read input file: %v", err)
 	}
-	fmt.Printf("inputs data: %s", data)
+
+	n, r, err := helpers.ParseInput(lines)
+	if err != nil {
+		log.Fatalf("Failed to parse input: %v", err)
+	}
+
+	fmt.Println("n =", n)
+	if r != nil {
+		fmt.Println("r =", r)
+	} else {
+		fmt.Println("No exponent r provided.")
+	}
 
 	return nil
 }
