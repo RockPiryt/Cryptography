@@ -5,8 +5,8 @@ import (
 	"flag"
 	"log"
 
-	"rbf_tests/flagfunc"
-	"rbf_tests/helpers"
+	"rabin/flagfunc"
+	"rabin/helpers"
 )
 
 func main() {
