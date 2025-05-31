@@ -1,3 +1,5 @@
-[Rabin-Miller/Fermat] 2025/05/31 21:31:18 flagfunc.go:115: Rabin-Miller test start
-[Rabin-Miller/Fermat] 2025/05/31 21:31:18 flagfunc.go:151: Rabin-Miller result: na pewno złożona
-[Rabin-Miller/Fermat] 2025/05/31 21:31:18 flagfunc.go:38: [INFO] Rabin-Miller test executed
+[Rabin-Miller/Fermat] 2025/05/31 21:55:23 flagfunc.go:114: Rabin-Miller test start
+[Rabin-Miller/Fermat] 2025/05/31 21:55:23 flagfunc.go:127: n = 718548065973745507
+[Rabin-Miller/Fermat] 2025/05/31 21:55:23 flagfunc.go:129: r = 1874691899662184949920
+[Rabin-Miller/Fermat] 2025/05/31 21:55:23 flagfunc.go:139: Rabin-Miller result: 740876531
+[Rabin-Miller/Fermat] 2025/05/31 21:55:23 flagfunc.go:38: [INFO] Rabin-Miller test executed
