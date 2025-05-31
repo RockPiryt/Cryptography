@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"crypto/rand"
 	"os"
 	"strings"
 )
@@ -79,4 +80,20 @@ func ParseInput(lines []string) (*big.Int, *big.Int, error) {
 	}
 
 	return n, r, nil
+}
+
+
+// CryptoRandBigIntBetween returns a cryptographically secure random big.Int in [min, max].
+func CryptoRandBigIntBetween(min, max *big.Int) (*big.Int, error) {
+	if min.Cmp(max) > 0 {
+		return nil, fmt.Errorf("min > max")
+	}
+
+	diff := new(big.Int).Sub(max, min)
+	n, err := rand.Int(rand.Reader, new(big.Int).Add(diff, big.NewInt(1)))
+	if err != nil {
+		return nil, fmt.Errorf("crypto/rand failed: %v", err)
+	}
+
+	return new(big.Int).Add(min, n), nil
 }

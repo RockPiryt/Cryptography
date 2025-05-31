@@ -25,10 +25,14 @@ func main() {
 		operation = "r" // default Rabin-Miller
 	}
 
-	err := flagfunc.ExecuteCipher(operation)
+	err := flagfunc.ExecuteProgram(operation)
 	if err != nil {
 		log.Fatalf("Execution error: %v", err)
 	}
 
+	err = flagfunc.FermatTest("files/wejscie.txt")
+	if err != nil {
+		log.Fatalf("Fermat test failed: %v", err)
+	}
 
 }

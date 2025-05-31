@@ -1,2 +1,4 @@
-[Rabin-Miller/Fermat] 2025/05/31 16:28:10 flagfunc.go:72: Rabin-Miller test start
-[Rabin-Miller/Fermat] 2025/05/31 16:28:10 flagfunc.go:35: [INFO] Rabin-Miller test executed
+[Rabin-Miller/Fermat] 2025/05/31 17:26:10 flagfunc.go:113: Rabin-Miller test start
+[Rabin-Miller/Fermat] 2025/05/31 17:26:10 flagfunc.go:38: [INFO] Rabin-Miller test executed
+[Rabin-Miller/Fermat] 2025/05/31 17:26:10 flagfunc.go:46: Fermat test start
+[Rabin-Miller/Fermat] 2025/05/31 17:26:10 flagfunc.go:70: Fermat test result: na pewno złożona
