@@ -136,10 +136,13 @@ func RabinMillerTest(EntryFile string) error {
 	factor, composite := RabinMillerFunc(n, r)
 	var result string
 	if factor != nil {
-		result = factor.String() // write factor
+		fmt.Printf("Znaleziony dzielnik: %s\n", factor.String())
+		result = factor.String()
 	} else if composite {
+		fmt.Printf("Brak dzielnika, ale liczba jest na pewno złożona: composite = %v\n", composite)
 		result = "na pewno złożona"
 	} else {
+		fmt.Printf("Liczba przeszła test: prawdopodobnie pierwsza (composite = %v)\n", composite)
 		result = "prawdopodobnie pierwsza"
 	}
 
@@ -156,88 +159,99 @@ func RabinMillerTest(EntryFile string) error {
 	return nil
 }
 
-// RabinMillerFunc performs the Rabin-Miller probabilistic primality test on a given number n.
-// Optionally, a universal exponent r can be provided instead of using n−1.
+
+
+
+
+// RabinMillerFunc wykonuje probabilistyczny test Rabina-Millera.
+// Zwraca:
+//   – dzielnik != nil  → znaleziono nietrywialny dzielnik n,
+//   – composite == true  → liczba na pewno złożona (bez dzielnika),
+//   – composite == false → liczba prawdopodobnie pierwsza.
 func RabinMillerFunc(n, r *big.Int) (*big.Int, bool) {
 	one := big.NewInt(1)
 	two := big.NewInt(2)
+	nMinusTwo := new(big.Int).Sub(n, two)
 
-	// Handle edge cases
+	// 2 jest pierwsza
 	if n.Cmp(two) == 0 {
-		return nil, false // 2 is prime
+		return nil, false
 	}
-	if new(big.Int).Mod(n, two).Cmp(big.NewInt(0)) == 0 {
-		return big.NewInt(2), true // even => composite
+	// Parzysta? → złożona, dzielnik 2
+	if new(big.Int).Mod(n, two).Sign() == 0 {
+		return big.NewInt(2), true
 	}
 
-	// Use r if provided, otherwise r = n - 1
-	var exponent = new(big.Int)
+	// wykładnik: r (jeśli podany) lub n-1
+	exponent := new(big.Int)
 	if r != nil {
 		exponent.Set(r)
 	} else {
-		exponent.Sub(n, one)
+		exponent.Sub(n, one) // n-1
 	}
 
-	// Decompose exponent: exponent = m * 2^k
+	// Rozkład: exponent = m · 2^k  (m – nieparzyste)
 	m := new(big.Int).Set(exponent)
 	k := 0
-	for new(big.Int).Mod(m, two).Cmp(big.NewInt(0)) == 0 {
-		m.Div(m, two)
+	for new(big.Int).And(m, one).Sign() == 0 { // dopóki parzyste
+		m.Rsh(m, 1) // m /= 2
 		k++
 	}
 
-	// Run several iterations
+	// Iteracje testu
 	for i := 0; i < Iterations; i++ {
-		a, err := helpers.CryptoRandBigIntBetween(two, new(big.Int).Sub(n, two))
+		// losowe  a ∈ [2, n−2]
+		a, err := helpers.CryptoRandBigIntBetween(two, nMinusTwo)
 		if err != nil {
-			log.Printf("Random a generation error: %v", err)
+			log.Printf("losowanie a nieudane: %v", err)
 			return nil, true
 		}
 
-		// Step 1: check gcd(a, n) for quick factor
-		gcd := new(big.Int).GCD(nil, nil, a, n)
-		if gcd.Cmp(one) != 0 {
-			return gcd, true // non-trivial factor found
+		// szybki dzielnik?
+		if d := new(big.Int).GCD(nil, nil, a, n); d.Cmp(one) != 0 {
+			return d, true
 		}
 
-		// Step 2: compute a^m mod n
+		// b0 = a^m mod n
 		b := new(big.Int).Exp(a, m, n)
 		if b.Cmp(one) == 0 || b.Cmp(new(big.Int).Sub(n, one)) == 0 {
-			continue // strong pseudoprime in this iteration
+			continue // silny pseudopierwszy w tej iteracji
 		}
 
-		// Step 3: square b repeatedly: b_j+1 = b_j^2 mod n
+		// powtarzaj: b_j+1 = b_j^2  (mod n)
+		prev := new(big.Int).Set(b) // b_j
 		strong := false
 		for j := 0; j < k-1; j++ {
-			b.Exp(b, two, n)
+			b.Exp(prev, two, n) // b = prev^2
 
+			// jeśli b == n−1 → przechodzi tę iterację
 			if b.Cmp(new(big.Int).Sub(n, one)) == 0 {
-				strong = true // passed this round
+				strong = true
 				break
 			}
 
+			// jeśli b == 1  i  prev ≠ ±1 → mamy rozkład
 			if b.Cmp(one) == 0 {
-				// Found non-trivial square root of 1 ⇒ factor
-				bMinus := new(big.Int).Sub(b, one)
-				bPlus := new(big.Int).Add(b, one)
-				f1 := new(big.Int).GCD(nil, nil, bMinus, n)
-				f2 := new(big.Int).GCD(nil, nil, bPlus, n)
-
-				if f1.Cmp(one) != 0 && f1.Cmp(n) != 0 {
-					return f1, true
+				// gcd(prev−1, n)
+				if d := new(big.Int).GCD(nil, nil,
+					new(big.Int).Sub(prev, one), n); d.Cmp(one) != 0 && d.Cmp(n) != 0 {
+					return d, true
 				}
-				if f2.Cmp(one) != 0 && f2.Cmp(n) != 0 {
-					return f2, true
+				// gcd(prev+1, n)
+				if d := new(big.Int).GCD(nil, nil,
+					new(big.Int).Add(prev, one), n); d.Cmp(one) != 0 && d.Cmp(n) != 0 {
+					return d, true
 				}
-				return nil, true // definitely composite
+				return nil, true // złożona, bez dzielnika
 			}
+			prev.Set(b) // przechodzimy do kolejnego b_j
 		}
 
+		// jeśli w ogóle nie było -1
 		if !strong {
-			return nil, true // definitely composite
+			return nil, true // liczba złożona
 		}
 	}
-
-	return nil, false // probably prime
+	// Po wszystkich iteracjach – prawdopodobnie pierwsza
+	return nil, false
 }
-

@@ -29,14 +29,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("Execution error: %v", err)
 	}
-
-	// err = flagfunc.FermatTest("files/wejscie.txt")
-	// if err != nil {
-	// 	log.Fatalf("Fermat test failed: %v", err)
-
-	err = flagfunc.RabinMillerTest("files/wejscie.txt")
-	if err != nil {
-		log.Fatalf("Test failed: %v", err)
-	}
 	
 }

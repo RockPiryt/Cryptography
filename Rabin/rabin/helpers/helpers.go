@@ -77,6 +77,7 @@ func ParseInput(lines []string) (*big.Int, *big.Int, error) {
 		}
 		r = new(big.Int).Mul(r1, r2)
 		r.Sub(r, big.NewInt(1))
+		//wykładnikiem uniwersalnym jest iloczyn liczb w drugim i trzecim wierszu minus jeden.
 	}
 
 	return n, r, nil
