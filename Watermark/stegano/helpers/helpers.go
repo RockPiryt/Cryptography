@@ -2,10 +2,12 @@
 package helpers
 
 import (
+	"bufio"
 	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -75,3 +77,35 @@ func SaveHexToFile(input, filename string) error {
 	hexStr := hex.EncodeToString([]byte(input))
 	return os.WriteFile(filename, []byte(hexStr), 0644)
 }
+
+
+// ClearHtml removes HTML comments, empty lines, and trailing spaces from each line, then saves the cleaned content to 'clearfile.html'.
+func ClearHtml(htmlFile string) error {
+	content, err := os.ReadFile(htmlFile)
+	if err != nil {
+		return err
+	}
+
+	// Remove HTML comments: <!-- ... -->
+	commentRegex := regexp.MustCompile(`(?s)<!--.*?-->`)
+	cleaned := commentRegex.ReplaceAllString(string(content), "")
+
+	// Process line by line
+	var cleanedLines []string
+	scanner := bufio.NewScanner(strings.NewReader(cleaned))
+	for scanner.Scan() {
+		line := scanner.Text()
+		line = strings.TrimRight(line, " \t")      // Remove trailing spaces/tabs
+		line = strings.TrimLeft(line, "\t")        // Optional: remove leading tabs
+		if strings.TrimSpace(line) != "" {         // Skip completely empty lines
+			cleanedLines = append(cleanedLines, line)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	finalContent := strings.Join(cleanedLines, "\n")
+	return os.WriteFile("files/clearfile.html", []byte(finalContent), 0644)
+}
+

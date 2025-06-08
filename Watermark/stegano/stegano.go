@@ -66,6 +66,13 @@ func main() {
 	} else {
 		fmt.Println("Hex saved to mess.txt")
 	}
+
+	err = helpers.ClearHtml("files/cover.html")
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Println("Cleaned HTML saved as files/clearfile.html")
+	}
 	// Execute main program logic
 	err = flagfunc.ExecuteProgram(operation, method)
 	if err != nil {
