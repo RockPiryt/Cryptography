@@ -1,9 +1,9 @@
 // Author: Paulina Kimak
+
 package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 
 	"stegano/flagfunc"
@@ -13,67 +13,54 @@ import (
 func main() {
 	helpers.SetLogger()
 
-	//Set flags
-	embedFlag := flag.Bool("e", false, "embed")
-	extractFlag := flag.Bool("d", false, "extract")
-	oneFlag := flag.Bool("1", false, "bit as addtional space at the end")
-	twoFlag := flag.Bool("2", false, "bit as two spaces")
-	threeFlag := flag.Bool("3", false, "bit as error in html attributes")
-	fourFlag := flag.Bool("4", false, "bit as addtional markup")
+	// Flags
+	embedFlag := flag.Bool("e", false, "Embed message into cover.html and create watermark.html")
+	extractFlag := flag.Bool("d", false, "Extract message from watermark.html")
+	oneFlag := flag.Bool("1", false, "Method 1: bit as additional space at line end")
+	twoFlag := flag.Bool("2", false, "Method 2: bit as single or double space")
+	threeFlag := flag.Bool("3", false, "Method 3: bit as HTML attribute typo")
+	fourFlag := flag.Bool("4", false, "Method 4: bit as redundant markup (e.g., FONT tags)")
 
 	flag.Parse()
 
-	// Check operation flags 
-	operationFlags := []*bool{embedFlag,extractFlag}
-	operationCount := helpers.CountSelectedFlags(operationFlags)
-
-	if operationCount != 1 {
+	// Validate operation selection
+	operationFlags := []*bool{embedFlag, extractFlag}
+	if helpers.CountSelectedFlags(operationFlags) != 1 {
 		log.Fatalf("Error: You must choose exactly one operation: -e or -d")
 	}
 
-	// Determine the operation
+	// Determine operation
 	var operation string
-	switch {
-	case *encryptFlag:
+	if *embedFlag {
 		operation = "e"
-	case *decryptFlag:
+	} else {
 		operation = "d"
-	default:
-		log.Fatalf("Error: Invalid operation selected.")
 	}
 
-	//var option string
-	if operation == "d" {
-		fmt.Print("Tryb zanurzenia")
+	// Validate method selection (required in both cases now)
+	methodFlags := []*bool{oneFlag, twoFlag, threeFlag, fourFlag}
+	selectedMethods := helpers.CountSelectedFlags(methodFlags)
+
+	if selectedMethods != 1 {
+		log.Fatalf("Error: You must specify exactly one method (-1, -2, -3, or -4)")
 	}
 
-	// Check operation flags 
-	operationFlags := []*bool{embedFlag,extractFlag}
-	operationCount := helpers.CountSelectedFlags(operationFlags)
-
-	if operationCount != 1 {
-		log.Fatalf("Error: You must choose exactly one operation: -e or -d")
-	}
-
-	// Determine the operation
-	var operation string
+	// Determine selected method
+	var method int
 	switch {
-	case *encryptFlag:
-		operation = "e"
-	case *decryptFlag:
-		operation = "d"
-	default:
-		log.Fatalf("Error: Invalid operation selected.")
+	case *oneFlag:
+		method = 1
+	case *twoFlag:
+		method = 2
+	case *threeFlag:
+		method = 3
+	case *fourFlag:
+		method = 4
 	}
 
-	//var option string
-	if operation == "d" {
-		fmt.Print("Tryb zanurzenia")
-	}
-
-	err := flagfunc.ExecuteProgram(operation)
+	// Execute main program logic
+	err := flagfunc.ExecuteProgram(operation, method)
 	if err != nil {
 		log.Fatalf("Execution error: %v", err)
 	}
-
 }

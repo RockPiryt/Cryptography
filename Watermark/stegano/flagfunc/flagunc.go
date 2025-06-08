@@ -4,8 +4,6 @@ package flagfunc
 import (
 	"fmt"
 	"log"
-
-	"stegano/helpers"
 )
 
 const (
@@ -16,7 +14,7 @@ const (
 )
 
 
-func ExecuteProgram(operation string) error {
+func ExecuteProgram(operation string, method int) error {
 	switch operation {
 	case "e":
 		// IN MessageFile, OUT WatermarkFile 
@@ -38,4 +36,13 @@ func ExecuteProgram(operation string) error {
 	default:
 		return fmt.Errorf("unsupported operation: %s", operation)
 	}
+}
+
+
+func EmbedMsg(MessageFile, HtmlFile string) error {
+	return nil
+}
+
+func ExtractMsg(WatermarkFile, DetectFile string) error {
+	return nil
 }
