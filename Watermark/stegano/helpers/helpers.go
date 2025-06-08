@@ -69,3 +69,9 @@ func bitsToHex(bits string) string {
 	}
 	return hex.EncodeToString(bytes)
 }
+
+// SaveHexToFile converts the input string to hex and writes it to the given file.
+func SaveHexToFile(input, filename string) error {
+	hexStr := hex.EncodeToString([]byte(input))
+	return os.WriteFile(filename, []byte(hexStr), 0644)
+}

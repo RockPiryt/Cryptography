@@ -4,6 +4,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"stegano/flagfunc"
@@ -57,9 +58,16 @@ func main() {
 	case *fourFlag:
 		method = 4
 	}
-
+	// Create mess.txt with hex input
+	var msg string = "bla"
+	err := helpers.SaveHexToFile(msg, "files/mess.txt")
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Println("Hex saved to mess.txt")
+	}
 	// Execute main program logic
-	err := flagfunc.ExecuteProgram(operation, method)
+	err = flagfunc.ExecuteProgram(operation, method)
 	if err != nil {
 		log.Fatalf("Execution error: %v", err)
 	}

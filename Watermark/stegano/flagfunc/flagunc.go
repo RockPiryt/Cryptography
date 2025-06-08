@@ -13,7 +13,6 @@ const (
 	DetectFile 			= "files/detect.txt"
 )
 
-
 func ExecuteProgram(operation string, method int) error {
 	switch operation {
 	case "e":
