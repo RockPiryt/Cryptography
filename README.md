@@ -70,5 +70,8 @@ For detailed descriptions of the xor cipher, refer to the documentation:
 For detailed descriptions of the Elgamal cipher, refer to the documentation:
 - [Elgamal Cipher](./descriptions/elgamal.md)
 
+For detailed descriptions of the Rabin-Miller probabilistic primality test, refer to the documentation:
+- [Rabin](./descriptions/rabin.md)
+
 For detailed descriptions of the steganography system for HTML files, refer to the documentation:
 - [Steganography](./descriptions/stegano.md)
