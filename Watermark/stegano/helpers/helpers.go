@@ -40,7 +40,7 @@ func TextToHex(input string) string {
 }
 
 
-func readHexBits(filename string) (string, error) {
+func ReadHexBits(filename string) (string, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return "", err
@@ -57,7 +57,7 @@ func readHexBits(filename string) (string, error) {
 	return bits.String(), nil
 }
 
-func bitsToHex(bits string) string {
+func BitsToHex(bits string) string {
 	var bytes []byte
 	for i := 0; i+8 <= len(bits); i += 8 {
 		var b byte
