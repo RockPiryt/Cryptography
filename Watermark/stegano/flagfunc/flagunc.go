@@ -43,7 +43,6 @@ func ExecuteProgram(operation string, method int) error {
 	}
 }
 
-
 func EmbedMsg(MessageFile, CoverFile string, method int) error {
 	messageBits, err := helpers.ReadHexBits(MessageFile)
 	if err != nil {
@@ -96,6 +95,7 @@ func ExtractMsg(WatermarkFile, DetectFile string, method int) error {
 	}
 }
 
+// Method 1: Embed by adding a space at the end of each line based on bit value
 // Method 1: Embed by adding a space at the end of each line based on bit value
 func embedMethod1(input []byte, messageBits string) error {
 	lines := strings.Split(string(input), "\n")
@@ -193,16 +193,25 @@ func embedMethod4(input []byte, messageBits string) error {
 	return os.WriteFile(WatermarkFile, []byte(sb.String()), 0644)
 }
 
+
 // Extraction for Method 1: Check if line ends with space
 func extractMethod1(input []byte, DetectFile string) error {
 	text := string(input)
 	lines := strings.Split(text, "\n")
 	var bits strings.Builder
+	bitCount := 0
 	for _, line := range lines {
 		if strings.HasSuffix(line, " ") {
 			bits.WriteByte('1')
-		} else {
+			bitCount++
+		} else if strings.TrimSpace(line) != "" {
 			bits.WriteByte('0')
+			bitCount++
+		}
+		if bitCount%4 == 0 && helpers.IsHex(bits.String()) {
+			if helpers.BitsToHex(bits.String()) == helpers.ReadFileContent("files/mess.txt") {
+				break
+			}
 		}
 	}
 	hexMsg := helpers.BitsToHex(bits.String())

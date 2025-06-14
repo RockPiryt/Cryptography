@@ -109,3 +109,26 @@ func ClearHtml(htmlFile string) error {
 	return os.WriteFile("files/clearfile.html", []byte(finalContent), 0644)
 }
 
+// IsHex checks if the bit string has a length that's a multiple of 4
+// and contains only '0' or '1'.
+func IsHex(bits string) bool {
+	bits = strings.TrimSpace(bits)
+	if len(bits)%4 != 0 {
+		return false
+	}
+	for _, ch := range bits {
+		if ch != '0' && ch != '1' {
+			return false
+		}
+	}
+	return true
+}
+
+// ReadFileContent reads the content of a file and returns it as a trimmed string.
+func ReadFileContent(path string) string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(data))
+}
