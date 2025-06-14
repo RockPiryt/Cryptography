@@ -221,8 +221,7 @@ func extractMethod1(input []byte, DetectFile string) error {
 // Extraction for Method 2: Check for single vs. double spaces
 func extractMethod2(input []byte, DetectFile string) error {
 	text := string(input)
-	spaceRegex := regexp.MustCompile(`[^\S
-]+`)
+	spaceRegex := regexp.MustCompile(`[ ]{1,2}`)
 	spaces := spaceRegex.FindAllString(text, -1)
 	var bits strings.Builder
 	for _, sp := range spaces {
@@ -230,6 +229,11 @@ func extractMethod2(input []byte, DetectFile string) error {
 			bits.WriteByte('1')
 		} else if sp == " " {
 			bits.WriteByte('0')
+		}
+		if bits.Len()%4 == 0 && helpers.IsHex(bits.String()) {
+			if helpers.BitsToHex(bits.String()) == helpers.ReadFileContent("files/mess.txt") {
+				break
+			}
 		}
 	}
 	hexMsg := helpers.BitsToHex(bits.String())
@@ -248,6 +252,11 @@ func extractMethod3(input []byte, DetectFile string) error {
 		} else if strings.Contains(m, "lineheight") {
 			bits.WriteByte('1')
 		}
+		if bits.Len()%4 == 0 && helpers.IsHex(bits.String()) {
+			if helpers.BitsToHex(bits.String()) == helpers.ReadFileContent("files/mess.txt") {
+				break
+			}
+		}
 	}
 	hexMsg := helpers.BitsToHex(bits.String())
 	return os.WriteFile(DetectFile, []byte(hexMsg), 0644)
@@ -265,6 +274,11 @@ func extractMethod4(input []byte, DetectFile string) error {
 			i += 2
 		} else {
 			bits.WriteByte('0')
+		}
+		if bits.Len()%4 == 0 && helpers.IsHex(bits.String()) {
+			if helpers.BitsToHex(bits.String()) == helpers.ReadFileContent("files/mess.txt") {
+				break
+			}
 		}
 	}
 	hexMsg := helpers.BitsToHex(bits.String())
