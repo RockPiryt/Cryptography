@@ -8,9 +8,9 @@
   <meta name="keywords" content="magazyn działka powierzchnia">
   <meta name="description" content="Strona o magazynach">
   <meta name="author" content="Paulina Kimak">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
         rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
         crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="css/styles.css">
 </head>
@@ -21,22 +21,18 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavId" aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="collapsibleNavId">
         <ul class="navbar-nav me-auto mt-2 mt-lg-0">
-            <!-- Strona domowa -->
             <li class="nav-item">
             <a class="nav-link active" href="index.html" aria-current="page">
                 Strona domowa
                 <span class="visually-hidden">(current)</span>
             </a>
             </li>
-            <!-- Zastosowanie -->
             <li class="nav-item">
             <a class="nav-link" href="#use">Zastosowanie</a>
             </li>
-            <!-- Wymagania (zagnieżdżone dropdowny) -->
             <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#general" id="dropdownWymagania" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Wymagania</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownWymagania">
-                <!-- Zestawienia -->
                 <li class="dropdown-submenu">
                 <a class="dropdown-item dropdown-toggle" href="#tables">
                     Zestawienia
@@ -54,7 +50,6 @@
                     </li>
                 </ul>
                 </li>
-                <!-- Standardy -->
                 <li class="dropdown-submenu">
                 <a class="dropdown-item dropdown-toggle" href="#modules">
                     Standardy
@@ -79,8 +74,6 @@
                 </li>
             </ul>
             </li>
-    
-            <!-- Eco rozwiązania -->
             <li class="nav-item dropdown">
             <a
                 class="nav-link dropdown-toggle"
@@ -104,18 +97,12 @@
                 </li>
             </ul>
             </li>
-    
-            <!-- Wizualizacje -->
             <li class="nav-item">
             <a class="nav-link" href="#visual">Wizualizacje</a>
             </li>
-    
-            <!-- Oznaczenia -->
             <li class="nav-item">
             <a class="nav-link" href="#legend">Oznaczenia</a>
             </li>
-    
-            <!-- Formularz -->
             <li class="nav-item">
             <a class="nav-link" href="#myform">Formularz</a>
             </li>
@@ -123,11 +110,8 @@
         </div>
     </nav>
     </header>
-      
-
 <main>
   <div class="container">
-    <!-- Opis -->
     <div class="row">
       <div class="col-md-10 offset-md-1 text-center text-white col-dark" id="use">
         <section>
@@ -139,23 +123,21 @@
           </fieldset>
           <h2>Zastosowanie BuildMaX</h2>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            Decyzja o zakupie działki jest podejmowana przez dewelopera na podstawie analizy chłonności, 
-            która określa procent zabudowy w stosunku do całej działki. Im wyższa wartość procentu zabudowy (powyżej 40 %) 
-            tym bardziej opłaca się zakup działki. Potrzeba także przeanalizować możliwe obszary problemowe takie jak 
-            np. duża ilość prac ziemnych czy stanowiska  archeologiczne.  Proces  ten  jest  czasochłonny  ze  względu  na  
-            potrzebę  analizy  wielu  dokumentów  oraz wykonanie  planów  zagospodarowania  działki  w  oparciu  o  standard 
+            Decyzja o zakupie działki jest podejmowana przez dewelopera na podstawie analizy chłonności,
+            która określa procent zabudowy w stosunku do całej działki. Im wyższa wartość procentu zabudowy (powyżej 40 %)
+            tym bardziej opłaca się zakup działki. Potrzeba także przeanalizować możliwe obszary problemowe takie jak
+            np. duża ilość prac ziemnych czy stanowiska  archeologiczne.  Proces  ten  jest  czasochłonny  ze  względu  na
+            potrzebę  analizy  wielu  dokumentów  oraz wykonanie  planów  zagospodarowania  działki  w  oparciu  o  standard
             budowlany  developera.  Wykonanie  standardowej analizy chłonności terenu zajmuje zwykle kilka tygodni.
           </p>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            BuildMaX  oblicza  <strong>maksymalną powierzchnię</strong> zabudowy dla wybranej działki 
+            BuildMaX  oblicza  <strong>maksymalną powierzchnię</strong> zabudowy dla wybranej działki
             w oparciu <br> o wybrany <strong>standard</strong> budowlany oraz uwarunkowania przestrzenne i prawne.
           </p>
           <button type="button" class="btn btn-warning">Wypełnij formularz</button>
         </section>
       </div>
     </div>
-
-    <!-- Opis budynków -->
     <div id="general">
       <h2>Wymagane budowle wraz z opisem przeznaczenia</h2>
       <dl>
@@ -169,7 +151,6 @@
         <dd>Budnynek techniczny do realizacji zadań związanych z wodą.</dd>
       </dl>
     </div>
-
     <div class="container">
       <div class="row">
         <div class="col-xs-6 col1" id="modules">
@@ -195,11 +176,8 @@
         </div>
       </div>
     </div>
-
-    <!-- Tabele -->
     <div class="row" id="tables">
       <h2>Przykładowe zestawienia</h2>
-
       <div class="col-md-6 justify-content-center align-items-center">
         <div class="table-responsive-md">
           <table class="table table-striped table-hover table-borderless table-dark align-middle" id="table1">
@@ -241,7 +219,6 @@
           </table>
         </div>
       </div>
-
       <div class="col-md-6 justify-content-center align-items-center">
         <div class="table-responsive-md">
           <table class="table table-striped table-hover table-borderless table-dark align-middle" id="table2">
@@ -271,8 +248,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Eko rozwiązania -->
     <div class="row">
       <section id="eco">
         <div class="col-md-12 text-white col3">
@@ -281,7 +256,6 @@
         </div>
       </section>
     </div>
-
     <div class="row g-4">
       <div class="col-xs-12 col-sm-6 col-md-3 col1 card border-warning" id="solar">
         <article class="eco-art">
@@ -291,13 +265,12 @@
           </figure>
           <h3>Panele fotowoltaiczne</h3>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            Wydajność instalacji fotowoltaicznej po 10 latach mieści się w granicach 80%. Szacuje się, 
+            Wydajność instalacji fotowoltaicznej po 10 latach mieści się w granicach 80%. Szacuje się,
             że panele fotowoltaiczne mogą pracować nawet przez 60 lat, bez przeszkód i większych napraw.
           </p>
           <p style="margin-bottom: 0cm; line-height: 100%"><a href="#" class="btn btn-warning">Wiecej</a></p>
         </article>
       </div>
-
       <div class="col-xs-12 col-sm-6 col-md-3 card border-warning" id="rain">
         <article class="eco-art">
           <figure>
@@ -306,14 +279,13 @@
           </figure>
           <h3>Deszczówka</h3>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            Woda deszczowa jest wodą czystą, wolną od bakterii, ale w momencie styczności z dachem zostaje 
-            zabrudzona i zmienia się w wodę szarą. W systemach gromadzenia wody deszczowej wykorzystuje się cały 
+            Woda deszczowa jest wodą czystą, wolną od bakterii, ale w momencie styczności z dachem zostaje
+            zabrudzona i zmienia się w wodę szarą. W systemach gromadzenia wody deszczowej wykorzystuje się cały
             układ filtrów, dzięki którym woda, zanim trafi do zbiornika, zostaje oczyszczona.
           </p>
           <p style="margin-bottom: 0cm; line-height: 100%"><a href="#" class="btn btn-warning">Wiecej</a></p>
         </article>
       </div>
-
       <div class="col-xs-12 col-sm-6 col-md-3 col1 card border-warning" id="recu">
         <article class="eco-art">
           <figure>
@@ -322,15 +294,14 @@
           </figure>
           <h3>Stacje ładowania</h3>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            Stacja ładowania do samochodu elektrycznego AC wykorzystuje prąd zmienny, 
-            a jej moc to od 3,7 kW do nawet 43 kW. Produkowana jest w dwóch wariantach 
+            Stacja ładowania do samochodu elektrycznego AC wykorzystuje prąd zmienny,
+            a jej moc to od 3,7 kW do nawet 43 kW. Produkowana jest w dwóch wariantach
             – wiszącym (wallbox) i wolnostojącym.
           </p>
           <p style="margin-bottom: 0cm; line-height: 100%"><a href="#" class="btn btn-warning">Wiecej</a></p>
         </article>
       </div>
     </div>
-
     <div id="myCarousel" class="carousel slide text-center">
       <section id="visual">
         <h2>Wizualizacje magazynów</h2>
@@ -366,7 +337,6 @@
         </button>
       </section>
     </div>
-
     <section id="legend">
       <h2>Przykład stosowanych oznaczeń terenu na podstawie planu miejscowego</h2>
       <p style="margin-bottom: 0cm; line-height: 100%"re>
@@ -392,8 +362,6 @@
       </pre>
       <p style="margin-bottom: 0cm; line-height: 100%">Źródło: https://bip.warszawa.pl/web/rada-warszawy/-/uchwala-nr-lxiii-1953-2009-z-2009-10-08-4757056-508311-4877750-1925578-1360431</p>
     </section>
-
-    <!-- form -->
     <div class="row" id="formstyle">
       <section id="myform">
         <h2>Informacje do analizy</h2>
@@ -404,24 +372,20 @@
               <label for="land">Kraj:</label>
               <input type="text" id="land" class="form-control" name="land" required placeholder="Wpisz nazwę kraju">
             </div>
-
             <div class="form-group">
               <label for="city">Miejscowość:</label>
               <input type="text" id="city" class="form-control" name="city" required placeholder="Wpisz nazwę miejscowości">
             </div>
-
             <div class="form-group">
               <label for="street">Ulica:</label>
               <input type="text" id="street" class="form-control" name="street" required placeholder="Wpisz nazwę ulicy">
             </div>
-
             <div class="form-group">
               <label for="plot">Nr działki:</label>
-              <input type="text" id="plot" class="form-control" name="plot" required 
-                     placeholder="Wpisz numer działki" pattern="^\d{1,5}$" 
+              <input type="text" id="plot" class="form-control" name="plot" required
+                     placeholder="Wpisz numer działki" pattern="^\d{1,5}$"
                      title="Numer działki powinien zawierać tylko cyfry (maksymalnie 5 cyfr)">
             </div>
-
             <div class="form-group">
               <label for="book-yes">Czy księga wieczysta:</label><br>
               <input type="radio" id="book-yes" name="book" value="yes" required>
@@ -429,17 +393,14 @@
               <input type="radio" id="book-no" name="book" value="no">
               <label for="book-no">Nie</label>
             </div>
-
             <div class="form-group">
               <label for="range">Ilość zieleni oczekiwana przez plan miejscowy w procentach:</label>
               <input type="range" id="range" name="range" min="1" max="100">
             </div>
-
             <div class="form-group">
               <label for="file">Prześlij plan miejscowy lub warunki zabudowy:</label>
               <input type="file" id="file" name="file">
             </div>
-
             <h4>Dane dotyczące parametrów budowlanych</h4>
             <div class="form-group">
               <label for="size">Wybierz moduł magazynu:</label>
@@ -450,34 +411,28 @@
                 <option value="12x12">12x12</option>
               </select>
             </div>
-
             <p style="margin-bottom: 0cm; line-height: 100%">Wybierz dodatkowe budowlne:</p>
             <div class="form-group">
               <label for="smoke">Wiata dla palaczy</label>
               <input type="checkbox" id="smoke" name="mp[]" value="smoke">
             </div>
-
             <div class="form-group">
               <label for="bicycle">Wiata rowerowa</label>
               <input type="checkbox" id="bicycle" name="mp[]" value="bicycle">
             </div>
-
             <div class="checkbox">
               <label for="trash">Wiata śmietnikowa</label>
               <input type="checkbox" id="trash" name="mp[]" value="trash">
             </div>
-
             <div class="checkbox">
               <label for="recreation">Miejsce rekreacji</label>
               <input type="checkbox" id="recreation" name="mp[]" value="recreation">
             </div>
-
             <div class="form-group">
               <label for="comments">Dodatkowe uwagi:</label>
-              <textarea id="comments"  name="comments" rows="4" cols="50" 
+              <textarea id="comments"  name="comments" rows="4" cols="50"
                         placeholder="Wpisz dodatkowe uwagi"></textarea>
             </div>
-
             <div>
               <button type="submit" class="btn btn-outline-warning">Wyślij</button>
               <button type="reset" class="btn btn-outline-secondary">Reset</button>
@@ -486,10 +441,8 @@
         </fieldset>
       </section>
     </div>
-
   </div>
   <div class="container">
-    <!-- Opis -->
     <div class="row">
       <div class="col-md-10 offset-md-1 text-center text-white col-dark" id="use">
         <section>
@@ -501,23 +454,21 @@
           </fieldset>
           <h2>Zastosowanie BuildMaX</h2>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            Decyzja o zakupie działki jest podejmowana przez dewelopera na podstawie analizy chłonności, 
-            która określa procent zabudowy w stosunku do całej działki. Im wyższa wartość procentu zabudowy (powyżej 40 %) 
-            tym bardziej opłaca się zakup działki. Potrzeba także przeanalizować możliwe obszary problemowe takie jak 
-            np. duża ilość prac ziemnych czy stanowiska  archeologiczne.  Proces  ten  jest  czasochłonny  ze  względu  na  
-            potrzebę  analizy  wielu  dokumentów  oraz wykonanie  planów  zagospodarowania  działki  w  oparciu  o  standard 
+            Decyzja o zakupie działki jest podejmowana przez dewelopera na podstawie analizy chłonności,
+            która określa procent zabudowy w stosunku do całej działki. Im wyższa wartość procentu zabudowy (powyżej 40 %)
+            tym bardziej opłaca się zakup działki. Potrzeba także przeanalizować możliwe obszary problemowe takie jak
+            np. duża ilość prac ziemnych czy stanowiska  archeologiczne.  Proces  ten  jest  czasochłonny  ze  względu  na
+            potrzebę  analizy  wielu  dokumentów  oraz wykonanie  planów  zagospodarowania  działki  w  oparciu  o  standard
             budowlany  developera.  Wykonanie  standardowej analizy chłonności terenu zajmuje zwykle kilka tygodni.
           </p>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            BuildMaX  oblicza  <strong>maksymalną powierzchnię</strong> zabudowy dla wybranej działki 
+            BuildMaX  oblicza  <strong>maksymalną powierzchnię</strong> zabudowy dla wybranej działki
             w oparciu <br> o wybrany <strong>standard</strong> budowlany oraz uwarunkowania przestrzenne i prawne.
           </p>
           <button type="button" class="btn btn-warning">Wypełnij formularz</button>
         </section>
       </div>
     </div>
-
-    <!-- Opis budynków -->
     <div id="general">
       <h2>Wymagane budowle wraz z opisem przeznaczenia</h2>
       <dl>
@@ -531,7 +482,6 @@
         <dd>Budnynek techniczny do realizacji zadań związanych z wodą.</dd>
       </dl>
     </div>
-
     <div class="container">
       <div class="row">
         <div class="col-xs-6 col1" id="modules">
@@ -557,11 +507,8 @@
         </div>
       </div>
     </div>
-
-    <!-- Tabele -->
     <div class="row" id="tables">
       <h2>Przykładowe zestawienia</h2>
-
       <div class="col-md-6 justify-content-center align-items-center">
         <div class="table-responsive-md">
           <table class="table table-striped table-hover table-borderless table-dark align-middle" id="table1">
@@ -603,7 +550,6 @@
           </table>
         </div>
       </div>
-
       <div class="col-md-6 justify-content-center align-items-center">
         <div class="table-responsive-md">
           <table class="table table-striped table-hover table-borderless table-dark align-middle" id="table2">
@@ -633,8 +579,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Eko rozwiązania -->
     <div class="row">
       <section id="eco">
         <div class="col-md-12 text-white col3">
@@ -643,7 +587,6 @@
         </div>
       </section>
     </div>
-
     <div class="row g-4">
       <div class="col-xs-12 col-sm-6 col-md-3 col1 card border-warning" id="solar">
         <article class="eco-art">
@@ -653,13 +596,12 @@
           </figure>
           <h3>Panele fotowoltaiczne</h3>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            Wydajność instalacji fotowoltaicznej po 10 latach mieści się w granicach 80%. Szacuje się, 
+            Wydajność instalacji fotowoltaicznej po 10 latach mieści się w granicach 80%. Szacuje się,
             że panele fotowoltaiczne mogą pracować nawet przez 60 lat, bez przeszkód i większych napraw.
           </p>
           <p style="margin-bottom: 0cm; line-height: 100%"><a href="#" class="btn btn-warning">Wiecej</a></p>
         </article>
       </div>
-
       <div class="col-xs-12 col-sm-6 col-md-3 card border-warning" id="rain">
         <article class="eco-art">
           <figure>
@@ -668,14 +610,13 @@
           </figure>
           <h3>Deszczówka</h3>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            Woda deszczowa jest wodą czystą, wolną od bakterii, ale w momencie styczności z dachem zostaje 
-            zabrudzona i zmienia się w wodę szarą. W systemach gromadzenia wody deszczowej wykorzystuje się cały 
+            Woda deszczowa jest wodą czystą, wolną od bakterii, ale w momencie styczności z dachem zostaje
+            zabrudzona i zmienia się w wodę szarą. W systemach gromadzenia wody deszczowej wykorzystuje się cały
             układ filtrów, dzięki którym woda, zanim trafi do zbiornika, zostaje oczyszczona.
           </p>
           <p style="margin-bottom: 0cm; line-height: 100%"><a href="#" class="btn btn-warning">Wiecej</a></p>
         </article>
       </div>
-
       <div class="col-xs-12 col-sm-6 col-md-3 col1 card border-warning" id="recu">
         <article class="eco-art">
           <figure>
@@ -684,15 +625,14 @@
           </figure>
           <h3>Stacje ładowania</h3>
           <p style="margin-bottom: 0cm; line-height: 100%">
-            Stacja ładowania do samochodu elektrycznego AC wykorzystuje prąd zmienny, 
-            a jej moc to od 3,7 kW do nawet 43 kW. Produkowana jest w dwóch wariantach 
+            Stacja ładowania do samochodu elektrycznego AC wykorzystuje prąd zmienny,
+            a jej moc to od 3,7 kW do nawet 43 kW. Produkowana jest w dwóch wariantach
             – wiszącym (wallbox) i wolnostojącym.
           </p>
           <p style="margin-bottom: 0cm; line-height: 100%"><a href="#" class="btn btn-warning">Wiecej</a></p>
         </article>
       </div>
     </div>
-
     <div id="myCarousel" class="carousel slide text-center">
       <section id="visual">
         <h2>Wizualizacje magazynów</h2>
@@ -728,7 +668,6 @@
         </button>
       </section>
     </div>
-
     <section id="legend">
       <h2>Przykład stosowanych oznaczeń terenu na podstawie planu miejscowego</h2>
       <p style="margin-bottom: 0cm; line-height: 100%"re>
@@ -754,8 +693,6 @@
       </pre>
       <p style="margin-bottom: 0cm; line-height: 100%">Źródło: https://bip.warszawa.pl/web/rada-warszawy/-/uchwala-nr-lxiii-1953-2009-z-2009-10-08-4757056-508311-4877750-1925578-1360431</p>
     </section>
-
-    <!-- form -->
     <div class="row" id="formstyle">
       <section id="myform">
         <h2>Informacje do analizy</h2>
@@ -766,24 +703,20 @@
               <label for="land">Kraj:</label>
               <input type="text" id="land" class="form-control" name="land" required placeholder="Wpisz nazwę kraju">
             </div>
-
             <div class="form-group">
               <label for="city">Miejscowość:</label>
               <input type="text" id="city" class="form-control" name="city" required placeholder="Wpisz nazwę miejscowości">
             </div>
-
             <div class="form-group">
               <label for="street">Ulica:</label>
               <input type="text" id="street" class="form-control" name="street" required placeholder="Wpisz nazwę ulicy">
             </div>
-
             <div class="form-group">
               <label for="plot">Nr działki:</label>
-              <input type="text" id="plot" class="form-control" name="plot" required 
-                     placeholder="Wpisz numer działki" pattern="^\d{1,5}$" 
+              <input type="text" id="plot" class="form-control" name="plot" required
+                     placeholder="Wpisz numer działki" pattern="^\d{1,5}$"
                      title="Numer działki powinien zawierać tylko cyfry (maksymalnie 5 cyfr)">
             </div>
-
             <div class="form-group">
               <label for="book-yes">Czy księga wieczysta:</label><br>
               <input type="radio" id="book-yes" name="book" value="yes" required>
@@ -791,17 +724,14 @@
               <input type="radio" id="book-no" name="book" value="no">
               <label for="book-no">Nie</label>
             </div>
-
             <div class="form-group">
               <label for="range">Ilość zieleni oczekiwana przez plan miejscowy w procentach:</label>
               <input type="range" id="range" name="range" min="1" max="100">
             </div>
-
             <div class="form-group">
               <label for="file">Prześlij plan miejscowy lub warunki zabudowy:</label>
               <input type="file" id="file" name="file">
             </div>
-
             <h4>Dane dotyczące parametrów budowlanych</h4>
             <div class="form-group">
               <label for="size">Wybierz moduł magazynu:</label>
@@ -812,34 +742,28 @@
                 <option value="12x12">12x12</option>
               </select>
             </div>
-
             <p style="margin-bottom: 0cm; line-height: 100%">Wybierz dodatkowe budowlne:</p>
             <div class="form-group">
               <label for="smoke">Wiata dla palaczy</label>
               <input type="checkbox" id="smoke" name="mp[]" value="smoke">
             </div>
-
             <div class="form-group">
               <label for="bicycle">Wiata rowerowa</label>
               <input type="checkbox" id="bicycle" name="mp[]" value="bicycle">
             </div>
-
             <div class="checkbox">
               <label for="trash">Wiata śmietnikowa</label>
               <input type="checkbox" id="trash" name="mp[]" value="trash">
             </div>
-
             <div class="checkbox">
               <label for="recreation">Miejsce rekreacji</label>
               <input type="checkbox" id="recreation" name="mp[]" value="recreation">
             </div>
-
             <div class="form-group">
               <label for="comments">Dodatkowe uwagi:</label>
-              <textarea id="comments"  name="comments" rows="4" cols="50" 
+              <textarea id="comments"  name="comments" rows="4" cols="50"
                         placeholder="Wpisz dodatkowe uwagi"></textarea>
             </div>
-
             <div>
               <button type="submit" class="btn btn-outline-warning">Wyślij</button>
               <button type="reset" class="btn btn-outline-secondary">Reset</button>
@@ -848,25 +772,19 @@
         </fieldset>
       </section>
     </div>
-
   </div>
 </main>
-
-<!-- Footer -->
 <footer>
   <details>
     <summary>&copy; Wszelkie prawa zastrzeżone 2025</summary>
     <p style="margin-bottom: 0cm; line-height: 100%">Autor: Paulina Kimak</p>
   </details>
 </footer>
-
-<!-- Bootstrap JavaScript Libraries -->
 <script
   src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
   integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
   crossorigin="anonymous"
 ></script>
-
 <script
   src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
   integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"

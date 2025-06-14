@@ -48,15 +48,22 @@ func EmbedMsg(MessageFile, CoverFile string, method int) error {
 	if err != nil {
 		return err
 	}
+	// //  BACKUP oryginału cover.html
+	// backup := "files/cover_original.html"
+	// inputOriginal, err := os.ReadFile(CoverFile)
+	// if err == nil {
+	// 	_ = os.WriteFile(backup, inputOriginal, 0644)
+	// 	log.Println("[INFO] Backup of cover.html saved as files/cover_original.html")
+	// }
 
 	err = helpers.ClearHtml(CoverFile)
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		log.Println("Cleaned HTML saved as files/clearfile.html")
+		log.Println("Cleaned HTML saved as files/cover.html")
 	}
 
-	input, err := os.ReadFile(ClearedHtml)
+	input, err := os.ReadFile(CoverFile)
 	if err != nil {
 		return err
 	}

@@ -20,7 +20,7 @@ func SetLogger() {
 	}
 
 	log.SetOutput(logFile)
-	log.SetPrefix("[Elgamal] ")
+	log.SetPrefix("[Steganpgraphy] ")
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 }
 
@@ -106,7 +106,7 @@ func ClearHtml(htmlFile string) error {
 	}
 
 	finalContent := strings.Join(cleanedLines, "\n")
-	return os.WriteFile("files/clearfile.html", []byte(finalContent), 0644)
+	return os.WriteFile(htmlFile, []byte(finalContent), 0644)
 }
 
 // IsHex checks if the bit string has a length that's a multiple of 4
