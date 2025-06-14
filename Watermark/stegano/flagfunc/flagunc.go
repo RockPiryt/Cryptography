@@ -15,7 +15,7 @@ const (
 	MessageFile    		= "files/mess.txt"
 	CoverFile      		= "files/cover.html"
 	ClearedHtml			= "files/clearfile.html"
-	WatermarkFile    	= "files/watermatk.html"
+	WatermarkFile    	= "files/watermark.html"
 	DetectFile 			= "files/detect.txt"
 )
 
