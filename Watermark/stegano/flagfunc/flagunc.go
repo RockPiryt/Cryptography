@@ -183,27 +183,37 @@ func embedMethod3(input []byte, messageBits string) error {
 }
 
 
-// Method 4: Embed bits using extra <font> tag patterns
+// Method 4: Embed bits using extra <div> tag patterns
 // 1 → duplicate open-close-open pattern, 0 → duplicate closing tags
 func embedMethod4(input []byte, messageBits string) error {
 	text := string(input)
-	fontRegex := regexp.MustCompile(`(?i)<font[^>]*>`)
-	matches := fontRegex.FindAllStringIndex(text, -1)
+
+	// Find <div ...>
+	divRegex := regexp.MustCompile(`(?i)<div[^>]*>`)
+	matches := divRegex.FindAllStringIndex(text, -1)
+
 	if len(messageBits) > len(matches) {
 		return errors.New("cover file too small for message (method 4)")
 	}
+
 	var sb strings.Builder
 	last := 0
+
 	for i, match := range matches {
 		sb.WriteString(text[last:match[1]])
-		if messageBits[i] == '1' {
-			sb.WriteString("</font><font>")
+
+		// Hide 1 
+		if i < len(messageBits) && messageBits[i] == '1' {
+			sb.WriteString("</div><div>")
 		}
+
 		last = match[1]
 	}
+
 	sb.WriteString(text[last:])
 	return os.WriteFile(WatermarkFile, []byte(sb.String()), 0644)
 }
+
 
 
 // Extraction for Method 1: Check if line ends with space
@@ -277,22 +287,34 @@ func extractMethod3(input []byte, DetectFile string) error {
 // Extraction for Method 4: Detect open-close-open <font> tag sequence
 func extractMethod4(input []byte, DetectFile string) error {
 	text := string(input)
-	open := regexp.MustCompile(`(?i)<font[^>]*>`)
-	sequence := open.FindAllString(text, -1)
+
+	// Znajdź wszystkie otwarcia <div ...>
+	open := regexp.MustCompile(`(?i)<div[^>]*>`)
+	openTags := open.FindAllStringIndex(text, -1)
+
 	var bits strings.Builder
-	for i := 0; i < len(sequence)-2; i++ {
-		if sequence[i] == sequence[i+2] {
+	i := 0
+
+	for i < len(openTags)-1 {
+		// Sprawdź, czy zaraz po tagu <div> występuje "</div><div"
+		if strings.HasPrefix(text[openTags[i][1]:], "</div><div") {
 			bits.WriteByte('1')
-			i += 2
+			i++ // pominąć następny tag-div w sekwencji
 		} else {
 			bits.WriteByte('0')
 		}
+		i++
+
+		// Opcjonalne zakończenie, gdy odzyskano cały komunikat
 		if bits.Len()%4 == 0 && helpers.IsHex(bits.String()) {
 			if helpers.BitsToHex(bits.String()) == helpers.ReadFileContent("files/mess.txt") {
 				break
 			}
 		}
 	}
+
 	hexMsg := helpers.BitsToHex(bits.String())
 	return os.WriteFile(DetectFile, []byte(hexMsg), 0644)
 }
+
+
