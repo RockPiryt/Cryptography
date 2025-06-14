@@ -107,6 +107,7 @@ func ExtractMsg(WatermarkFile, DetectFile string, method int) error {
 func embedMethod1(input []byte, messageBits string) error {
 	lines := strings.Split(string(input), "\n")
 	if len(messageBits) > len(lines) {
+		fmt.Println("cover file too small for message (method 1)")
 		return errors.New("cover file too small for message (method 1)")
 	}
 	var outLines []string
@@ -130,6 +131,7 @@ func embedMethod2(input []byte, messageBits string) error {
 	spaceRegions := regexp.MustCompile(`[^\S
 ]+`).FindAllStringIndex(text, -1)
 	if len(messageBits) > len(spaceRegions) {
+		fmt.Printf("cover file too small for message (method 2)")
 		return errors.New("cover file too small for message (method 2)")
 	}
 	var sb strings.Builder
@@ -159,6 +161,7 @@ func embedMethod3(input []byte, messageBits string) error {
 	styleMatches := styleRegex.FindAllStringIndex(text, -1)
 
 	if len(messageBits) > len(styleMatches) {
+		fmt.Println("cover file too small for message (method 3)")
 		return errors.New("cover file too small for message (method 3)")
 	}
 
@@ -200,6 +203,7 @@ func embedMethod4(input []byte, messageBits string) error {
 	matches := divRegex.FindAllStringIndex(text, -1)
 
 	if len(messageBits) > len(matches) {
+		fmt.Printf("cover file too small for message (method 4)")
 		return errors.New("cover file too small for message (method 4)")
 	}
 

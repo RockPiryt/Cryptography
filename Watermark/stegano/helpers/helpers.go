@@ -78,26 +78,38 @@ func SaveHexToFile(input, filename string) error {
 	return os.WriteFile(filename, []byte(hexStr), 0644)
 }
 
-
-// ClearHtml removes HTML comments, empty lines, and trailing spaces from each line, then saves the cleaned content to 'clearfile.html'.
+// ClearHtml removes HTML comments, unnecessary whitespace, and previously embedded steganographic markers
 func ClearHtml(htmlFile string) error {
 	content, err := os.ReadFile(htmlFile)
 	if err != nil {
 		return err
 	}
 
-	// Remove HTML comments: <!-- ... -->
+	// 1. Remove HTML comments <!-- ... -->
 	commentRegex := regexp.MustCompile(`(?s)<!--.*?-->`)
 	cleaned := commentRegex.ReplaceAllString(string(content), "")
 
-	// Process line by line
+	// 2. Remove known steganographic artifacts from previous embeddings:
+	// - method 2: double spaces
+	cleaned = strings.ReplaceAll(cleaned, "  ", " ")
+
+	// - method 3: fix intentionally broken CSS attributes
+	cleaned = strings.ReplaceAll(cleaned, "margin-botom", "margin-bottom")
+	cleaned = strings.ReplaceAll(cleaned, "lineheight", "line-height")
+
+	// - method 4: remove artificially injected </div><div> sequences
+	cleaned = strings.ReplaceAll(cleaned, "</div><div>", "")
+
+	// 3. Line-by-line processing for:
+	// - method 1: trim trailing spaces
+	// - remove empty lines
 	var cleanedLines []string
 	scanner := bufio.NewScanner(strings.NewReader(cleaned))
 	for scanner.Scan() {
 		line := scanner.Text()
-		line = strings.TrimRight(line, " \t")      // Remove trailing spaces/tabs
-		line = strings.TrimLeft(line, "\t")        // Optional: remove leading tabs
-		if strings.TrimSpace(line) != "" {         // Skip completely empty lines
+		line = strings.TrimRight(line, " \t") // trailing spaces/tabs
+		line = strings.TrimLeft(line, "\t")   // optional: leading tabs
+		if strings.TrimSpace(line) != "" {
 			cleanedLines = append(cleanedLines, line)
 		}
 	}
