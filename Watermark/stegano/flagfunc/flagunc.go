@@ -150,26 +150,38 @@ func embedMethod3(input []byte, messageBits string) error {
 	text := string(input)
 	styleRegex := regexp.MustCompile(`<p[^>]*style="[^"]*"[^>]*>`)
 	styleMatches := styleRegex.FindAllStringIndex(text, -1)
+
 	if len(messageBits) > len(styleMatches) {
 		return errors.New("cover file too small for message (method 3)")
 	}
+
 	var sb strings.Builder
 	last := 0
+
 	for i, match := range styleMatches {
 		sb.WriteString(text[last:match[0]])
 		original := text[match[0]:match[1]]
 		modified := original
-		if messageBits[i] == '1' {
-			modified = strings.Replace(modified, "line-height", "lineheight", 1)
-		} else {
-			modified = strings.Replace(modified, "margin-bottom", "margin-botom", 1)
+
+		// Embed bit only if available
+		if i < len(messageBits) {
+			if messageBits[i] == '1' {
+				modified = strings.Replace(modified, "line-height", "lineheight", 1)
+			} else if messageBits[i] == '0' {
+				modified = strings.Replace(modified, "margin-bottom", "margin-botom", 1)
+			} else {
+				return fmt.Errorf("invalid bit at position %d: %c", i, messageBits[i])
+			}
 		}
+
 		sb.WriteString(modified)
 		last = match[1]
 	}
+
 	sb.WriteString(text[last:])
 	return os.WriteFile(WatermarkFile, []byte(sb.String()), 0644)
 }
+
 
 // Method 4: Embed bits using extra <font> tag patterns
 // 1 → duplicate open-close-open pattern, 0 → duplicate closing tags

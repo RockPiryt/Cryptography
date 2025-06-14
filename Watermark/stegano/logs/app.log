@@ -1,3 +1,2 @@
-[Elgamal] 2025/06/14 16:04:38 stegano.go:66: Hex saved to mess.txt
-[Elgamal] 2025/06/14 16:04:38 flagunc.go:56: Cleaned HTML saved as files/clearfile.html
-[Elgamal] 2025/06/14 16:04:38 flagunc.go:30: [INFO] Text successfully embeded into watermark.html.
+[Elgamal] 2025/06/14 16:16:54 stegano.go:66: Hex saved to mess.txt
+[Elgamal] 2025/06/14 16:16:54 flagunc.go:38: [INFO] Text successfully decrypted into decrypt.txt.
