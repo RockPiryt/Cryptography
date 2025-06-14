@@ -4,7 +4,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 
 	"stegano/flagfunc"
@@ -62,9 +61,9 @@ func main() {
 	var msg string = "bla"
 	err := helpers.SaveHexToFile(msg, "files/mess.txt")
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Println("Error:", err)
 	} else {
-		fmt.Println("Hex saved to mess.txt")
+		log.Println("Hex saved to mess.txt")
 	}
 
 	// Execute main program logic

@@ -53,7 +53,7 @@ func EmbedMsg(MessageFile, CoverFile string, method int) error {
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		fmt.Println("Cleaned HTML saved as files/clearfile.html")
+		log.Println("Cleaned HTML saved as files/clearfile.html")
 	}
 
 	input, err := os.ReadFile(ClearedHtml)
